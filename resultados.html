@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - Actividades de Mejora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { margin: 0; font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(to bottom, #e3f2fd, #bbdefb); min-height: 100vh; color: #2f4f4f; }
+        .navbar { background-color: #1565c0; color: white; padding: 15px 30px; font-size: 20px; font-weight: 500; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; justify-content: space-between; align-items: center; }
+        .project-name { font-size: 18px; }
+        .container { max-width: 900px; margin: 60px auto; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); text-align: center; }
+        h1 { color: #0d47a1; margin-bottom: 30px; }
+        .success-message { font-size: 20px; margin: 40px 0; color: #1565c0; line-height: 1.6; }
+        .pdf-info { font-size: 16px; margin: 30px 0; padding: 20px; background: #f5fbff; border-radius: 10px; border-left: 5px solid #1976d2; }
+        .buttons { margin-top: 50px; }
+        .btn-primary { background-color: #1976d2; color: white; padding: 14px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3); transition: all 0.3s ease; margin: 10px; }
+        .btn-primary:hover { background-color: #1565c0; transform: translateY(-3px); }
+        .btn-secondary { background-color: #78909c; }
+        .btn-secondary:hover { background-color: #607d8b; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>Desarrollo de formularios para actividades de mejora</div>
+        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+    </div>
+
+    <div class="container">
+        <h1>¡Informe generado con éxito!</h1>
+
+        <div class="success-message">
+            El informe PDF de su proyecto ha sido generado y descargado automáticamente.<br>
+            Puede encontrarlo en la carpeta de descargas de su navegador.
+        </div>
+
+        <div class="pdf-info">
+            <strong>Nombre del archivo:</strong> <span id="filenameDisplay"></span><br><br>
+            <button class="btn-primary" id="downloadAgainBtn">Descargar PDF nuevamente</button>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-primary btn-secondary" onclick="window.location.href='index.html'">Volver al menú principal</button>
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('projectData') || '{}');
+        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+
+        let pdfBlob = null;
+        let filename = `informe_${(data.projectName || 'proyecto').replace(/ /g, '_')}.pdf`;
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let y = 20;
+            const margen = 20;
+            const anchoPagina = doc.internal.pageSize.width;
+
+            // 1. PORTADA
+            doc.setFontSize(24);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("INFORME COMPLETO DE PROYECTO", anchoPagina / 2, 80, { align: "center" });
+            
+            doc.setFontSize(18);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.projectName || "Proyecto sin nombre", anchoPagina / 2, 110, { align: "center" });
+            
+            const hoy = new Date().toLocaleDateString('es-ES');
+            doc.setFontSize(14);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generado el: ${hoy}`, anchoPagina / 2, 130, { align: "center" });
+            
+            // Nueva página para contenido
+            doc.addPage();
+            y = margen;
+
+            // 2. CRITERIOS Y PESOS
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("1. CRITERIOS Y PESOS", margen, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "normal");
+            
+            let sumaPesos = 0;
+            for (let i = 1; i <= 4; i++) {
+                const criterio = data[`criterio${i}`] || `Criterio ${i}`;
+                const peso = parseFloat(data[`peso${i}`]) || 0;
+                sumaPesos += peso;
+                
+                doc.text(`${i}. ${criterio}`, margen, y);
+                doc.text(`Peso: ${peso.toFixed(1)}`, margen + 100, y);
+                y += 10;
+                
+                if (y > 280) {
+                    doc.addPage();
+                    y = margen;
+                }
+            }
+            
+            doc.setFont("helvetica", "bold");
+            doc.text(`SUMA TOTAL DE PESOS: ${sumaPesos.toFixed(1)}`, margen, y);
+            y += 15;
+            doc.setFont("helvetica", "normal");
+            
+            y += 10;
+
+            // 3. IDEAS / CONCEPTOS INICIALES
+            if (y > 250) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("2. IDEAS / CONCEPTOS INICIALES", margen, y);
+            y += 15;
+            
+            for (let i = 1; i <= 5; i++) {
+                const concepto = data[`concepto${i}`] || `Idea ${i}`;
+                doc.text(`${i}. ${concepto}`, margen, y);
+                y += 10;
+                
+                if (y > 280) {
+                    doc.addPage();
+                    y = margen;
+                }
+            }
+            
+            y += 10;
+
+            // 4. EVALUACIÓN INICIAL DE IDEAS
+            if (y > 220) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("3. EVALUACIÓN INICIAL DE IDEAS", margen, y);
+            y += 15;
+            
+            // Verificar si hay datos de evaluación inicial
+            let tieneEvaluacionInicial = false;
+            for (let conc = 1; conc <= 5; conc++) {
+                for (let i = 1; i <= 4; i++) {
+                    if (data[`calif${conc}_${i}`]) {
+                        tieneEvaluacionInicial = true;
+                        break;
+                    }
+                }
+                if (tieneEvaluacionInicial) break;
+            }
+            
+            if (tieneEvaluacionInicial) {
+                for (let conc = 1; conc <= 5; conc++) {
+                    if (y > 240) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(13, 71, 161);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`Idea ${conc}: ${data[`concepto${conc}`] || `Idea ${conc}`}`, margen, y);
+                    y += 12;
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    
+                    let total = 0;
+                    let tieneDatos = false;
+                    
+                    for (let i = 1; i <= 4; i++) {
+                        const calif = parseFloat(data[`calif${conc}_${i}`]) || 0;
+                        const peso = parseFloat(data[`peso${i}`]) || 0;
+                        
+                        if (data[`calif${conc}_${i}`]) {
+                            tieneDatos = true;
+                            const ponderado = calif * peso;
+                            total += ponderado;
+                            
+                            const criterio = data[`criterio${i}`] || `Criterio ${i}`;
+                            doc.text(`  ${criterio}: ${calif.toFixed(1)} × ${peso.toFixed(1)} = ${ponderado.toFixed(2)}`, margen + 10, y);
+                            y += 8;
+                            
+                            if (y > 280) {
+                                doc.addPage();
+                                y = margen;
+                            }
+                        }
+                    }
+                    
+                    if (tieneDatos) {
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
+                        doc.setFont("helvetica", "normal");
+                        y += 12;
+                    }
+                    
+                    y += 10;
+                }
+            } else {
+                doc.text("No hay datos de evaluación inicial", margen, y);
+                y += 10;
+            }
+            
+            y += 10;
+
+            // 5. EXPLORACIÓN DE POSIBILIDADES
+            if (y > 200) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("4. EXPLORACIÓN DE POSIBILIDADES", margen, y);
+            y += 15;
+            
+            // Verificar si hay datos de posibilidades
+            let tienePosibilidades = false;
+            for (let i = 1; i <= 15; i++) {
+                if (data[`pos${i}`]) {
+                    tienePosibilidades = true;
+                    break;
+                }
+            }
+            
+            if (tienePosibilidades) {
+                for (let conc = 1; conc <= 5; conc++) {
+                    if (y > 250) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(13, 71, 161);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`Para ${data[`concepto${conc}`] || `Idea ${conc}`}`, margen, y);
+                    y += 12;
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    
+                    for (let row = 1; row <= 3; row++) {
+                        const posIdx = (conc - 1) * 3 + row;
+                        const posibilidad = data[`pos${posIdx}`] || "";
+                        
+                        if (posibilidad) {
+                            doc.text(`  Opción ${row}: ${posibilidad}`, margen + 10, y);
+                            y += 8;
+                            
+                            if (y > 280) {
+                                doc.addPage();
+                                y = margen;
+                            }
+                        }
+                    }
+                    
+                    y += 10;
+                }
+            } else {
+                doc.text("No hay datos de exploración de posibilidades", margen, y);
+                y += 10;
+            }
+            
+            y += 10;
+
+            // 6. FORMACIÓN DE CONCEPTOS
+            if (y > 200) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("5. FORMACIÓN DE CONCEPTOS", margen, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(80, 80, 80);
+            doc.text("(Selecciones realizadas con checkboxes)", margen, y);
+            y += 10;
+            
+            // Verificar si hay selecciones
+            let tieneSelecciones = false;
+            for (let i = 1; i <= 15; i++) {
+                if (data[`pastel_grupo${i}`]) {
+                    tieneSelecciones = true;
+                    break;
+                }
+            }
+            
+            if (tieneSelecciones) {
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                
+                // Mostrar tabla de selecciones
+                doc.text("Resumen de selecciones por grupo:", margen, y);
+                y += 10;
+                
+                for (let i = 1; i <= 15; i++) {
+                    const seleccion = data[`pastel_grupo${i}`];
+                    if (seleccion) {
+                        // Determinar a qué idea original pertenece
+                        const ideaOriginal = Math.ceil(i / 3);
+                        const nombreIdea = data[`concepto${ideaOriginal}`] || `Idea ${ideaOriginal}`;
+                        
+                        doc.text(`  Grupo ${i} (de ${nombreIdea}): ${seleccion}`, margen + 10, y);
+                        y += 8;
+                        
+                        if (y > 280) {
+                            doc.addPage();
+                            y = margen;
+                        }
+                    }
+                }
+            } else {
+                doc.text("No hay selecciones realizadas", margen, y);
+                y += 10;
+            }
+            
+            y += 15;
+
+            // 7. CONCEPTOS FORMADOS (3 conceptos de 5 ideas)
+            if (y > 220) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("6. CONCEPTOS FORMADOS", margen, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(80, 80, 80);
+            doc.text("(Los 3 conceptos creados a partir de las selecciones)", margen, y);
+            y += 10;
+            
+            // Los 3 conceptos formados
+            const conceptosFormados = [
+                { nombre: "Concepto Formado 1", grupos: [1, 4, 7, 10, 13] },
+                { nombre: "Concepto Formado 2", grupos: [2, 5, 8, 11, 14] },
+                { nombre: "Concepto Formado 3", grupos: [3, 6, 9, 12, 15] }
+            ];
+            
+            let tieneConceptos = false;
+            
+            for (const concepto of conceptosFormados) {
+                if (y > 240) {
+                    doc.addPage();
+                    y = margen;
+                }
+                
+                doc.setFontSize(14);
+                doc.setTextColor(13, 71, 161);
+                doc.setFont("helvetica", "bold");
+                doc.text(concepto.nombre, margen, y);
+                y += 12;
+                
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "normal");
+                
+                let seleccionesCount = 0;
+                
+                // Mostrar las 5 ideas que forman este concepto
+                for (let i = 0; i < concepto.grupos.length; i++) {
+                    const grupoKey = `pastel_grupo${concepto.grupos[i]}`;
+                    const seleccion = data[grupoKey];
+                    
+                    if (seleccion) {
+                        seleccionesCount++;
+                        tieneConceptos = true;
+                        
+                        doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+                        y += 10;
+                        
+                        if (y > 280) {
+                            doc.addPage();
+                            y = margen;
+                        }
+                    } else {
+                        doc.text(`${i + 1}. (Sin selección)`, margen + 10, y);
+                        y += 10;
+                    }
+                }
+                
+                y += 10;
+            }
+            
+            if (!tieneConceptos) {
+                doc.text("No se han formado conceptos", margen, y);
+                y += 10;
+            }
+            
+            y += 15;
+
+            // 8. EVALUACIÓN DE CONCEPTOS FORMADOS
+            if (y > 220) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("7. EVALUACIÓN DE CONCEPTOS FORMADOS", margen, y);
+            y += 15;
+            
+            let tieneEvalConceptos = false;
+            
+            for (let conc = 1; conc <= 3; conc++) {
+                let tieneDatos = false;
+                for (let i = 1; i <= 4; i++) {
+                    const key = `ca${(conc - 1) * 4 + i}`;
+                    if (data[key]) {
+                        tieneDatos = true;
+                        tieneEvalConceptos = true;
+                        break;
+                    }
+                }
+                
+                if (tieneDatos) {
+                    if (y > 260) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(13, 71, 161);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`Concepto Formado ${conc}`, margen, y);
+                    y += 12;
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    
+                    let total = 0;
+                    for (let i = 1; i <= 4; i++) {
+                        const key = `ca${(conc - 1) * 4 + i}`;
+                        const calif = parseFloat(data[key]) || 0;
+                        const peso = parseFloat(data[`peso${i}`]) || 0;
+                        total += calif * peso;
+                    }
+                    
+                    doc.text(`Puntuación final: ${total.toFixed(2)}`, margen + 10, y);
+                    y += 12;
+                    
+                    data[`resultado${conc + 3}`] = total.toFixed(2);
+                }
+            }
+            
+            if (!tieneEvalConceptos) {
+                doc.text("No hay evaluación de conceptos formados", margen, y);
+                y += 10;
+            }
+            
+            y += 15;
+
+            // 9. MEJOR CONCEPTO SELECCIONADO - COMPLETO
+            if (y > 230) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("8. MEJOR CONCEPTO SELECCIONADO", margen, y);
+            y += 15;
+            
+            // Buscar el mejor concepto
+            let mejorIndice = -1;
+            let mejorPuntuacion = -1;
+            
+            for (let i = 4; i <= 6; i++) {
+                const puntuacion = parseFloat(data[`resultado${i}`]) || 0;
+                if (puntuacion > mejorPuntuacion) {
+                    mejorPuntuacion = puntuacion;
+                    mejorIndice = i - 3;
+                }
+            }
+            
+            if (mejorIndice > 0 && mejorPuntuacion > 0) {
+                
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Puntuación obtenida: ${mejorPuntuacion.toFixed(2)}`, margen, y);
+                y += 12;
+                
+                // MOSTRAR QUÉ FORMA EL MEJOR CONCEPTO
+                doc.setFontSize(14);
+                doc.setTextColor(21, 101, 192);
+                doc.setFont("helvetica", "bold");
+                doc.text("COMPOSICIÓN DEL CONCEPTO GANADOR:", margen, y);
+                y += 12;
+                
+                // Determinar qué grupos forman este concepto
+                let gruposDelConcepto = [];
+                if (mejorIndice === 1) {
+                    gruposDelConcepto = [1, 4, 7, 10, 13];
+                } else if (mejorIndice === 2) {
+                    gruposDelConcepto = [2, 5, 8, 11, 14];
+                } else {
+                    gruposDelConcepto = [3, 6, 9, 12, 15];
+                }
+                
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "normal");
+                
+                // Mostrar cada una de las 5 ideas que forman el concepto
+                for (let i = 0; i < gruposDelConcepto.length; i++) {
+                    const grupoKey = `pastel_grupo${gruposDelConcepto[i]}`;
+                    const seleccion = data[grupoKey];
+                    
+                    if (y > 270) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                    
+                    if (seleccion) {
+                        doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+                        y += 10;
+                    } else {
+                        doc.text(`${i + 1}. (Idea no seleccionada)`, margen + 10, y);
+                        y += 10;
+                    }
+                }
+                
+            } else {
+                doc.text("No hay concepto evaluado como mejor", margen, y);
+                y += 10;
+            }
+            
+            y += 20;
+
+            // 10. PREVENCIÓN DE RIESGOS - COMPLETO
+            if (y > 220) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("9. PREVENCIÓN DE RIESGOS", margen, y);
+            y += 15;
+            
+            let tienePrevencion = false;
+            
+            for (let i = 1; i <= 3; i++) {
+                // Verificar si hay datos para esta prevención
+                const falla = data[`fallaPotencial${i}`];
+                const efecto = data[`efecto${i}`];
+                const sev = data[`sev${i}`];
+                const ocu = data[`ocu${i}`];
+                const riesgo = data[`riesgo${i}`];
+                const accionReal = data[`accionReal${i}`];
+                const responsable = data[`responsable${i}`];
+                const fechaCell = data[`fechaCell${i}`];
+                const accionTom = data[`accionTom${i}`];
+                const fecha = data[`fecha${i}`];
+                
+                // Verificar si hay al menos un dato
+                if (falla || efecto || sev || ocu || riesgo || accionReal || responsable || fechaCell || accionTom || fecha) {
+                    tienePrevencion = true;
+                    
+                    if (y > 240) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(13, 71, 161);
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`PREVENCIÓN ${i}`, margen, y);
+                    y += 12;
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    
+                    // Mostrar TODOS los campos disponibles
+                    if (falla) {
+                        doc.text(`• Falla potencial: ${falla}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (efecto) {
+                        doc.text(`• Efecto: ${efecto}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (sev) {
+                        doc.text(`• Severidad (1-10): ${sev}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (ocu) {
+                        doc.text(`• Ocurrencia (1-10): ${ocu}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (riesgo) {
+                        doc.text(`• Riesgo calculado: ${riesgo}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (accionReal) {
+                        doc.text(`• Acción/Acciones a realizar: ${accionReal}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (responsable) {
+                        doc.text(`• Responsable: ${responsable}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (fechaCell) {
+                        doc.text(`• Fecha de hoy: ${fechaCell}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (accionTom) {
+                        doc.text(`• Acción tomada: ${accionTom}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    if (fecha) {
+                        doc.text(`• Fecha de realización: ${fecha}`, margen + 10, y);
+                        y += 10;
+                    }
+                    
+                    y += 10;
+                    
+                    if (y > 280) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                }
+            }
+            
+            if (!tienePrevencion) {
+                doc.text("No hay datos de prevención de riesgos", margen, y);
+                y += 10;
+            }
+            
+            y += 15;
+
+            // 11. PLAN DE ACCIÓN
+            if (y > 230) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(21, 101, 192);
+            doc.setFont("helvetica", "bold");
+            doc.text("10. PLAN DE ACCIÓN", margen, y);
+            y += 15;
+            
+            let tieneTareas = false;
+            
+            // Tareas 1-15
+            doc.setFontSize(14);
+            doc.setTextColor(13, 71, 161);
+            doc.setFont("helvetica", "bold");
+            doc.text("Tareas 1-15:", margen, y);
+            y += 12;
+            
+            for (let i = 1; i <= 15; i++) {
+                const tarea = data[`tarea${i}`];
+                const persona = data[`persona${i}`];
+                
+                if (tarea || persona) {
+                    tieneTareas = true;
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
+                    y += 10;
+                    
+                    if (y > 280) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                }
+            }
+            
+            y += 15;
+            
+            // Tareas 16-30
+            if (y > 250) {
+                doc.addPage();
+                y = margen;
+            }
+            
+            doc.setFontSize(14);
+            doc.setTextColor(13, 71, 161);
+            doc.setFont("helvetica", "bold");
+            doc.text("Tareas 16-30:", margen, y);
+            y += 12;
+            
+            for (let i = 16; i <= 30; i++) {
+                const tarea = data[`tarea${i}`];
+                const persona = data[`persona${i}`];
+                
+                if (tarea || persona) {
+                    tieneTareas = true;
+                    doc.setFontSize(12);
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFont("helvetica", "normal");
+                    doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
+                    y += 10;
+                    
+                    if (y > 280) {
+                        doc.addPage();
+                        y = margen;
+                    }
+                }
+            }
+            
+            if (!tieneTareas) {
+                doc.text("No hay tareas en el plan", margen, y);
+                y += 10;
+            }
+
+            // 12. FIN DEL DOCUMENTO
+            const finalY = doc.internal.pageSize.height - 20;
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Documento generado el ${hoy}`, anchoPagina / 2, finalY, { align: "center" });
+
+            // Guardar PDF
+            pdfBlob = doc.output('blob');
+            document.getElementById('filenameDisplay').textContent = filename;
+
+            // Descarga automática
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Botón para descargar nuevamente
+        document.getElementById('downloadAgainBtn').addEventListener('click', () => {
+            if (pdfBlob) {
+                const url = URL.createObjectURL(pdfBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                generarPDF();
+            }
+        });
+
+        // Generar PDF al cargar
+        window.onload = function() {
+            console.log("Generando PDF...");
+            setTimeout(generarPDF, 500);
+        };
+    </script>
+</body>
+</html>
