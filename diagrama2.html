@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama pt.2 - Actividades de Mejora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(to bottom, #e3f2fd, #bbdefb); min-height: 100vh; color: #2f4f4f; }
+        .navbar { background-color: #1565c0; color: white; padding: 15px 30px; font-size: 20px; font-weight: 500; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; justify-content: space-between; align-items: center; }
+        .project-name { font-size: 18px; }
+        .container { max-width: 1300px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; color: #0d47a1; margin-bottom: 30px; }
+        .mejor-concepto { text-align: center; font-size: 22px; font-weight: 700; color: #1565c0; margin-bottom: 20px; }
+        .opciones-list {
+            margin: 20px auto; padding: 18px; background: #ffffff; border-radius: 10px; border-left: 5px solid #1976d2; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); max-width: 800px;
+        }
+        .opciones-list strong { display: block; margin-bottom: 12px; font-size: 16px; color: #0d47a1; }
+        .opciones-list ul { margin: 0; padding-left: 22px; list-style-type: disc; }
+        .opciones-list li { margin-bottom: 10px; font-size: 15px; line-height: 1.5; }
+        .tabla-tareas { margin-top: 50px; }
+        .tarea-row { display: flex; align-items: center; margin-bottom: 40px; padding: 20px; background: #f5fbff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
+        .numero { font-size: 36px; font-weight: 700; color: #1976d2; margin-right: 40px; min-width: 80px; text-align: center; }
+        .responsable { flex: 1; margin-right: 60px; }
+        .tarea { flex: 2; }
+        .responsable label, .tarea label { display: block; margin-bottom: 10px; font-weight: 500; color: #1565c0; font-size: 16px; }
+        input[type="text"] { width: 100%; padding: 14px; border: 1px solid #90caf9; border-radius: 8px; font-size: 16px; }
+        .buttons { text-align: center; margin-top: 60px; }
+        .btn-primary { background-color: #1976d2; color: white; padding: 14px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3); transition: all 0.3s ease; margin: 10px; }
+        .btn-primary:hover { background-color: #1565c0; transform: translateY(-3px); }
+        .btn-secondary { background-color: #78909c; }
+        .btn-secondary:hover { background-color: #607d8b; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>Desarrollo de formularios para actividades de mejora</div>
+        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+    </div>
+
+    <div class="container">
+        <h1>Diagrama pt.2</h1>
+
+        <div id="mejorConceptoContainer"></div>
+
+        <div class="tabla-tareas">
+            <h2 style="text-align: center; color: #0d47a1; margin-bottom: 40px;">Tabla de tareas y responsables</h2>
+            <div id="tareasContainer"></div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-primary" id="guardarBtn">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='diagrama.html'">Regreso</button>
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('projectData') || '{}');
+        const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
+        const tareasContainer = document.getElementById('tareasContainer');
+
+        // Cargar nombre del proyecto
+        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+
+        // Determinar el mejor concepto (mismo cálculo)
+        const resultados = [4,5,6].map(n => parseFloat(data[`resultado${n}`]) || 0);
+        let mejorIdx = resultados.indexOf(Math.max(...resultados));
+        if (resultados.every(r => r === 0)) mejorIdx = -1;
+        const mejorConcepto = mejorIdx >= 0 ? `Concepto ${mejorIdx + 1}` : 'Ninguno seleccionado';
+
+        // Mostrar mejor concepto y sus opciones
+        const opciones = [];
+        if (mejorIdx >= 0) {
+            for (let g = 1; g <= 5; g++) {
+                const key = `pastel_grupo${mejorIdx * 5 + g}`;
+                opciones.push(data[key] || 'Sin selección');
+            }
+        }
+
+        mejorConceptoContainer.innerHTML = `
+            <div class="mejor-concepto">Mejor Concepto: ${mejorConcepto}</div>
+            ${mejorIdx >= 0 ? `
+                <div class="opciones-list">
+                    <strong>Opciones que componen este concepto:</strong>
+                    <ul>
+                        <li>${opciones[0]}</li>
+                        <li>${opciones[1]}</li>
+                        <li>${opciones[2]}</li>
+                        <li>${opciones[3]}</li>
+                        <li>${opciones[4]}</li>
+                    </ul>
+                </div>
+            ` : ''}
+        `;
+
+        // Generar las tareas 16 a 30 con número secuencial grande
+        for (let i = 16; i <= 30; i++) {
+            const responsable = data[`persona${i}`] || '';
+            const tarea = data[`tarea${i}`] || '';
+
+            const tareaDiv = document.createElement('div');
+            tareaDiv.className = 'tarea-row';
+            tareaDiv.innerHTML = `
+                <div class="numero">${i}</div>
+                <div class="responsable">
+                    <label>Responsable</label>
+                    <input type="text" value="${responsable}" data-key="persona${i}">
+                </div>
+                <div class="tarea">
+                    <label>Tarea</label>
+                    <input type="text" value="${tarea}" data-key="tarea${i}">
+                </div>
+            `;
+            tareasContainer.appendChild(tareaDiv);
+        }
+
+        // Guardar y continuar
+        document.getElementById('guardarBtn').addEventListener('click', () => {
+            document.querySelectorAll('input[data-key]').forEach(input => {
+                data[input.dataset.key] = input.value.trim();
+            });
+            localStorage.setItem('projectData', JSON.stringify(data));
+            window.location.href = 'resultados.html';  // Siguiente página: Resultados
+        });
+    </script>
+</body>
+</html>

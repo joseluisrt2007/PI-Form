@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prevenir - Actividades de Mejora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(to bottom, #e3f2fd, #bbdefb); min-height: 100vh; color: #2f4f4f; }
+        .navbar { background-color: #1565c0; color: white; padding: 15px 30px; font-size: 20px; font-weight: 500; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; justify-content: space-between; align-items: center; }
+        .project-name { font-size: 18px; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; color: #0d47a1; margin-bottom: 30px; }
+        .mejor-concepto { text-align: center; font-size: 22px; font-weight: 700; color: #1565c0; margin-bottom: 20px; }
+        .opciones-list {
+            margin: 20px auto; padding: 18px; background: #ffffff; border-radius: 10px; border-left: 5px solid #1976d2; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); max-width: 800px;
+        }
+        .opciones-list strong { display: block; margin-bottom: 12px; font-size: 16px; color: #0d47a1; }
+        .opciones-list ul { margin: 0; padding-left: 22px; list-style-type: disc; }
+        .opciones-list li { margin-bottom: 10px; font-size: 15px; line-height: 1.5; }
+        .tabla-prevencion { margin-bottom: 50px; padding: 20px; background: #f5fbff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
+        .tabla-title { font-size: 18px; font-weight: 700; color: #1565c0; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        th { background-color: #e3f2fd; color: #1565c0; }
+        input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #90caf9; border-radius: 6px; font-size: 15px; }
+        .riesgo { font-weight: bold; font-size: 18px; color: #d32f2f; }
+        .buttons { text-align: center; margin-top: 40px; }
+        .btn-primary { background-color: #1976d2; color: white; padding: 14px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3); transition: all 0.3s ease; margin: 10px; }
+        .btn-primary:hover { background-color: #1565c0; transform: translateY(-3px); }
+        .btn-secondary { background-color: #78909c; }
+        .btn-secondary:hover { background-color: #607d8b; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>Desarrollo de formularios para actividades de mejora</div>
+        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+    </div>
+
+    <div class="container">
+        <h1>Prevenir</h1>
+
+        <div id="mejorConceptoContainer"></div>
+
+        <div id="tablasContainer"></div>
+
+        <div class="buttons">
+            <button class="btn-primary" id="guardarBtn">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='evalConceptos.html'">Regreso</button>
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('projectData') || '{}');
+        const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
+        const tablasContainer = document.getElementById('tablasContainer');
+
+        // Cargar nombre del proyecto
+        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+
+        // Determinar el mejor concepto
+        const resultados = [4,5,6].map(n => parseFloat(data[`resultado${n}`]) || 0);
+        let mejorIdx = resultados.indexOf(Math.max(...resultados));
+        if (resultados.every(r => r === 0)) mejorIdx = -1;
+        const mejorConcepto = mejorIdx >= 0 ? `Concepto ${mejorIdx + 1}` : 'Ninguno seleccionado';
+
+        // Mostrar mejor concepto y sus opciones
+        const opciones = [];
+        if (mejorIdx >= 0) {
+            for (let g = 1; g <= 5; g++) {
+                const key = `pastel_grupo${mejorIdx * 5 + g}`;
+                opciones.push(data[key] || 'Sin selección');
+            }
+        }
+
+        mejorConceptoContainer.innerHTML = `
+            <div class="mejor-concepto">Mejor Concepto: ${mejorConcepto}</div>
+            ${mejorIdx >= 0 ? `
+                <div class="opciones-list">
+                    <strong>Opciones que componen este concepto:</strong>
+                    <ul>
+                        <li>${opciones[0]}</li>
+                        <li>${opciones[1]}</li>
+                        <li>${opciones[2]}</li>
+                        <li>${opciones[3]}</li>
+                        <li>${opciones[4]}</li>
+                    </ul>
+                </div>
+            ` : ''}
+        `;
+
+        // Generar las 3 tablas de prevención
+        for (let tabla = 1; tabla <= 3; tabla++) {
+            const section = document.createElement('div');
+            section.className = 'tabla-prevencion';
+            section.innerHTML = `
+                <div class="tabla-title">Prevención ${tabla}</div>
+                <table>
+                    <tr><th>Falla potencial</th><td><input type="text" data-key="fallaPotencial${tabla}" value="${data[`fallaPotencial${tabla}`] || ''}"></td></tr>
+                    <tr><th>Efecto</th><td><input type="text" data-key="efecto${tabla}" value="${data[`efecto${tabla}`] || ''}"></td></tr>
+                    <tr><th>Severidad (1-10)</th><td><input type="number" class="sev" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`sev${tabla}`] || ''}"></td></tr>
+                    <tr><th>Ocurrencia (1-10)</th><td><input type="number" class="ocu" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`ocu${tabla}`] || ''}"></td></tr>
+                    <tr><th>Riesgo</th><td><span class="riesgo" id="riesgo${tabla}">${data[`riesgo${tabla}`] || '0.00'}</span></td></tr>
+                    <tr><th>Acción/Acciones a realizar</th><td><input type="text" data-key="accionReal${tabla}" value="${data[`accionReal${tabla}`] || ''}"></td></tr>
+                    <tr><th>Responsable</th><td><input type="text" data-key="responsable${tabla}" value="${data[`responsable${tabla}`] || ''}"></td></tr>
+                    <tr><th>Fecha de hoy</th><td><input type="date" data-key="fechaCell${tabla}" value="${data[`fechaCell${tabla}`] || new Date().toISOString().split('T')[0]}"></td></tr>
+                    <tr><th>Acción tomada</th><td><input type="text" data-key="accionTom${tabla}" value="${data[`accionTom${tabla}`] || ''}"></td></tr>
+                    <tr><th>Fecha en la que se realizó la acción</th><td><input type="date" data-key="fecha${tabla}" value="${data[`fecha${tabla}`] || ''}"></td></tr>
+                </table>
+                <button class="btn-primary" style="background-color: #42a5f5; margin-top: 10px;" onclick="calcularRiesgo(${tabla})">Calcular riesgo</button>
+            `;
+            tablasContainer.appendChild(section);
+        }
+
+        // Cálculo de riesgo con validación estricta 1-10
+        function calcularRiesgo(tabla) {
+            const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
+            const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
+            const sev = parseFloat(sevInput.value);
+            const ocu = parseFloat(ocuInput.value);
+
+            if (isNaN(sev) || isNaN(ocu) || sev < 1 || sev > 10 || ocu < 1 || ocu > 10) {
+                alert("Severidad y Ocurrencia deben ser números enteros entre 1 y 10.");
+                return;
+            }
+
+            const riesgo = (sev * ocu).toFixed(2);
+            document.getElementById(`riesgo${tabla}`).textContent = riesgo;
+            data[`riesgo${tabla}`] = riesgo;  // Guardado automático en el objeto data
+        }
+
+        // Recalcular riesgos al cargar si hay datos
+        for (let tabla = 1; tabla <= 3; tabla++) {
+            const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
+            const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
+            if (sevInput.value && ocuInput.value) {
+                calcularRiesgo(tabla);
+            }
+        }
+
+        // Guardar y continuar
+        document.getElementById('guardarBtn').addEventListener('click', () => {
+            document.querySelectorAll('input[data-key]').forEach(input => {
+                data[input.dataset.key] = input.value;
+            });
+            document.querySelectorAll('.sev, .ocu').forEach(input => {
+                data[input.className + input.dataset.tabla] = input.value;
+            });
+            localStorage.setItem('projectData', JSON.stringify(data));
+            window.location.href = 'diagrama.html';  // Siguiente página
+        });
+    </script>
+</body>
+</html>
