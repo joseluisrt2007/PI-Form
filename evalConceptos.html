@@ -330,10 +330,10 @@
             const section = document.createElement('div');
             section.className = 'concepto-section';
 
-            // Obtener las 5 opciones del concepto
+            // Obtener las 5 opciones del concepto formado (una por cada concepto original, tomando la seleccionada en la columna 'conc')
             const indices = [];
-            for (let g = 1; g <= 5; g++) {
-                const grupoKey = `pastel_grupo${(conc - 1) * 5 + g}`;
+            for (let g = 1; g <= 5; g++) {  // g = concepto original (1 a 5)
+                const grupoKey = `pastel_grupo${(g - 1) * 3 + conc}`;  // conc actúa como columna seleccionada (1 a 3)
                 const selectedPos = data[grupoKey] || 'Sin selección';
                 indices.push(selectedPos);
             }
