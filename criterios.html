@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criterios - Actividades de Mejora</title>
+    <title data-i18n="criteria_weights">Criterios - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -46,12 +46,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -210,9 +260,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -234,32 +317,65 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Criterios</h1>
+        <h1 data-i18n="criteria_weights">Criterios y pesos (la suma debe ser 10)</h1>
 
         <!-- Nombre del proyecto -->
         <div class="section">
-            <label for="projectName">Nombre del proyecto</label>
-            <input type="text" id="projectName" placeholder="Ingrese el nombre del proyecto">
+            <label for="projectName" data-i18n="project_name">Nombre del proyecto</label>
+            <input type="text" id="projectName" data-i18n-placeholder="enter_project_name" placeholder="Ingrese el nombre del proyecto">
         </div>
 
         <!-- Criterios y pesos -->
         <div class="section">
-            <h2>Criterios y pesos (la suma debe ser 10)</h2>
+            <h2 data-i18n="criteria_weights">Criterios y pesos (la suma debe ser 10)</h2>
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Criterio</th>
-                        <th>Peso</th>
+                        <th data-i18n="criteria">Criterio</th>
+                        <th data-i18n="weight">Peso</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -274,12 +390,12 @@
 
         <!-- Ideas/Conceptos -->
         <div class="section">
-            <h2>Ideas / Conceptos</h2>
+            <h2 data-i18n="ideas_concepts">Ideas / Conceptos</h2>
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Idea</th>
+                        <th data-i18n="idea">Idea</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -287,17 +403,20 @@
                     <tr><td>2</td><td><input type="text" class="concepto" data-id="2"></td></tr>
                     <tr><td>3</td><td><input type="text" class="concepto" data-id="3"></td></tr>
                     <tr><td>4</td><td><input type="text" class="concepto" data-id="4"></td></tr>
-                    <tr><td>5</td><td><input type="text" class="concepto" class="concepto" data-id="5"></td></tr>
+                    <tr><td>5</td><td><input type="text" class="concepto" data-id="5"></td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn" disabled>Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='index.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" disabled data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='index.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
+    <!-- Sistema de traducción -->
+    <script src="lang.js"></script>
+    
     <script>
         const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 
@@ -308,10 +427,31 @@
         document.querySelectorAll('.concepto').forEach(el => el.value = data[`concepto${el.dataset.id}`] || '');
         updateProjectName();
 
+        // Configurar selector de idioma
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                    updateProjectName(); // Actualizar nombre del proyecto con nueva traducción
+                });
+            }
+        });
+
         // Actualizar nombre del proyecto en navbar
         function updateProjectName() {
-            const name = document.getElementById('projectName').value.trim() || '(Sin nombre)';
-            document.getElementById('projectNameDisplay').textContent = `Proyecto: ${name}`;
+            const name = document.getElementById('projectName').value.trim();
+            const projectText = document.getElementById('projectNameText');
+            
+            if (name) {
+                projectText.textContent = name;
+            } else {
+                // Usar traducción para "(Sin nombre)"
+                projectText.textContent = t('unnamed_project');
+            }
         }
 
         // Validación y guardado
@@ -331,7 +471,8 @@
             } else {
                 document.getElementById('guardarBtn').disabled = true;
                 if (sumaPesos !== 10 && pesos.some(p => p > 0)) {
-                    errorEl.textContent = `La suma de los pesos debe ser exactamente 10 (actual: ${sumaPesos.toFixed(1)})`;
+                    // Usar traducción para el mensaje de error
+                    errorEl.textContent = t('error_sum_weights') + ` (actual: ${sumaPesos.toFixed(1)})`;
                 } else {
                     errorEl.textContent = '';
                 }

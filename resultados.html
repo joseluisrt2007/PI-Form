@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados - Actividades de Mejora</title>
+    <title data-i18n="results">Resultados - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -23,6 +23,74 @@
             --section-bg: #f8fbff;
             --accent-border: #1976d2;
         }
+        
+        header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding: 1.25rem 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
+            font-size: 1.125rem;
+            font-weight: 400;
+            opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
+        }
 
         * {
             box-sizing: border-box;
@@ -37,24 +105,6 @@
             color: var(--text-dark);
             display: flex;
             flex-direction: column;
-        }
-
-        header {
-            background-color: var(--primary);
-            color: var(--text-light);
-            padding: 1.25rem 2rem;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        .project-name {
-            font-size: 1.125rem;
-            font-weight: 400;
-            opacity: 0.95;
         }
 
         main {
@@ -201,65 +251,318 @@
                 max-width: 400px;
             }
         }
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+                font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .success-message {
+                font-size: 1.25rem;
+            }
+
+            .pdf-info {
+                font-size: 1rem;
+                padding: 1.25rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+    
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+    
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
+<script src="lang.js"></script>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+    <div class="header-left">
+        <!-- Espacio reservado para alineación -->
+    </div>
+    
+    <div class="header-center">
+        <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+        <div class="project-name-container" id="projectNameDisplay">
+            <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+        </div>
+    </div>
+    
+    <div class="header-right">
+        <div class="language-selector">
+            <select id="languageSelector">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </div>
     </header>
 
     <main>
         <div class="container">
-            <h1>¡Informe generado con éxito!</h1>
+            <h1 data-i18n="report_generated">¡Informe generado con éxito!</h1>
 
-            <div class="success-message">
-                El informe PDF de su proyecto ha sido generado y descargado automáticamente.<br>
-                Puede encontrarlo en la carpeta de descargas de su navegador.
-            </div>
+        <div class="success-message" data-i18n="pdf_download_info">
+            El informe PDF de su proyecto ha sido generado y descargado automáticamente.<br>
+            Puede encontrarlo en la carpeta de descargas de su navegador.
+        </div>
 
-            <div class="pdf-info">
-                <strong>Nombre del archivo:</strong> <span id="filenameDisplay"></span><br><br>
-                <button class="btn-primary" id="downloadAgainBtn">Descargar PDF nuevamente</button>
-            </div>
+        <div class="pdf-info">
+           <strong data-i18n="pdf_filename">Nombre del archivo:</strong> <span id="filenameDisplay"></span><br><br>
+           <button class="btn-primary" id="downloadAgainBtn" data-i18n="download_again">Descargar PDF nuevamente</button>
+        </div>
 
-            <div class="buttons">
-                <button class="btn-primary btn-secondary" onclick="window.location.href='index.html'">Volver al menú principal</button>
-            </div>
+        <div class="buttons">
+            <button class="btn-primary btn-secondary" onclick="window.location.href='index.html'" data-i18n="return_main_menu">Volver al menú principal</button>
+        </div>
         </div>
     </main>
+    
 
     <script>
         const data = JSON.parse(localStorage.getItem('projectData') || '{}');
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+    
+            // Configurar selector de idioma
+            document.addEventListener('DOMContentLoaded', function() {
+               const langSelector = document.getElementById('languageSelector');
+               if (langSelector) {
+                   const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                   langSelector.value = currentLang;
+            
+                   langSelector.addEventListener('change', function() {
+                       setLanguage(this.value);
+                       updateProjectName();
+                   });
+                }
+        
+                updateProjectName();
+            });
 
-        let pdfBlob = null;
-        let filename = `informe_${(data.projectName || 'proyecto').replace(/ /g, '_')}.pdf`;
+            // Actualizar nombre del proyecto en navbar
+            function updateProjectName() {
+                const projectText = document.getElementById('projectNameText');
+        
+                if (data.projectName && data.projectName.trim()) {
+                    projectText.textContent = data.projectName;
+             } else {
+                   // Usar traducción para "(Sin nombre)"
+                    projectText.textContent = t('unnamed_project');
+                }
+            }
+
+            let pdfBlob = null;
+            let filename = `informe_${(data.projectName || 'proyecto').replace(/ /g, '_')}.pdf`;
+
 
         function generarPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
+    
             let y = 20;
             const margen = 20;
             const anchoPagina = doc.internal.pageSize.width;
+
+            // Determinar idioma actual
+            const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+            const isSpanish = currentLang === 'es';
+    
+            // Funciones de traducción para el PDF
+            const t = (key) => {
+                const translations = {
+                    'es': {
+                        'complete_project_report': 'INFORME COMPLETO DE PROYECTO',
+                        'generated_on': 'Generado el:',
+                        'criteria_weights': '1. CRITERIOS Y PESOS',
+                        'criteria': 'Criterio',
+                        'weight': 'Peso',
+                        'total_sum_weights': 'SUMA TOTAL DE PESOS:',
+                        'ideas_concepts': '2. IDEAS / CONCEPTOS INICIALES',
+                        'idea': 'Idea',
+                        'initial_evaluation': '3. EVALUACIÓN INICIAL DE IDEAS',
+                        'no_initial_data': 'No hay datos de evaluación inicial',
+                        'for': 'Para',
+                        'option': 'Opción',
+                        'explore_possibilities': '4. EXPLORACIÓN DE POSIBILIDADES',
+                        'no_possibilities_data': 'No hay datos de exploración de posibilidades',
+                        'concept_formation': '5. FORMACIÓN DE CONCEPTOS',
+                        'checkbox_selections': '(Selecciones realizadas con checkboxes)',
+                        'selection_summary': 'Resumen de selecciones por grupo:',
+                        'group': 'Grupo',
+                        'from': 'de',
+                        'no_selections': 'No hay selecciones realizadas',
+                        'concepts_formed': '6. CONCEPTOS FORMADOS',
+                        'concepts_from_selections': '(Los 3 conceptos creados a partir de las selecciones)',
+                        'concept_formed': 'Concepto Formado',
+                        'no_selection': '(Sin selección)',
+                        'no_concepts_formed': 'No se han formado conceptos',
+                        'evaluation_concepts_formed': '7. EVALUACIÓN DE CONCEPTOS FORMADOS',
+                        'no_evaluation_concepts': 'No hay evaluación de conceptos formados',
+                        'final_score': 'Puntuación final:',
+                        'best_concept_selected': '8. MEJOR CONCEPTO SELECCIONADO',
+                        'score_obtained': 'Puntuación obtenida:',
+                        'composition_winner': 'COMPOSICIÓN DEL CONCEPTO GANADOR:',
+                        'idea_not_selected': '(Idea no seleccionada)',
+                        'no_best_concept': 'No hay concepto evaluado como mejor',
+                        'risk_prevention': '9. PREVENCIÓN DE RIESGOS',
+                        'prevention': 'PREVENCIÓN',
+                        'potential_failure': '• Falla potencial:',
+                        'effect': '• Efecto:',
+                        'severity': '• Severidad (1-10):',
+                        'occurrence': '• Ocurrencia (1-10):',
+                        'risk': '• Riesgo calculado:',
+                        'actions_to_take': '• Acción/Acciones a realizar:',
+                        'responsible': '• Responsable:',
+                        'today_date': '• Fecha de hoy:',
+                        'action_taken': '• Acción tomada:',
+                        'action_date': '• Fecha de realización:',
+                        'no_prevention_data': 'No hay datos de prevención de riesgos',
+                        'action_plan': '10. PLAN DE ACCIÓN',
+                        'tasks_1_15': 'Tareas 1-15:',
+                        'tasks_16_30': 'Tareas 16-30:',
+                        'no_tasks': 'No hay tareas en el plan',
+                        'document_generated': 'Documento generado el'
+                    },
+                    'en': {
+                        'complete_project_report': 'COMPLETE PROJECT REPORT',
+                        'generated_on': 'Generated on:',
+                        'criteria_weights': '1. CRITERIA AND WEIGHTS',
+                        'criteria': 'Criteria',
+                        'weight': 'Weight',
+                        'total_sum_weights': 'TOTAL SUM OF WEIGHTS:',
+                        'ideas_concepts': '2. INITIAL IDEAS / CONCEPTS',
+                        'idea': 'Idea',
+                        'initial_evaluation': '3. INITIAL EVALUATION OF IDEAS',
+                        'no_initial_data': 'No initial evaluation data',
+                        'for': 'For',
+                        'option': 'Option',
+                        'explore_possibilities': '4. EXPLORATION OF POSSIBILITIES',
+                        'no_possibilities_data': 'No exploration of possibilities data',
+                        'concept_formation': '5. CONCEPT FORMATION',
+                        'checkbox_selections': '(Selections made with checkboxes)',
+                        'selection_summary': 'Selection summary by group:',
+                        'group': 'Group',
+                        'from': 'from',
+                        'no_selections': 'No selections made',
+                        'concepts_formed': '6. FORMED CONCEPTS',
+                        'concepts_from_selections': '(The 3 concepts created from the selections)',
+                        'concept_formed': 'Concept Formed',
+                        'no_selection': '(No selection)',
+                        'no_concepts_formed': 'No concepts have been formed',
+                        'evaluation_concepts_formed': '7. EVALUATION OF FORMED CONCEPTS',
+                        'no_evaluation_concepts': 'No evaluation of formed concepts',
+                        'final_score': 'Final score:',
+                        'best_concept_selected': '8. BEST CONCEPT SELECTED',
+                        'score_obtained': 'Score obtained:',
+                        'composition_winner': 'COMPOSITION OF THE WINNING CONCEPT:',
+                        'idea_not_selected': '(Idea not selected)',
+                        'no_best_concept': 'No concept evaluated as best',
+                        'risk_prevention': '9. RISK PREVENTION',
+                        'prevention': 'PREVENTION',
+                        'potential_failure': '• Potential failure:',
+                        'effect': '• Effect:',
+                        'severity': '• Severity (1-10):',
+                        'occurrence': '• Occurrence (1-10):',
+                        'risk': '• Calculated risk:',
+                        'actions_to_take': '• Action/Actions to take:',
+                        'responsible': '• Responsible:',
+                        'today_date': '• Today\'s date:',
+                        'action_taken': '• Action taken:',
+                        'action_date': '• Date of execution:',
+                        'no_prevention_data': 'No risk prevention data',
+                        'action_plan': '10. ACTION PLAN',
+                        'tasks_1_15': 'Tasks 1-15:',
+                        'tasks_16_30': 'Tasks 16-30:',
+                        'no_tasks': 'No tasks in the plan',
+                        'document_generated': 'Document generated on'
+                    }
+                };
+        
+                return translations[currentLang][key] || key;
+            };
 
             // 1. PORTADA
             doc.setFontSize(24);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("INFORME COMPLETO DE PROYECTO", anchoPagina / 2, 80, { align: "center" });
-            
+            doc.text(t('complete_project_report'), anchoPagina / 2, 80, { align: "center" });
+
             doc.setFontSize(18);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            doc.text(data.projectName || "Proyecto sin nombre", anchoPagina / 2, 110, { align: "center" });
-            
-            const hoy = new Date().toLocaleDateString('es-ES');
+            doc.text(data.projectName || (isSpanish ? "Proyecto sin nombre" : "Unnamed project"), anchoPagina / 2, 110, { align: "center" });
+
+            const hoy = new Date().toLocaleDateString(isSpanish ? 'es-ES' : 'en-US');
             doc.setFontSize(14);
             doc.setTextColor(100, 100, 100);
-            doc.text(`Generado el: ${hoy}`, anchoPagina / 2, 130, { align: "center" });
-            
+            doc.text(`${t('generated_on')} ${hoy}`, anchoPagina / 2, 130, { align: "center" });
+
             // Nueva página para contenido
             doc.addPage();
             y = margen;
@@ -268,34 +571,34 @@
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("1. CRITERIOS Y PESOS", margen, y);
+            doc.text(t('criteria_weights'), margen, y);
             y += 15;
-            
+
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            
+
             let sumaPesos = 0;
             for (let i = 1; i <= 4; i++) {
-                const criterio = data[`criterio${i}`] || `Criterio ${i}`;
+                const criterio = data[`criterio${i}`] || `${t('criteria')} ${i}`;
                 const peso = parseFloat(data[`peso${i}`]) || 0;
                 sumaPesos += peso;
-                
+
                 doc.text(`${i}. ${criterio}`, margen, y);
-                doc.text(`Peso: ${peso.toFixed(1)}`, margen + 100, y);
+                doc.text(`${t('weight')}: ${peso.toFixed(1)}`, margen + 100, y);
                 y += 10;
-                
+
                 if (y > 280) {
                     doc.addPage();
                     y = margen;
                 }
             }
-            
+
             doc.setFont("helvetica", "bold");
-            doc.text(`SUMA TOTAL DE PESOS: ${sumaPesos.toFixed(1)}`, margen, y);
+            doc.text(`${t('total_sum_weights')} ${sumaPesos.toFixed(1)}`, margen, y);
             y += 15;
             doc.setFont("helvetica", "normal");
-            
+
             y += 10;
 
             // 3. IDEAS / CONCEPTOS INICIALES
@@ -303,24 +606,24 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("2. IDEAS / CONCEPTOS INICIALES", margen, y);
+            doc.text(t('ideas_concepts'), margen, y);
             y += 15;
-            
+
             for (let i = 1; i <= 5; i++) {
-                const concepto = data[`concepto${i}`] || `Idea ${i}`;
+                const concepto = data[`concepto${i}`] || `${t('idea')} ${i}`;
                 doc.text(`${i}. ${concepto}`, margen, y);
                 y += 10;
-                
+
                 if (y > 280) {
                     doc.addPage();
                     y = margen;
                 }
             }
-            
+
             y += 10;
 
             // 4. EVALUACIÓN INICIAL DE IDEAS
@@ -328,13 +631,13 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("3. EVALUACIÓN INICIAL DE IDEAS", margen, y);
+            doc.text(t('initial_evaluation'), margen, y);
             y += 15;
-            
+
             // Verificar si hay datos de evaluación inicial
             let tieneEvaluacionInicial = false;
             for (let conc = 1; conc <= 5; conc++) {
@@ -346,61 +649,61 @@
                 }
                 if (tieneEvaluacionInicial) break;
             }
-            
+
             if (tieneEvaluacionInicial) {
                 for (let conc = 1; conc <= 5; conc++) {
                     if (y > 240) {
                         doc.addPage();
                         y = margen;
                     }
-                    
+
                     doc.setFontSize(14);
                     doc.setTextColor(13, 71, 161);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Idea ${conc}: ${data[`concepto${conc}`] || `Idea ${conc}`}`, margen, y);
+                    doc.text(`${t('idea')} ${conc}: ${data[`concepto${conc}`] || `${t('idea')} ${conc}`}`, margen, y);
                     y += 12;
-                    
+
                     doc.setFontSize(12);
                     doc.setTextColor(0, 0, 0);
                     doc.setFont("helvetica", "normal");
-                    
+
                     let total = 0;
                     let tieneDatos = false;
-                    
+
                     for (let i = 1; i <= 4; i++) {
                         const calif = parseFloat(data[`calif${conc}_${i}`]) || 0;
                         const peso = parseFloat(data[`peso${i}`]) || 0;
-                        
+
                         if (data[`calif${conc}_${i}`]) {
                             tieneDatos = true;
                             const ponderado = calif * peso;
                             total += ponderado;
-                            
-                            const criterio = data[`criterio${i}`] || `Criterio ${i}`;
+
+                            const criterio = data[`criterio${i}`] || `${t('criteria')} ${i}`;
                             doc.text(`  ${criterio}: ${calif.toFixed(1)} × ${peso.toFixed(1)} = ${ponderado.toFixed(2)}`, margen + 10, y);
                             y += 8;
-                            
+
                             if (y > 280) {
                                 doc.addPage();
                                 y = margen;
                             }
                         }
                     }
-                    
+
                     if (tieneDatos) {
                         doc.setFont("helvetica", "bold");
                         doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
                         doc.setFont("helvetica", "normal");
                         y += 12;
                     }
-                    
+
                     y += 10;
                 }
             } else {
-                doc.text("No hay datos de evaluación inicial", margen, y);
+                doc.text(t('no_initial_data'), margen, y);
                 y += 10;
             }
-            
+
             y += 10;
 
             // 5. EXPLORACIÓN DE POSIBILIDADES
@@ -408,13 +711,13 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("4. EXPLORACIÓN DE POSIBILIDADES", margen, y);
+            doc.text(t('explore_possibilities'), margen, y);
             y += 15;
-            
+
             // Verificar si hay datos de posibilidades
             let tienePosibilidades = false;
             for (let i = 1; i <= 15; i++) {
@@ -423,46 +726,46 @@
                     break;
                 }
             }
-            
+
             if (tienePosibilidades) {
                 for (let conc = 1; conc <= 5; conc++) {
                     if (y > 250) {
                         doc.addPage();
                         y = margen;
                     }
-                    
+
                     doc.setFontSize(14);
                     doc.setTextColor(13, 71, 161);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Para ${data[`concepto${conc}`] || `Idea ${conc}`}`, margen, y);
+                    doc.text(`${t('for')} ${data[`concepto${conc}`] || `${t('idea')} ${conc}`}`, margen, y);
                     y += 12;
-                    
+
                     doc.setFontSize(12);
                     doc.setTextColor(0, 0, 0);
                     doc.setFont("helvetica", "normal");
-                    
+
                     for (let row = 1; row <= 3; row++) {
                         const posIdx = (conc - 1) * 3 + row;
                         const posibilidad = data[`pos${posIdx}`] || "";
-                        
+
                         if (posibilidad) {
-                            doc.text(`  Opción ${row}: ${posibilidad}`, margen + 10, y);
+                            doc.text(`  ${t('option')} ${row}: ${posibilidad}`, margen + 10, y);
                             y += 8;
-                            
+
                             if (y > 280) {
                                 doc.addPage();
                                 y = margen;
                             }
                         }
                     }
-                    
+
                     y += 10;
                 }
             } else {
-                doc.text("No hay datos de exploración de posibilidades", margen, y);
+                doc.text(t('no_possibilities_data'), margen, y);
                 y += 10;
             }
-            
+
             y += 10;
 
             // 6. FORMACIÓN DE CONCEPTOS
@@ -470,18 +773,18 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("5. FORMACIÓN DE CONCEPTOS", margen, y);
+            doc.text(t('concept_formation'), margen, y);
             y += 15;
-            
+
             doc.setFontSize(12);
             doc.setTextColor(80, 80, 80);
-            doc.text("(Selecciones realizadas con checkboxes)", margen, y);
+            doc.text(t('checkbox_selections'), margen, y);
             y += 10;
-            
+
             // Verificar si hay selecciones
             let tieneSelecciones = false;
             for (let i = 1; i <= 15; i++) {
@@ -490,25 +793,25 @@
                     break;
                 }
             }
-            
+
             if (tieneSelecciones) {
                 doc.setFontSize(12);
                 doc.setTextColor(0, 0, 0);
-                
+
                 // Mostrar tabla de selecciones
-                doc.text("Resumen de selecciones por grupo:", margen, y);
+                doc.text(t('selection_summary'), margen, y);
                 y += 10;
-                
+
                 for (let i = 1; i <= 15; i++) {
                     const seleccion = data[`pastel_grupo${i}`];
                     if (seleccion) {
                         // Determinar a qué idea original pertenece
                         const ideaOriginal = Math.ceil(i / 3);
-                        const nombreIdea = data[`concepto${ideaOriginal}`] || `Idea ${ideaOriginal}`;
-                        
-                        doc.text(`  Grupo ${i} (de ${nombreIdea}): ${seleccion}`, margen + 10, y);
+                        const nombreIdea = data[`concepto${ideaOriginal}`] || `${t('idea')} ${ideaOriginal}`;
+
+                        doc.text(`  ${t('group')} ${i} (${t('from')} ${nombreIdea}): ${seleccion}`, margen + 10, y);
                         y += 8;
-                        
+
                         if (y > 280) {
                             doc.addPage();
                             y = margen;
@@ -516,10 +819,10 @@
                     }
                 }
             } else {
-                doc.text("No hay selecciones realizadas", margen, y);
+                doc.text(t('no_selections'), margen, y);
                 y += 10;
             }
-            
+
             y += 15;
 
             // 7. CONCEPTOS FORMADOS (3 conceptos de 5 ideas)
@@ -527,75 +830,70 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("6. CONCEPTOS FORMADOS", margen, y);
+            doc.text(t('concepts_formed'), margen, y);
             y += 15;
-            
+
             doc.setFontSize(12);
             doc.setTextColor(80, 80, 80);
-            doc.text("(Los 3 conceptos creados a partir de las selecciones)", margen, y);
+            doc.text(t('concepts_from_selections'), margen, y);
             y += 10;
-            
+
             // Los 3 conceptos formados
             const conceptosFormados = [
-                { nombre: "Concepto Formado 1", grupos: [1, 4, 7, 10, 13] },
-                { nombre: "Concepto Formado 2", grupos: [2, 5, 8, 11, 14] },
-                { nombre: "Concepto Formado 3", grupos: [3, 6, 9, 12, 15] }
+                { nombre: t('concept_formed') + " 1", grupos: [1, 4, 7, 10, 13] },
+                { nombre: t('concept_formed') + " 2", grupos: [2, 5, 8, 11, 14] },
+                { nombre: t('concept_formed') + " 3", grupos: [3, 6, 9, 12, 15] }
             ];
-            
+
             let tieneConceptos = false;
-            
+
             for (const concepto of conceptosFormados) {
                 if (y > 240) {
                     doc.addPage();
                     y = margen;
                 }
-                
+
                 doc.setFontSize(14);
                 doc.setTextColor(13, 71, 161);
                 doc.setFont("helvetica", "bold");
                 doc.text(concepto.nombre, margen, y);
                 y += 12;
-                
+
                 doc.setFontSize(12);
                 doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "normal");
-                
+
                 let seleccionesCount = 0;
-                
+
                 // Mostrar las 5 ideas que forman este concepto
                 for (let i = 0; i < concepto.grupos.length; i++) {
                     const grupoKey = `pastel_grupo${concepto.grupos[i]}`;
-                    const seleccion = data[grupoKey];
-                    
-                    if (seleccion) {
-                        seleccionesCount++;
-                        tieneConceptos = true;
-                        
-                        doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
-                        y += 10;
-                        
-                        if (y > 280) {
-                            doc.addPage();
-                            y = margen;
-                        }
-                    } else {
-                        doc.text(`${i + 1}. (Sin selección)`, margen + 10, y);
-                        y += 10;
+                    const seleccion = data[grupoKey] || t('no_selection');
+
+                    seleccionesCount++;
+                    tieneConceptos = true;
+
+                    doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+                    y += 10;
+
+                    if (y > 280) {
+                        doc.addPage();
+                        y = margen;
                     }
                 }
-                
+
                 y += 10;
             }
-            
+
             if (!tieneConceptos) {
-                doc.text("No se han formado conceptos", margen, y);
+                doc.text(t('no_concepts_formed'), margen, y);
                 y += 10;
             }
-            
+
             y += 15;
 
             // 8. EVALUACIÓN DE CONCEPTOS FORMADOS
@@ -603,15 +901,15 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("7. EVALUACIÓN DE CONCEPTOS FORMADOS", margen, y);
+            doc.text(t('evaluation_concepts_formed'), margen, y);
             y += 15;
-            
+
             let tieneEvalConceptos = false;
-            
+
             for (let conc = 1; conc <= 3; conc++) {
                 let tieneDatos = false;
                 for (let i = 1; i <= 4; i++) {
@@ -622,23 +920,23 @@
                         break;
                     }
                 }
-                
+
                 if (tieneDatos) {
                     if (y > 260) {
                         doc.addPage();
                         y = margen;
                     }
-                    
+
                     doc.setFontSize(14);
                     doc.setTextColor(13, 71, 161);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`Concepto Formado ${conc}`, margen, y);
+                    doc.text(`${t('concept_formed')} ${conc}`, margen, y);
                     y += 12;
-                    
+
                     doc.setFontSize(12);
                     doc.setTextColor(0, 0, 0);
                     doc.setFont("helvetica", "normal");
-                    
+
                     let total = 0;
                     for (let i = 1; i <= 4; i++) {
                         const key = `ca${(conc - 1) * 4 + i}`;
@@ -646,19 +944,19 @@
                         const peso = parseFloat(data[`peso${i}`]) || 0;
                         total += calif * peso;
                     }
-                    
-                    doc.text(`Puntuación final: ${total.toFixed(2)}`, margen + 10, y);
+
+                    doc.text(`${t('final_score')}: ${total.toFixed(2)}`, margen + 10, y);
                     y += 12;
-                    
+
                     data[`resultado${conc + 3}`] = total.toFixed(2);
                 }
             }
-            
+
             if (!tieneEvalConceptos) {
-                doc.text("No hay evaluación de conceptos formados", margen, y);
+                doc.text(t('no_evaluation_concepts'), margen, y);
                 y += 10;
             }
-            
+
             y += 15;
 
             // 9. MEJOR CONCEPTO SELECCIONADO - COMPLETO
@@ -666,17 +964,17 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("8. MEJOR CONCEPTO SELECCIONADO", margen, y);
+            doc.text(t('best_concept_selected'), margen, y);
             y += 15;
-            
+
             // Buscar el mejor concepto
             let mejorIndice = -1;
             let mejorPuntuacion = -1;
-            
+
             for (let i = 4; i <= 6; i++) {
                 const puntuacion = parseFloat(data[`resultado${i}`]) || 0;
                 if (puntuacion > mejorPuntuacion) {
@@ -684,22 +982,22 @@
                     mejorIndice = i - 3;
                 }
             }
-            
+
             if (mejorIndice > 0 && mejorPuntuacion > 0) {
-                
+
                 doc.setFontSize(14);
                 doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "normal");
-                doc.text(`Puntuación obtenida: ${mejorPuntuacion.toFixed(2)}`, margen, y);
+                doc.text(`${t('score_obtained')}: ${mejorPuntuacion.toFixed(2)}`, margen, y);
                 y += 12;
-                
+
                 // MOSTRAR QUÉ FORMA EL MEJOR CONCEPTO
                 doc.setFontSize(14);
                 doc.setTextColor(21, 101, 192);
                 doc.setFont("helvetica", "bold");
-                doc.text("COMPOSICIÓN DEL CONCEPTO GANADOR:", margen, y);
+                doc.text(t('composition_winner'), margen, y);
                 y += 12;
-                
+
                 // Determinar qué grupos forman este concepto
                 let gruposDelConcepto = [];
                 if (mejorIndice === 1) {
@@ -709,35 +1007,30 @@
                 } else {
                     gruposDelConcepto = [3, 6, 9, 12, 15];
                 }
-                
+
                 doc.setFontSize(12);
                 doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "normal");
-                
+
                 // Mostrar cada una de las 5 ideas que forman el concepto
                 for (let i = 0; i < gruposDelConcepto.length; i++) {
                     const grupoKey = `pastel_grupo${gruposDelConcepto[i]}`;
-                    const seleccion = data[grupoKey];
-                    
+                    const seleccion = data[grupoKey] || t('idea_not_selected');
+
                     if (y > 270) {
                         doc.addPage();
                         y = margen;
                     }
-                    
-                    if (seleccion) {
-                        doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
-                        y += 10;
-                    } else {
-                        doc.text(`${i + 1}. (Idea no seleccionada)`, margen + 10, y);
-                        y += 10;
-                    }
+
+                    doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+                    y += 10;
                 }
-                
+
             } else {
-                doc.text("No hay concepto evaluado como mejor", margen, y);
+                doc.text(t('no_best_concept'), margen, y);
                 y += 10;
             }
-            
+
             y += 20;
 
             // 10. PREVENCIÓN DE RIESGOS - COMPLETO
@@ -745,15 +1038,15 @@
                 doc.addPage();
                 y = margen;
             }
-            
+
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("9. PREVENCIÓN DE RIESGOS", margen, y);
+            doc.text(t('risk_prevention'), margen, y);
             y += 15;
-            
+
             let tienePrevencion = false;
-            
+
             for (let i = 1; i <= 3; i++) {
                 // Verificar si hay datos para esta prevención
                 const falla = data[`fallaPotencial${i}`];
@@ -766,91 +1059,91 @@
                 const fechaCell = data[`fechaCell${i}`];
                 const accionTom = data[`accionTom${i}`];
                 const fecha = data[`fecha${i}`];
-                
+
                 // Verificar si hay al menos un dato
                 if (falla || efecto || sev || ocu || riesgo || accionReal || responsable || fechaCell || accionTom || fecha) {
                     tienePrevencion = true;
-                    
+
                     if (y > 240) {
                         doc.addPage();
                         y = margen;
                     }
-                    
+
                     doc.setFontSize(14);
                     doc.setTextColor(13, 71, 161);
                     doc.setFont("helvetica", "bold");
-                    doc.text(`PREVENCIÓN ${i}`, margen, y);
+                    doc.text(`${t('prevention')} ${i}`, margen, y);
                     y += 12;
-                    
+
                     doc.setFontSize(12);
                     doc.setTextColor(0, 0, 0);
                     doc.setFont("helvetica", "normal");
-                    
+
                     // Mostrar TODOS los campos disponibles
                     if (falla) {
-                        doc.text(`• Falla potencial: ${falla}`, margen + 10, y);
+                        doc.text(`${t('potential_failure')} ${falla}`, margen + 10, y);
                         y += 10;
                     }
-                    
+
                     if (efecto) {
-                        doc.text(`• Efecto: ${efecto}`, margen + 10, y);
+                        doc.text(`${t('effect')} ${efecto}`, margen + 10, y);
                         y += 10;
                     }
-                    
+
                     if (sev) {
-                        doc.text(`• Severidad (1-10): ${sev}`, margen + 10, y);
+                        doc.text(`${t('severity')} ${sev}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (ocu) {
-                        doc.text(`• Ocurrencia (1-10): ${ocu}`, margen + 10, y);
+                        doc.text(`${t('occurrence')} ${ocu}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (riesgo) {
-                        doc.text(`• Riesgo calculado: ${riesgo}`, margen + 10, y);
+                        doc.text(`${t('risk')} ${riesgo}`, margen + 10, y);
                         y += 10;
-                    }
-                    
+                    }       
+            
                     if (accionReal) {
-                        doc.text(`• Acción/Acciones a realizar: ${accionReal}`, margen + 10, y);
+                        doc.text(`${t('actions_to_take')} ${accionReal}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (responsable) {
-                        doc.text(`• Responsable: ${responsable}`, margen + 10, y);
+                        doc.text(`${t('responsible')} ${responsable}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (fechaCell) {
-                        doc.text(`• Fecha de hoy: ${fechaCell}`, margen + 10, y);
+                        doc.text(`${t('today_date')} ${fechaCell}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (accionTom) {
-                        doc.text(`• Acción tomada: ${accionTom}`, margen + 10, y);
+                        doc.text(`${t('action_taken')} ${accionTom}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     if (fecha) {
-                        doc.text(`• Fecha de realización: ${fecha}`, margen + 10, y);
+                        doc.text(`${t('action_date')} ${fecha}`, margen + 10, y);
                         y += 10;
                     }
-                    
+            
                     y += 10;
-                    
+            
                     if (y > 280) {
                         doc.addPage();
                         y = margen;
                     }
                 }
             }
-            
+    
             if (!tienePrevencion) {
-                doc.text("No hay datos de prevención de riesgos", margen, y);
+                doc.text(t('no_prevention_data'), margen, y);
                 y += 10;
             }
-            
+    
             y += 15;
 
             // 11. PLAN DE ACCIÓN
@@ -858,26 +1151,26 @@
                 doc.addPage();
                 y = margen;
             }
-            
+    
             doc.setFontSize(16);
             doc.setTextColor(21, 101, 192);
             doc.setFont("helvetica", "bold");
-            doc.text("10. PLAN DE ACCIÓN", margen, y);
+            doc.text(t('action_plan'), margen, y);
             y += 15;
-            
+    
             let tieneTareas = false;
-            
+    
             // Tareas 1-15
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            doc.text("Tareas 1-15:", margen, y);
+            doc.text(t('tasks_1_15'), margen, y);
             y += 12;
-            
+    
             for (let i = 1; i <= 15; i++) {
                 const tarea = data[`tarea${i}`];
                 const persona = data[`persona${i}`];
-                
+        
                 if (tarea || persona) {
                     tieneTareas = true;
                     doc.setFontSize(12);
@@ -885,32 +1178,32 @@
                     doc.setFont("helvetica", "normal");
                     doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
                     y += 10;
-                    
+            
                     if (y > 280) {
                         doc.addPage();
                         y = margen;
                     }
                 }
             }
-            
+    
             y += 15;
-            
+    
             // Tareas 16-30
             if (y > 250) {
                 doc.addPage();
                 y = margen;
             }
-            
+    
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            doc.text("Tareas 16-30:", margen, y);
+            doc.text(t('tasks_16_30'), margen, y);
             y += 12;
-            
+    
             for (let i = 16; i <= 30; i++) {
                 const tarea = data[`tarea${i}`];
                 const persona = data[`persona${i}`];
-                
+        
                 if (tarea || persona) {
                     tieneTareas = true;
                     doc.setFontSize(12);
@@ -918,16 +1211,16 @@
                     doc.setFont("helvetica", "normal");
                     doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
                     y += 10;
-                    
+            
                     if (y > 280) {
                         doc.addPage();
                         y = margen;
                     }
                 }
             }
-            
+    
             if (!tieneTareas) {
-                doc.text("No hay tareas en el plan", margen, y);
+                doc.text(t('no_tasks'), margen, y);
                 y += 10;
             }
 
@@ -935,7 +1228,7 @@
             const finalY = doc.internal.pageSize.height - 20;
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
-            doc.text(`Documento generado el ${hoy}`, anchoPagina / 2, finalY, { align: "center" });
+            doc.text(`${t('document_generated')} ${hoy}`, anchoPagina / 2, finalY, { align: "center" });
 
             // Guardar PDF
             pdfBlob = doc.output('blob');

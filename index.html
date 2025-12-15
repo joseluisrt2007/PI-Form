@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desarrollo de Formularios para Actividades de Mejora</title>
+    <title data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -39,10 +39,61 @@
             background-color: var(--primary);
             color: var(--text-light);
             padding: 1.25rem 2rem;
-            text-align: center;
             box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
+        }
+
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         main {
@@ -111,14 +162,45 @@
         }
 
         @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+                font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
+            }
+
             .page-title {
                 font-size: 2.5rem;
                 margin-bottom: 4rem;
-            }
-
-            header {
-                font-size: 1.3rem;
-                padding: 1rem;
             }
 
             main {
@@ -132,6 +214,16 @@
         }
 
         @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+            
             .page-title {
                 font-size: 2.2rem;
             }
@@ -140,13 +232,28 @@
 </head>
 <body>
     <header role="banner">
-        Desarrollo de Formularios para Actividades de Mejora
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <main>
-        <h1 class="page-title">Menú Principal</h1>
+        <h1 class="page-title" data-i18n="main_menu">Menú Principal</h1>
         <div class="menu-actions">
-            <button class="btn-primary" onclick="goToCriterios()" aria-label="Iniciar una nueva actividad de mejora">
+            <button class="btn-primary" onclick="goToCriterios()" aria-label="Iniciar una nueva actividad de mejora" data-i18n="start">
                 Iniciar
             </button>
         </div>
@@ -156,6 +263,9 @@
         José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García
     </footer>
 
+    <!-- Primero cargamos el sistema de traducciones -->
+    <script src="lang.js"></script>
+    
     <script>
         // Almacenamiento local (equivalente a storage.py)
         if (!localStorage.getItem('projectData')) {
@@ -165,6 +275,19 @@
         function goToCriterios() {
             window.location.href = 'criterios.html';
         }
+
+        // Configurar el selector de idioma después de cargar lang.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                });
+            }
+        });
     </script>
 </body>
 </html>

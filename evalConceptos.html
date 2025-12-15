@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación de Conceptos - Actividades de Mejora</title>
+    <title data-i18n="evaluation_concepts_formed">Evaluación de Conceptos - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="lang.js"></script>
     <style>
         :root {
             --primary: #0d47a1;
@@ -38,6 +39,7 @@
             color: var(--text-dark);
         }
 
+        /* Header con tres columnas para selector de idioma */
         header {
             background-color: var(--primary);
             color: var(--text-light);
@@ -48,12 +50,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -263,9 +315,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -295,24 +380,57 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Evaluación de Conceptos</h1>
+        <h1 data-i18n="evaluation_concepts_formed">Evaluación de Conceptos Formados</h1>
 
         <div id="tablasContainer"></div>
 
         <div class="error" id="errorMsg"></div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn" disabled>Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='gc1.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" disabled data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='gc1.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
@@ -322,52 +440,137 @@
         const guardarBtn = document.getElementById('guardarBtn');
         const errorMsg = document.getElementById('errorMsg');
 
-        // Cargar nombre del proyecto
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
-
-        // Generar las 3 tablas de conceptos formados
-        for (let conc = 1; conc <= 3; conc++) {
-            const section = document.createElement('div');
-            section.className = 'concepto-section';
-
-            // Obtener las 5 opciones del concepto formado (una por cada concepto original, tomando la seleccionada en la columna 'conc')
-            const indices = [];
-            for (let g = 1; g <= 5; g++) {  // g = concepto original (1 a 5)
-                const grupoKey = `pastel_grupo${(g - 1) * 3 + conc}`;  // conc actúa como columna seleccionada (1 a 3)
-                const selectedPos = data[grupoKey] || 'Sin selección';
-                indices.push(selectedPos);
+        // Configurar selector de idioma y cargar datos
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                    updateProjectName();
+                    // Regenerar tablas para aplicar traducciones
+                    generarTablas();
+                });
             }
+            
+            updateProjectName();
+            generarTablas();
+        });
 
-            section.innerHTML = `
-                <div class="concepto-title">Concepto ${conc}</div>
-                <div class="opciones-list">
-                    <strong>Opciones que componen este concepto:</strong>
-                    <ul>
-                        <li>${indices[0]}</li>
-                        <li>${indices[1]}</li>
-                        <li>${indices[2]}</li>
-                        <li>${indices[3]}</li>
-                        <li>${indices[4]}</li>
-                    </ul>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>#</th><th>Criterio</th><th>Calificación (0-10)</th><th>Resultado</th></tr>
-                    </thead>
-                    <tbody>
-                        ${[1,2,3,4].map(i => `
+        // Actualizar nombre del proyecto en navbar
+        function updateProjectName() {
+            const projectText = document.getElementById('projectNameText');
+            
+            if (data.projectName && data.projectName.trim()) {
+                projectText.textContent = data.projectName;
+            } else {
+                // Usar traducción para "(Sin nombre)"
+                projectText.textContent = t('unnamed_project');
+            }
+        }
+
+        // Generar las 3 tablas de conceptos formados con textos traducidos
+        function generarTablas() {
+            tablasContainer.innerHTML = '';
+            
+            for (let conc = 1; conc <= 3; conc++) {
+                const section = document.createElement('div');
+                section.className = 'concepto-section';
+
+                // Obtener las 5 opciones del concepto formado
+                const indices = [];
+                for (let g = 1; g <= 5; g++) {
+                    const grupoKey = `pastel_grupo${(g - 1) * 3 + conc}`;
+                    const selectedPos = data[grupoKey] || t('no_selection');
+                    indices.push(selectedPos);
+                }
+
+                section.innerHTML = `
+                    <div class="concepto-title">${t('concept_formed')} ${conc}</div>
+                    <div class="opciones-list">
+                        <strong data-i18n="options_forming_concept">Opciones que componen este concepto:</strong>
+                        <ul>
+                            <li>${indices[0]}</li>
+                            <li>${indices[1]}</li>
+                            <li>${indices[2]}</li>
+                            <li>${indices[3]}</li>
+                            <li>${indices[4]}</li>
+                        </ul>
+                    </div>
+                    <table>
+                        <thead>
                             <tr>
-                                <td>${i}</td>
-                                <td>${data[`criterio${i}`] || `Criterio ${i}`}</td>
-                                <td><input type="number" class="calif" data-conc="${conc}" data-crit="${i}" min="0" max="10" step="0.1" value="${data[`ca${(conc-1)*4 + i}`] || ''}"></td>
-                                <td>${i === 1 ? '<span class="resultado" id="res' + conc + '">0.00</span>' : ''}</td>
+                                <th>#</th>
+                                <th data-i18n="criteria">Criterio</th>
+                                <th data-i18n="rating">Calificación (0-10)</th>
+                                <th data-i18n="result">Resultado</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <button class="btn-calc" onclick="calcular(${conc})">Calcular</button>
-            `;
-            tablasContainer.appendChild(section);
+                        </thead>
+                        <tbody>
+                            ${[1,2,3,4].map(i => `
+                                <tr>
+                                    <td>${i}</td>
+                                    <td>${data[`criterio${i}`] || `${t('criteria')} ${i}`}</td>
+                                    <td><input type="number" class="calif" data-conc="${conc}" data-crit="${i}" min="0" max="10" step="0.1" value="${data[`ca${(conc-1)*4 + i}`] || ''}" data-i18n-placeholder="enter_rating"></td>
+                                    <td>${i === 1 ? '<span class="resultado" id="res' + conc + '">0.00</span>' : ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <button class="btn-calc" onclick="calcular(${conc})" data-i18n="calculate">Calcular</button>
+                `;
+                tablasContainer.appendChild(section);
+            }
+            
+            // Aplicar traducciones a los textos dinámicos
+            aplicarTraduccionesDinamicas();
+            
+            // Aplicar traducciones a los placeholders
+            document.querySelectorAll('input[data-i18n-placeholder]').forEach(input => {
+                const key = input.getAttribute('data-i18n-placeholder');
+                input.placeholder = t(key);
+            });
+            
+            // Aplicar traducciones a los encabezados de tabla
+            document.querySelectorAll('thead th[data-i18n]').forEach(th => {
+                const key = th.getAttribute('data-i18n');
+                th.textContent = t(key);
+            });
+            
+            // Aplicar traducciones a los textos fuertes
+            document.querySelectorAll('strong[data-i18n]').forEach(strong => {
+                const key = strong.getAttribute('data-i18n');
+                strong.textContent = t(key);
+            });
+            
+            // Aplicar traducciones a los botones de calcular
+            document.querySelectorAll('.btn-calc').forEach(btn => {
+                btn.textContent = t('calculate');
+            });
+            
+            // Aplicar traducciones a los títulos de concepto
+            document.querySelectorAll('.concepto-title').forEach((title, index) => {
+                title.textContent = t('concept_formed') + ' ' + (index + 1);
+            });
+            
+            // Recalcular si hay datos
+            recalcularTodo();
+            validateAll();
+            
+            // Añadir event listeners a los inputs
+            document.querySelectorAll('.calif').forEach(input => input.addEventListener('input', validateAll));
+        }
+
+        // Aplicar traducciones a textos dinámicos que se generan en JavaScript
+        function aplicarTraduccionesDinamicas() {
+            // Actualizar textos "Sin selección" en las listas
+            document.querySelectorAll('.opciones-list li').forEach(li => {
+                if (li.textContent === t('no_selection')) {
+                    li.textContent = t('no_selection');
+                }
+            });
         }
 
         // Cálculo de una tabla
@@ -385,12 +588,12 @@
                 document.getElementById(`res${conc}`).textContent = total.toFixed(2);
                 data[`resultado${conc + 3}`] = total.toFixed(2);  // resultado4,5,6
             } else {
-                alert("Las calificaciones deben estar entre 0 y 10.");
+                alertT('error_ratings_range');
             }
             validateAll();
         }
 
-        // Validación global
+        // Validación global con mensajes traducidos
         function validateAll() {
             let allValid = true;
             document.querySelectorAll('.calif').forEach(input => {
@@ -398,7 +601,7 @@
                 if (isNaN(val) || val < 0 || val > 10 || input.value === '') allValid = false;
             });
             guardarBtn.disabled = !allValid;
-            errorMsg.textContent = allValid ? '' : 'Complete todas las calificaciones (0-10).';
+            errorMsg.textContent = allValid ? '' : t('error_ratings');
         }
 
         // Recalcular automáticamente al cargar
@@ -423,13 +626,6 @@
             localStorage.setItem('projectData', JSON.stringify(data));
             window.location.href = 'prevenir.html';
         });
-
-        // Eventos
-        document.querySelectorAll('.calif').forEach(input => input.addEventListener('input', validateAll));
-
-        // Inicialización
-        validateAll();
-        recalcularTodo();
     </script>
 </body>
 </html>

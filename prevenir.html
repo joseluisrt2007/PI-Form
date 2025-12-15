@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prevenir - Actividades de Mejora</title>
+    <title data-i18n="risk_prevention">Prevenir - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="lang.js"></script>
     <style>
         :root {
             --primary: #0d47a1;
@@ -39,6 +40,7 @@
             color: var(--text-dark);
         }
 
+        /* Header con tres columnas para selector de idioma */
         header {
             background-color: var(--primary);
             color: var(--text-light);
@@ -49,12 +51,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -243,9 +295,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -280,55 +365,134 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Prevenir</h1>
+        <h1 data-i18n="risk_prevention">Prevenir</h1>
 
         <div id="mejorConceptoContainer"></div>
 
         <div id="tablasContainer"></div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn">Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='evalConceptos.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='evalConceptos.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
     <script>
-        const data = JSON.parse(localStorage.getItem('projectData') || '{}');
-        const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
-        const tablasContainer = document.getElementById('tablasContainer');
+    const data = JSON.parse(localStorage.getItem('projectData') || '{}');
+    const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
+    const tablasContainer = document.getElementById('tablasContainer');
 
-        // Cargar nombre del proyecto
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+    // Configurar selector de idioma y cargar datos
+    document.addEventListener('DOMContentLoaded', function() {
+        const langSelector = document.getElementById('languageSelector');
+        if (langSelector) {
+            const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+            langSelector.value = currentLang;
+            
+            langSelector.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateProjectName();
+                // Regenerar contenido para aplicar traducciones
+                generarContenido();
+            });
+        }
+        
+        updateProjectName();
+        generarContenido();
+    });
 
+    // Actualizar nombre del proyecto en navbar
+    function updateProjectName() {
+        const projectText = document.getElementById('projectNameText');
+        
+        if (data.projectName && data.projectName.trim()) {
+            projectText.textContent = data.projectName;
+        } else {
+            // Usar traducción para "(Sin nombre)"
+            projectText.textContent = t('unnamed_project');
+        }
+    }
+
+    // Generar todo el contenido con textos traducidos
+    function generarContenido() {
+        generarMejorConcepto();
+        generarTablasPrevencion();
+    }
+
+    // Generar sección del mejor concepto
+    function generarMejorConcepto() {
         // Determinar el mejor concepto
         const resultados = [4,5,6].map(n => parseFloat(data[`resultado${n}`]) || 0);
         let mejorIdx = resultados.indexOf(Math.max(...resultados));
         if (resultados.every(r => r === 0)) mejorIdx = -1;
-        const mejorConcepto = mejorIdx >= 0 ? `Concepto ${mejorIdx + 1}` : 'Ninguno seleccionado';
+        
+        // Crear el texto del mejor concepto
+        let mejorConceptoTexto;
+        if (mejorIdx >= 0) {
+            mejorConceptoTexto = `${t('concept_formed')} ${mejorIdx + 1}`;
+        } else {
+            mejorConceptoTexto = t('no_concept_selected');
+        }
 
-        // Mostrar mejor concepto y sus opciones
+        // Obtener opciones del mejor concepto
         const opciones = [];
         if (mejorIdx >= 0) {
             for (let g = 1; g <= 5; g++) {
                 const key = `pastel_grupo${mejorIdx * 5 + g}`;
-                opciones.push(data[key] || 'Sin selección');
+                opciones.push(data[key] || t('no_selection'));
             }
         }
 
+        // Generar HTML usando t() directamente - NO usar data-i18n
         mejorConceptoContainer.innerHTML = `
-            <div class="mejor-concepto">Mejor Concepto: ${mejorConcepto}</div>
+            <div class="mejor-concepto">
+                ${t('best_concept')} ${mejorConceptoTexto}
+            </div>
             ${mejorIdx >= 0 ? `
                 <div class="opciones-list">
-                    <strong>Opciones que componen este concepto:</strong>
+                    <strong>${t('concept_composition')}</strong>
                     <ul>
                         <li>${opciones[0]}</li>
                         <li>${opciones[1]}</li>
@@ -339,67 +503,87 @@
                 </div>
             ` : ''}
         `;
+    }
 
-        // Generar las 3 tablas de prevención
+    // Generar las 3 tablas de prevención
+    function generarTablasPrevencion() {
+        tablasContainer.innerHTML = '';
+        
         for (let tabla = 1; tabla <= 3; tabla++) {
             const section = document.createElement('div');
             section.className = 'tabla-prevencion';
             section.innerHTML = `
-                <div class="tabla-title">Prevención ${tabla}</div>
+                <div class="tabla-title">${t('prevention')} ${tabla}</div>
                 <table>
-                    <tr><th>Falla potencial</th><td><input type="text" data-key="fallaPotencial${tabla}" value="${data[`fallaPotencial${tabla}`] || ''}"></td></tr>
-                    <tr><th>Efecto</th><td><input type="text" data-key="efecto${tabla}" value="${data[`efecto${tabla}`] || ''}"></td></tr>
-                    <tr><th>Severidad (1-10)</th><td><input type="number" class="sev" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`sev${tabla}`] || ''}"></td></tr>
-                    <tr><th>Ocurrencia (1-10)</th><td><input type="number" class="ocu" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`ocu${tabla}`] || ''}"></td></tr>
-                    <tr><th>Riesgo</th><td class="riesgo-cell"><span class="riesgo" id="riesgo${tabla}">${data[`riesgo${tabla}`] || '0.00'}</span></td></tr>
-                    <tr><th>Acción/Acciones a realizar</th><td><input type="text" data-key="accionReal${tabla}" value="${data[`accionReal${tabla}`] || ''}"></td></tr>
-                    <tr><th>Responsable</th><td><input type="text" data-key="responsable${tabla}" value="${data[`responsable${tabla}`] || ''}"></td></tr>
-                    <tr><th>Fecha de hoy</th><td><input type="date" data-key="fechaCell${tabla}" value="${data[`fechaCell${tabla}`] || new Date().toISOString().split('T')[0]}"></td></tr>
-                    <tr><th>Acción tomada</th><td><input type="text" data-key="accionTom${tabla}" value="${data[`accionTom${tabla}`] || ''}"></td></tr>
-                    <tr><th>Fecha en la que se realizó la acción</th><td><input type="date" data-key="fecha${tabla}" value="${data[`fecha${tabla}`] || ''}"></td></tr>
+                    <tr><th>${t('potential_failure')}</th><td><input type="text" data-key="fallaPotencial${tabla}" value="${data[`fallaPotencial${tabla}`] || ''}" placeholder="${t('enter_task')}"></td></tr>
+                    <tr><th>${t('effect')}</th><td><input type="text" data-key="efecto${tabla}" value="${data[`efecto${tabla}`] || ''}" placeholder="${t('enter_task')}"></td></tr>
+                    <tr><th>${t('severity')}</th><td><input type="number" class="sev" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`sev${tabla}`] || ''}" placeholder="${t('enter_severity')}"></td></tr>
+                    <tr><th>${t('occurrence')}</th><td><input type="number" class="ocu" data-tabla="${tabla}" min="1" max="10" step="1" value="${data[`ocu${tabla}`] || ''}" placeholder="${t('enter_occurrence')}"></td></tr>
+                    <tr><th>${t('risk')}</th><td class="riesgo-cell"><span class="riesgo" id="riesgo${tabla}">${data[`riesgo${tabla}`] || '0.00'}</span></td></tr>
+                    <tr><th>${t('actions_to_take')}</th><td><input type="text" data-key="accionReal${tabla}" value="${data[`accionReal${tabla}`] || ''}" placeholder="${t('enter_task')}"></td></tr>
+                    <tr><th>${t('responsible')}</th><td><input type="text" data-key="responsable${tabla}" value="${data[`responsable${tabla}`] || ''}" placeholder="${t('enter_responsible')}"></td></tr>
+                    <tr><th>${t('today_date')}</th><td><input type="date" data-key="fechaCell${tabla}" value="${data[`fechaCell${tabla}`] || new Date().toISOString().split('T')[0]}"></td></tr>
+                    <tr><th>${t('action_taken')}</th><td><input type="text" data-key="accionTom${tabla}" value="${data[`accionTom${tabla}`] || ''}" placeholder="${t('enter_task')}"></td></tr>
+                    <tr><th>${t('action_date')}</th><td><input type="date" data-key="fecha${tabla}" value="${data[`fecha${tabla}`] || ''}"></td></tr>
                 </table>
-                <button class="btn-calc" onclick="calcularRiesgo(${tabla})">Calcular riesgo</button>
+                <button class="btn-calc" onclick="calcularRiesgo(${tabla})">${t('risk_calculation')}</button>
             `;
             tablasContainer.appendChild(section);
         }
+        
+        // Recalcular riesgos si hay datos
+        recalcularRiesgosSiExisten();
+    }
 
-        // Cálculo de riesgo con validación estricta 1-10
-        function calcularRiesgo(tabla) {
-            const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
-            const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
-            const sev = parseFloat(sevInput.value);
-            const ocu = parseFloat(ocuInput.value);
+    // Cálculo de riesgo con validación estricta 1-10 y mensajes traducidos
+    function calcularRiesgo(tabla) {
+        const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
+        const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
+        const sev = parseFloat(sevInput.value);
+        const ocu = parseFloat(ocuInput.value);
 
-            if (isNaN(sev) || isNaN(ocu) || sev < 1 || sev > 10 || ocu < 1 || ocu > 10) {
-                alert("Severidad y Ocurrencia deben ser números enteros entre 1 y 10.");
-                return;
-            }
-
-            const riesgo = (sev * ocu).toFixed(2);
-            document.getElementById(`riesgo${tabla}`).textContent = riesgo;
-            data[`riesgo${tabla}`] = riesgo;  // Guardado automático en el objeto data
+        if (isNaN(sev) || isNaN(ocu) || sev < 1 || sev > 10 || ocu < 1 || ocu > 10) {
+            alert(t('error_severity_occurrence'));
+            return;
         }
 
-        // Recalcular riesgos al cargar si hay datos
+        const riesgo = (sev * ocu).toFixed(2);
+        document.getElementById(`riesgo${tabla}`).textContent = riesgo;
+        data[`riesgo${tabla}`] = riesgo;
+    }
+
+    // Recalcular riesgos al cargar si hay datos
+    function recalcularRiesgosSiExisten() {
         for (let tabla = 1; tabla <= 3; tabla++) {
             const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
             const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
-            if (sevInput.value && ocuInput.value) {
+            if (sevInput && sevInput.value && ocuInput && ocuInput.value) {
                 calcularRiesgo(tabla);
             }
         }
+    }
 
-        // Guardar y continuar
-        document.getElementById('guardarBtn').addEventListener('click', () => {
-            document.querySelectorAll('input[data-key]').forEach(input => {
-                data[input.dataset.key] = input.value;
-            });
-            document.querySelectorAll('.sev, .ocu').forEach(input => {
-                data[input.className + input.dataset.tabla] = input.value;
-            });
-            localStorage.setItem('projectData', JSON.stringify(data));
-            window.location.href = 'diagrama.html';  // Siguiente página
+    // Guardar y continuar
+    document.getElementById('guardarBtn').addEventListener('click', () => {
+        // Guardar valores de inputs
+        document.querySelectorAll('input[data-key]').forEach(input => {
+            data[input.dataset.key] = input.value;
         });
-    </script>
+        
+        // Guardar valores de severidad y ocurrencia
+        document.querySelectorAll('.sev').forEach(input => {
+            const tabla = input.dataset.tabla;
+            data[`sev${tabla}`] = input.value;
+        });
+        
+        document.querySelectorAll('.ocu').forEach(input => {
+            const tabla = input.dataset.tabla;
+            data[`ocu${tabla}`] = input.value;
+        });
+        
+        localStorage.setItem('projectData', JSON.stringify(data));
+        window.location.href = 'diagrama.html';
+    });
+</script>
 </body>
 </html>

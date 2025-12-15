@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagrama pt.2 - Actividades de Mejora</title>
+    <title data-i18n="diagram_pt2">Diagrama pt.2 - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="lang.js"></script>
     <style>
         :root {
             --primary: #0d47a1;
@@ -36,6 +37,7 @@
             color: var(--text-dark);
         }
 
+        /* Header con tres columnas para selector de idioma */
         header {
             background-color: var(--primary);
             color: var(--text-light);
@@ -46,12 +48,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -234,9 +286,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -266,27 +351,60 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Diagrama pt.2</h1>
+        <h1 data-i18n="diagram_pt2">Diagrama pt.2</h1>
 
         <div id="mejorConceptoContainer"></div>
 
         <div class="tabla-tareas">
-            <h2>Tabla de tareas y responsables</h2>
+            <h2 data-i18n="tasks_responsibles">Tabla de tareas y responsables</h2>
             <div id="tareasContainer"></div>
         </div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn">Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='diagrama.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='diagrama.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
@@ -295,59 +413,123 @@
         const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
         const tareasContainer = document.getElementById('tareasContainer');
 
-        // Cargar nombre del proyecto
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+        // Configurar selector de idioma y cargar datos
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                    updateProjectName();
+                    // Regenerar contenido para aplicar traducciones
+                    generarContenido();
+                });
+            }
+            
+            updateProjectName();
+            generarContenido();
+        });
 
-        // Determinar el mejor concepto (mismo cálculo)
-        const resultados = [4,5,6].map(n => parseFloat(data[`resultado${n}`]) || 0);
-        let mejorIdx = resultados.indexOf(Math.max(...resultados));
-        if (resultados.every(r => r === 0)) mejorIdx = -1;
-        const mejorConcepto = mejorIdx >= 0 ? `Concepto ${mejorIdx + 1}` : 'Ninguno seleccionado';
-
-        // Mostrar mejor concepto y sus opciones
-        const opciones = [];
-        if (mejorIdx >= 0) {
-            for (let g = 1; g <= 5; g++) {
-                const key = `pastel_grupo${mejorIdx * 5 + g}`;
-                opciones.push(data[key] || 'Sin selección');
+        // Actualizar nombre del proyecto en navbar
+        function updateProjectName() {
+            const projectText = document.getElementById('projectNameText');
+            
+            if (data.projectName && data.projectName.trim()) {
+                projectText.textContent = data.projectName;
+            } else {
+                // Usar traducción para "(Sin nombre)"
+                projectText.textContent = t('unnamed_project');
             }
         }
 
-        mejorConceptoContainer.innerHTML = `
-            <div class="mejor-concepto">Mejor Concepto: ${mejorConcepto}</div>
-            ${mejorIdx >= 0 ? `
-                <div class="opciones-list">
-                    <strong>Opciones que componen este concepto:</strong>
-                    <ul>
-                        <li>${opciones[0]}</li>
-                        <li>${opciones[1]}</li>
-                        <li>${opciones[2]}</li>
-                        <li>${opciones[3]}</li>
-                        <li>${opciones[4]}</li>
-                    </ul>
-                </div>
-            ` : ''}
-        `;
+        // Generar todo el contenido con textos traducidos
+        function generarContenido() {
+            generarMejorConcepto();
+            generarTareas();
+            aplicarTraduccionesEtiquetas();
+        }
 
-        // Generar las tareas 16 a 30 con número secuencial grande
-        for (let i = 16; i <= 30; i++) {
-            const responsable = data[`persona${i}`] || '';
-            const tarea = data[`tarea${i}`] || '';
+        // Generar sección del mejor concepto
+        function generarMejorConcepto() {
+            // Determinar el mejor concepto
+            const resultados = [4,5,6].map(n => parseFloat(data[`resultado${n}`]) || 0);
+            let mejorIdx = resultados.indexOf(Math.max(...resultados));
+            if (resultados.every(r => r === 0)) mejorIdx = -1;
+            
+            // Crear el texto del mejor concepto
+            let mejorConceptoTexto;
+            if (mejorIdx >= 0) {
+                mejorConceptoTexto = `${t('concept_formed')} ${mejorIdx + 1}`;
+            } else {
+                mejorConceptoTexto = t('no_concept_selected');
+            }
 
-            const tareaDiv = document.createElement('div');
-            tareaDiv.className = 'tarea-row';
-            tareaDiv.innerHTML = `
-                <div class="numero">${i}</div>
-                <div class="responsable">
-                    <label>Responsable</label>
-                    <input type="text" value="${responsable}" data-key="persona${i}">
+            // Obtener opciones del mejor concepto
+            const opciones = [];
+            if (mejorIdx >= 0) {
+                for (let g = 1; g <= 5; g++) {
+                    const key = `pastel_grupo${mejorIdx * 5 + g}`;
+                    opciones.push(data[key] || t('no_selection'));
+                }
+            }
+
+            // Generar HTML usando t() directamente - NO usar data-i18n
+            mejorConceptoContainer.innerHTML = `
+                <div class="mejor-concepto">
+                    ${t('best_concept')} ${mejorConceptoTexto}
                 </div>
-                <div class="tarea">
-                    <label>Tarea</label>
-                    <input type="text" value="${tarea}" data-key="tarea${i}">
-                </div>
+                ${mejorIdx >= 0 ? `
+                    <div class="opciones-list">
+                        <strong>${t('concept_composition')}</strong>
+                        <ul>
+                            <li>${opciones[0]}</li>
+                            <li>${opciones[1]}</li>
+                            <li>${opciones[2]}</li>
+                            <li>${opciones[3]}</li>
+                            <li>${opciones[4]}</li>
+                        </ul>
+                    </div>
+                ` : ''}
             `;
-            tareasContainer.appendChild(tareaDiv);
+        }
+
+        // Generar las tareas 16 a 30
+        function generarTareas() {
+            tareasContainer.innerHTML = '';
+            
+            for (let i = 16; i <= 30; i++) {
+                const responsable = data[`persona${i}`] || '';
+                const tarea = data[`tarea${i}`] || '';
+
+                const tareaDiv = document.createElement('div');
+                tareaDiv.className = 'tarea-row';
+                tareaDiv.innerHTML = `
+                    <div class="numero">${i}</div>
+                    <div class="responsable">
+                        <label>${t('responsable_label')}</label>
+                        <input type="text" value="${responsable}" data-key="persona${i}" placeholder="${t('enter_responsible')}">
+                    </div>
+                    <div class="tarea">
+                        <label>${t('task_label')}</label>
+                        <input type="text" value="${tarea}" data-key="tarea${i}" placeholder="${t('enter_task')}">
+                    </div>
+                `;
+                tareasContainer.appendChild(tareaDiv);
+            }
+        }
+
+        // Aplicar traducciones a las etiquetas y placeholders
+        function aplicarTraduccionesEtiquetas() {
+            // El sistema de lang.js se encargará automáticamente de los elementos con data-i18n
+            // Solo necesitamos asegurarnos de que applyTranslations se ejecute
+            
+            // Aplicar traducción al título de la tabla de tareas
+            const tituloTabla = document.querySelector('.tabla-tareas h2');
+            if (tituloTabla && tituloTabla.hasAttribute('data-i18n')) {
+                tituloTabla.textContent = t('tasks_responsibles');
+            }
         }
 
         // Guardar y continuar
@@ -356,7 +538,7 @@
                 data[input.dataset.key] = input.value.trim();
             });
             localStorage.setItem('projectData', JSON.stringify(data));
-            window.location.href = 'resultados.html';  // Siguiente página: Resultados
+            window.location.href = 'resultados.html';
         });
     </script>
 </body>

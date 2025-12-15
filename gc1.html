@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formación de Conceptos - Actividades de Mejora</title>
+    <title data-i18n="concept_formation">Formación de Conceptos - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="lang.js"></script>
     <style>
         :root {
             --primary: #0d47a1;
@@ -36,6 +37,7 @@
             color: var(--text-dark);
         }
 
+        /* Header con tres columnas para selector de idioma */
         header {
             background-color: var(--primary);
             color: var(--text-light);
@@ -46,12 +48,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -199,9 +251,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -240,22 +325,55 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Formación de Conceptos</h1>
+        <h1 data-i18n="concept_formation">Formación de Conceptos</h1>
 
         <div id="tablasContainer"></div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn">Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='morfologia.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='morfologia.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
@@ -263,76 +381,125 @@
         const data = JSON.parse(localStorage.getItem('projectData') || '{}');
         const tablasContainer = document.getElementById('tablasContainer');
 
-        // Cargar nombre del proyecto
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+        // Configurar selector de idioma y cargar datos
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                    updateProjectName();
+                    // Regenerar tablas para aplicar traducciones
+                    generarTablas();
+                });
+            }
+            
+            updateProjectName();
+            generarTablas();
+        });
 
-        // Generar las 5 tablas
-        for (let conc = 1; conc <= 5; conc++) {
-            const conceptoNombre = data[`concepto${conc}`] || `Concepto ${conc}`;
-
-            const section = document.createElement('div');
-            section.className = 'concepto-section';
-            section.innerHTML = `
-                <div class="concepto-title">${conceptoNombre}</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Opción 1</th>
-                            <th>Opción 2</th>
-                            <th>Opción 3</th>
-                            <th>Posibilidades</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${[1,2,3].map(row => {
-                            const posIdx = (conc - 1) * 3 + row;
-                            const posibilidad = data[`pos${posIdx}`] || `Opción ${posIdx}`;
-                            const savedSelections = data[`pastel_grupo${(conc - 1) * 3 + row}`] || {}; // Objeto para selección por fila si se necesita
-                            return `
-                                <tr>
-                                    <td>${row}</td>
-                                    <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="1" data-pos="${posIdx}"></td>
-                                    <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="2" data-pos="${posIdx}"></td>
-                                    <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="3" data-pos="${posIdx}"></td>
-                                    <td class="posibilidad">${posibilidad}</td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            `;
-            tablasContainer.appendChild(section);
+        // Actualizar nombre del proyecto en navbar
+        function updateProjectName() {
+            const projectText = document.getElementById('projectNameText');
+            
+            if (data.projectName && data.projectName.trim()) {
+                projectText.textContent = data.projectName;
+            } else {
+                // Usar traducción para "(Sin nombre)"
+                projectText.textContent = t('unnamed_project');
+            }
         }
 
-        // Selección única por columna
-        document.querySelectorAll('.chk').forEach(chk => {
-            const conc = chk.dataset.conc;
-            const col = chk.dataset.col;
-            const pos = chk.dataset.pos;
+        // Generar las 5 tablas con textos traducidos
+        function generarTablas() {
+            tablasContainer.innerHTML = '';
+            
+            for (let conc = 1; conc <= 5; conc++) {
+                const conceptoNombre = data[`concepto${conc}`] || `Concepto ${conc}`;
 
-            // Cargar selección guardada
-            if (data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`] === data[`pos${pos}`]) {
-                chk.checked = true;
+                const section = document.createElement('div');
+                section.className = 'concepto-section';
+                section.innerHTML = `
+                    <div class="concepto-title">${conceptoNombre}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th data-i18n-col="1">Opción 1</th>
+                                <th data-i18n-col="2">Opción 2</th>
+                                <th data-i18n-col="3">Opción 3</th>
+                                <th data-i18n="possibilities">Posibilidades</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[1,2,3].map(row => {
+                                const posIdx = (conc - 1) * 3 + row;
+                                const posibilidad = data[`pos${posIdx}`] || `Opción ${posIdx}`;
+                                return `
+                                    <tr>
+                                        <td>${row}</td>
+                                        <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="1" data-pos="${posIdx}"></td>
+                                        <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="2" data-pos="${posIdx}"></td>
+                                        <td><input type="checkbox" class="chk" data-conc="${conc}" data-col="3" data-pos="${posIdx}"></td>
+                                        <td class="posibilidad">${posibilidad}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+                tablasContainer.appendChild(section);
             }
-
-            chk.addEventListener('change', () => {
-                if (chk.checked) {
-                    // Desmarcar otros en la misma columna
-                    document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`).forEach(other => {
-                        if (other !== chk) other.checked = false;
-                    });
-                    // Guardar selección
-                    data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`] = data[`pos${pos}`] || '';
-                } else {
-                    // Si se desmarca y no hay otro seleccionado, limpiar
-                    const anyChecked = Array.from(document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`)).some(c => c.checked);
-                    if (!anyChecked) {
-                        delete data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`];
-                    }
-                }
+            
+            // Aplicar traducciones a los encabezados de tabla
+            document.querySelectorAll('thead th[data-i18n]').forEach(th => {
+                const key = th.getAttribute('data-i18n');
+                th.textContent = t(key);
             });
-        });
+            
+            // Aplicar traducciones a las opciones (Opción 1, Opción 2, Opción 3)
+            document.querySelectorAll('thead th[data-i18n-col]').forEach(th => {
+                const colNum = th.getAttribute('data-i18n-col');
+                th.textContent = t('option') + ' ' + colNum;
+            });
+            
+            // Configurar checkboxes
+            configurarCheckboxes();
+        }
+
+        // Configurar checkboxes y cargar selecciones guardadas
+        function configurarCheckboxes() {
+            // Selección única por columna
+            document.querySelectorAll('.chk').forEach(chk => {
+                const conc = chk.dataset.conc;
+                const col = chk.dataset.col;
+                const pos = chk.dataset.pos;
+
+                // Cargar selección guardada
+                if (data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`] === data[`pos${pos}`]) {
+                    chk.checked = true;
+                }
+
+                chk.addEventListener('change', () => {
+                    if (chk.checked) {
+                        // Desmarcar otros en la misma columna
+                        document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`).forEach(other => {
+                            if (other !== chk) other.checked = false;
+                        });
+                        // Guardar selección
+                        data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`] = data[`pos${pos}`] || '';
+                    } else {
+                        // Si se desmarca y no hay otro seleccionado, limpiar
+                        const anyChecked = Array.from(document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`)).some(c => c.checked);
+                        if (!anyChecked) {
+                            delete data[`pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`];
+                        }
+                    }
+                });
+            });
+        }
 
         // Guardar y continuar
         document.getElementById('guardarBtn').addEventListener('click', () => {

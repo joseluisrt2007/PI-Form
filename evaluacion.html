@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación - Actividades de Mejora</title>
+    <title data-i18n="concept_evaluation">Evaluación - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,12 +47,62 @@
             align-items: center;
             font-size: 1.5rem;
             font-weight: 500;
+            position: relative;
         }
 
-        .project-name {
+        .header-left {
+            flex: 1;
+            text-align: left;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            flex: 1;
+            text-align: right;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-name-container {
             font-size: 1.125rem;
             font-weight: 400;
             opacity: 0.95;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid #1976d2;
+            background-color: white;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .language-selector select:hover {
+            border-color: #0d47a1;
+            box-shadow: 0 2px 8px rgba(13, 71, 161, 0.2);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
         }
 
         .container {
@@ -232,9 +282,42 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 padding: 1rem;
                 font-size: 1.3rem;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-center,
+            .header-right {
+                width: 100%;
+                text-align: center;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                margin-top: 0.5rem;
+            }
+
+            .header-right {
+                order: 2;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .project-name-container {
+                font-size: 1rem;
+            }
+
+            .language-selector select {
+                min-width: 100px;
             }
 
             .container {
@@ -260,62 +343,151 @@
                 max-width: 400px;
             }
         }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.2rem;
+            }
+            
+            .project-name-container {
+                font-size: 0.95rem;
+            }
+            
+            .language-selector select {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                min-width: 90px;
+            }
+        }
     </style>
 </head>
 <body>
     <header role="banner">
-        <div>Desarrollo de Formularios para Actividades de Mejora</div>
-        <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
     </header>
 
     <div class="container">
-        <h1>Evaluación</h1>
+        <h1 data-i18n="concept_evaluation">Evaluación</h1>
 
         <div id="tablasContainer"></div>
 
         <div class="error" id="errorMsg"></div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn" disabled>Guardar y continuar</button>
-            <button class="btn-primary btn-secondary" onclick="window.location.href='criterios.html'">Regreso</button>
+            <button class="btn-primary" id="guardarBtn" disabled data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary btn-secondary" onclick="window.location.href='criterios.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
+    <!-- Sistema de traducción -->
+    <script src="lang.js"></script>
+    
     <script>
         const data = JSON.parse(localStorage.getItem('projectData') || '{}');
         const tablasContainer = document.getElementById('tablasContainer');
         const guardarBtn = document.getElementById('guardarBtn');
         const errorMsg = document.getElementById('errorMsg');
 
-        // Cargar nombre del proyecto
-        document.getElementById('projectNameDisplay').textContent = `Proyecto: ${data.projectName || '(Sin nombre)'}`;
+        // Configurar selector de idioma
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                const currentLang = localStorage.getItem('preferredLanguage') || 'es';
+                langSelector.value = currentLang;
+                
+                langSelector.addEventListener('change', function() {
+                    setLanguage(this.value);
+                    updateProjectName(); // Actualizar nombre del proyecto con nueva traducción
+                });
+            }
+            
+            updateProjectName();
+            generarTablas();
+        });
+
+        // Actualizar nombre del proyecto en navbar
+        function updateProjectName() {
+            const projectText = document.getElementById('projectNameText');
+            
+            if (data.projectName && data.projectName.trim()) {
+                projectText.textContent = data.projectName;
+            } else {
+                // Usar traducción para "(Sin nombre)"
+                projectText.textContent = t('unnamed_project');
+            }
+        }
 
         // Generar las 5 tablas
-        for (let conc = 1; conc <= 5; conc++) {
-            const conceptoNombre = data[`concepto${conc}`] || `Concepto ${conc}`;
+        function generarTablas() {
+            tablasContainer.innerHTML = '';
+            
+            for (let conc = 1; conc <= 5; conc++) {
+                const conceptoNombre = data[`concepto${conc}`] || `Concepto ${conc}`;
 
-            const section = document.createElement('div');
-            section.className = 'concepto-section';
-            section.innerHTML = `
-                <div class="concepto-title">${conceptoNombre}</div>
-                <table>
-                    <thead>
-                        <tr><th>#</th><th>Criterio</th><th>Calificación (0-10)</th><th>Resultado</th></tr>
-                    </thead>
-                    <tbody>
-                        ${[1,2,3,4].map(i => `
+                const section = document.createElement('div');
+                section.className = 'concepto-section';
+                section.innerHTML = `
+                    <div class="concepto-title">${conceptoNombre}</div>
+                    <table>
+                        <thead>
                             <tr>
-                                <td>${i}</td>
-                                <td>${data[`criterio${i}`] || `Criterio ${i}`}</td>
-                                <td><input type="number" class="calif" data-conc="${conc}" data-crit="${i}" min="0" max="10" step="0.1" value="${data[`calif${conc}_${i}`] || ''}"></td>
-                                <td>${i === 1 ? '<span class="resultado" id="res' + conc + '">0.00</span>' : ''}</td>
+                                <th>#</th>
+                                <th data-i18n="criteria">Criterio</th>
+                                <th data-i18n="rating">Calificación (0-10)</th>
+                                <th data-i18n="result">Resultado</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <button class="btn-calc" onclick="calcular(${conc})">Calcular</button>
-            `;
-            tablasContainer.appendChild(section);
+                        </thead>
+                        <tbody>
+                            ${[1,2,3,4].map(i => `
+                                <tr>
+                                    <td>${i}</td>
+                                    <td>${data[`criterio${i}`] || `Criterio ${i}`}</td>
+                                    <td><input type="number" class="calif" data-conc="${conc}" data-crit="${i}" min="0" max="10" step="0.1" value="${data[`calif${conc}_${i}`] || ''}"></td>
+                                    <td>${i === 1 ? '<span class="resultado" id="res' + conc + '">0.00</span>' : ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <button class="btn-calc" onclick="calcular(${conc})" data-i18n="calculate">Calcular</button>
+                `;
+                tablasContainer.appendChild(section);
+            }
+            
+            // Aplicar traducciones a los botones de calcular
+            document.querySelectorAll('.btn-calc').forEach(btn => {
+                btn.textContent = t('calculate');
+            });
+            
+            // Aplicar traducciones a los encabezados de tabla
+            document.querySelectorAll('thead th[data-i18n]').forEach(th => {
+                const key = th.getAttribute('data-i18n');
+                th.textContent = t(key);
+            });
+            
+            // Recalcular si hay datos
+            recalcularTodo();
+            validateAll();
+            
+            // Añadir event listeners a los inputs
+            document.querySelectorAll('.calif').forEach(input => input.addEventListener('input', validateAll));
         }
 
         // Cálculo de una tabla
@@ -333,7 +505,7 @@
                 document.getElementById(`res${conc}`).textContent = total.toFixed(2);
                 data[`resultado${conc}`] = total.toFixed(2);
             } else {
-                alert("Las calificaciones deben estar entre 0 y 10.");
+                alert(t('error_ratings_range'));
             }
             validateAll();
         }
@@ -346,7 +518,7 @@
                 if (isNaN(val) || val < 0 || val > 10 || input.value === '') allValid = false;
             });
             guardarBtn.disabled = !allValid;
-            errorMsg.textContent = allValid ? '' : 'Complete todas las calificaciones (0-10).';
+            errorMsg.textContent = allValid ? '' : t('error_ratings');
         }
 
         // Calcular automáticamente al cargar si hay datos
@@ -372,12 +544,7 @@
             window.location.href = 'morfologia.html';
         });
 
-        // Eventos
-        document.querySelectorAll('.calif').forEach(input => input.addEventListener('input', validateAll));
-
-        // Inicialización
-        validateAll();
-        recalcularTodo();  // Muestra resultados guardados al cargar
+        // Inicialización - ya se hace en DOMContentLoaded
     </script>
 </body>
 </html>
