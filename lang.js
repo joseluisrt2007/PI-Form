@@ -8,13 +8,15 @@ const translations = {
         'unnamed_project': '(Sin nombre)',
         
         // =================== BOTONES ===================
-        'save_continue': 'Guardar y continuar',
-        'back': 'Regreso',
-        'start': 'Iniciar',
-        'calculate': 'Calcular',
-        'download_pdf': 'Descargar PDF nuevamente',
-        'return_main_menu': 'Volver al menú principal',
-        'risk_calculation': 'Calcular riesgo',
+        'save_continue': '💾 Guardar y continuar',
+        'back': '◀️ Regreso',
+        'start': '🚀 Iniciar',
+        'calculate': '🧮 Calcular',
+        'download_pdf': '📄 Descargar PDF nuevamente',
+        'return_main_menu': '🏠 Volver al menú principal',
+        'risk_calculation': '⚠️ Calcular riesgo',
+        'theme_light': 'Cambiar a modo claro',
+        'theme_dark': 'Cambiar a modo oscuro',
         
         // =================== ERRORES ===================
         'error_sum_weights': 'La suma de los pesos debe ser exactamente 10',
@@ -123,13 +125,15 @@ const translations = {
         'unnamed_project': '(Unnamed)',
         
         // =================== BUTTONS ===================
-        'save_continue': 'Save and continue',
-        'back': 'Back',
-        'start': 'Start',
-        'calculate': 'Calculate',
-        'download_pdf': 'Download PDF again',
-        'return_main_menu': 'Return to main menu',
-        'risk_calculation': 'Calculate risk',
+        'save_continue': '💾 Save and continue',
+        'back': '◀️ Back',
+        'start': '🚀 Start',
+        'calculate': '🧮 Calculate',
+        'download_pdf': '📄 Download PDF again',
+        'return_main_menu': '🏠 Return to main menu',
+        'risk_calculation': '⚠️ Calculate risk',
+        'theme_light': 'Switch to light mode',
+        'theme_dark': 'Switch to dark mode',
         
         // =================== ERRORS ===================
         'error_sum_weights': 'Sum of weights must be exactly 10',
