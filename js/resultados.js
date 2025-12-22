@@ -125,38 +125,42 @@ function t(key) {
             'unnamed_project': '(Sin nombre)',
             'complete_project_report': 'INFORME COMPLETO DE PROYECTO',
             'generated_on': 'Generado el:',
-            'criteria_weights': '1. CRITERIOS Y PESOS',
+            'project_information': '1. INFORMACIÓN DEL PROYECTO',
+            'project_name_label': 'Nombre del proyecto:',
+            'description_label': 'Descripción:',
+            'no_description': '(Sin descripción)',
+            'criteria_weights': '2. CRITERIOS Y PESOS',
             'criteria': 'Criterio',
             'weight': 'Peso',
             'total_sum_weights': 'SUMA TOTAL DE PESOS:',
-            'ideas_concepts': '2. IDEAS / CONCEPTOS INICIALES',
+            'ideas_concepts': '3. IDEAS / CONCEPTOS INICIALES',
             'idea': 'Idea',
-            'initial_evaluation': '3. EVALUACIÓN INICIAL DE IDEAS',
+            'initial_evaluation': '4. EVALUACIÓN INICIAL DE IDEAS',
             'no_initial_data': 'No hay datos de evaluación inicial',
             'for': 'Para',
             'option': 'Opción',
-            'explore_possibilities': '4. EXPLORACIÓN DE POSIBILIDADES',
-            'no_possibilities_data': 'No hay datos de exploración de posibilidades',
-            'concept_formation': '5. FORMACIÓN DE CONCEPTOS',
+            'explore_possibilities': '5. EXPLORACIÓN DE OPCIONES',
+            'no_possibilities_data': 'No hay datos de exploración de opciones',
+            'concept_formation': '6. FORMACIÓN DE CONCEPTOS',
             'checkbox_selections': '(Selecciones realizadas con checkboxes)',
             'selection_summary': 'Resumen de selecciones por grupo:',
             'group': 'Grupo',
             'from': 'de',
             'no_selections': 'No hay selecciones realizadas',
-            'concepts_formed': '6. CONCEPTOS FORMADOS',
+            'concepts_formed': '7. CONCEPTOS FORMADOS',
             'concepts_from_selections': '(Los 3 conceptos creados a partir de las selecciones)',
             'concept_formed': 'Concepto Formado',
             'no_selection': '(Sin selección)',
             'no_concepts_formed': 'No se han formado conceptos',
-            'evaluation_concepts_formed': '7. EVALUACIÓN DE CONCEPTOS FORMADOS',
+            'evaluation_concepts_formed': '8. EVALUACIÓN DE CONCEPTOS FORMADOS',
             'no_evaluation_concepts': 'No hay evaluación de conceptos formados',
             'final_score': 'Puntuación final',
-            'best_concept_selected': '8. MEJOR CONCEPTO SELECCIONADO',
+            'best_concept_selected': '9. MEJOR CONCEPTO SELECCIONADO',
             'score_obtained': 'Puntuación obtenida',
             'composition_winner': 'COMPOSICIÓN DEL CONCEPTO GANADOR:',
             'idea_not_selected': '(Idea no seleccionada)',
             'no_best_concept': 'No hay concepto evaluado como mejor',
-            'risk_prevention': '9. PREVENCIÓN DE RIESGOS',
+            'risk_prevention': '10. PREVENCIÓN DE RIESGOS',
             'prevention': 'PREVENCIÓN',
             'potential_failure': '• Falla potencial:',
             'effect': '• Efecto:',
@@ -169,7 +173,7 @@ function t(key) {
             'action_taken': '• Acción tomada:',
             'action_date': '• Fecha de realización:',
             'no_prevention_data': 'No hay datos de prevención de riesgos',
-            'action_plan': '10. PLAN DE ACCIÓN',
+            'action_plan': '11. PLAN DE ACCIÓN',
             'tasks_1_15': 'Tareas 1-15:',
             'tasks_16_30': 'Tareas 16-30:',
             'no_tasks': 'No hay tareas en el plan',
@@ -181,38 +185,43 @@ function t(key) {
             'unnamed_project': '(Unnamed)',
             'complete_project_report': 'COMPLETE PROJECT REPORT',
             'generated_on': 'Generated on:',
-            'criteria_weights': '1. CRITERIA AND WEIGHTS',
+            'project_information': '1. PROJECT INFORMATION',
+            'project_name_label': 'Project name:',
+            'description_label': 'Description:',
+            'no_description': '(No description)',
+            'criteria_weights': '2. CRITERIA AND WEIGHTS',
             'criteria': 'Criteria',
             'weight': 'Weight',
             'total_sum_weights': 'TOTAL SUM OF WEIGHTS:',
-            'ideas_concepts': '2. INITIAL IDEAS / CONCEPTS',
+            'ideas_concepts': '3. INITIAL IDEAS / CONCEPTS',
             'idea': 'Idea',
-            'initial_evaluation': '3. INITIAL EVALUATION OF IDEAS',
+            'initial_evaluation': '4. INITIAL EVALUATION OF IDEAS',
             'no_initial_data': 'No initial evaluation data',
             'for': 'For',
             'option': 'Option',
-            'explore_possibilities': '4. EXPLORATION OF POSSIBILITIES',
-            'no_possibilities_data': 'No exploration of possibilities data',
-            'concept_formation': '5. CONCEPT FORMATION',
+            'options': 'Option',
+            'explore_possibilities': '5. EXPLORATION OF OPTIONS',
+            'no_possibilities_data': 'No exploration of options data',
+            'concept_formation': '6. CONCEPT FORMATION',
             'checkbox_selections': '(Selections made with checkboxes)',
             'selection_summary': 'Selection summary by group:',
             'group': 'Group',
             'from': 'from',
             'no_selections': 'No selections made',
-            'concepts_formed': '6. FORMED CONCEPTS',
+            'concepts_formed': '7. FORMED CONCEPTS',
             'concepts_from_selections': '(The 3 concepts created from the selections)',
             'concept_formed': 'Concept Formed',
             'no_selection': '(No selection)',
             'no_concepts_formed': 'No concepts have been formed',
-            'evaluation_concepts_formed': '7. EVALUATION OF FORMED CONCEPTS',
+            'evaluation_concepts_formed': '8. EVALUATION OF FORMED CONCEPTS',
             'no_evaluation_concepts': 'No evaluation of formed concepts',
             'final_score': 'Final score',
-            'best_concept_selected': '8. BEST CONCEPT SELECTED',
+            'best_concept_selected': '9. BEST CONCEPT SELECTED',
             'score_obtained': 'Score obtained',
             'composition_winner': 'COMPOSITION OF THE WINNING CONCEPT:',
             'idea_not_selected': '(Idea not selected)',
             'no_best_concept': 'No concept evaluated as best',
-            'risk_prevention': '9. RISK PREVENTION',
+            'risk_prevention': '10. RISK PREVENTION',
             'prevention': 'PREVENTION',
             'potential_failure': '• Potential failure:',
             'effect': '• Effect:',
@@ -225,7 +234,7 @@ function t(key) {
             'action_taken': '• Action taken:',
             'action_date': '• Date of execution:',
             'no_prevention_data': 'No risk prevention data',
-            'action_plan': '10. ACTION PLAN',
+            'action_plan': '11. ACTION PLAN',
             'tasks_1_15': 'Tasks 1-15:',
             'tasks_16_30': 'Tasks 16-30:',
             'no_tasks': 'No tasks in the plan',
@@ -395,7 +404,7 @@ function generarPDF() {
     const currentLang = localStorage.getItem('preferredLanguage') || 'es';
     const isSpanish = currentLang === 'es';
 
-    // 1. PORTADA
+    // PORTADA
     doc.setFontSize(24);
     doc.setTextColor(21, 101, 192);
     doc.setFont("helvetica", "bold");
@@ -414,6 +423,52 @@ function generarPDF() {
     // Nueva página para contenido
     doc.addPage();
     y = margen;
+
+    // 1. INFORMACIÓN DEL PROYECTO 
+    doc.setFontSize(16);
+    doc.setTextColor(21, 101, 192);
+    doc.setFont("helvetica", "bold");
+    doc.text(t('project_information'), margen, y);
+    y += 15;
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    
+    // Nombre del proyecto
+    doc.setFont("helvetica", "bold");
+    doc.text(t('project_name_label'), margen, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(data.projectName || t('unnamed_project'), margen + 50, y);
+    y += 10;
+
+    // Descripción del proyecto (NUEVO)
+    if (data.projectDescription && data.projectDescription.trim()) {
+        doc.setFont("helvetica", "bold");
+        doc.text(t('description_label'), margen, y);
+        doc.setFont("helvetica", "normal");
+        y += 8;
+        
+        // Crear texto multilínea para la descripción
+        const descripcionLines = doc.splitTextToSize(data.projectDescription, anchoPagina - 2 * margen);
+        
+        for (let i = 0; i < descripcionLines.length; i++) {
+            if (y > 280) {
+                doc.addPage();
+                y = margen;
+            }
+            doc.text(descripcionLines[i], margen, y);
+            y += 7;
+        }
+    } else {
+        doc.setFont("helvetica", "bold");
+        doc.text(t('description_label'), margen, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(t('no_description'), margen + 50, y);
+        y += 10;
+    }
+
+    y += 15;
 
     // 2. CRITERIOS Y PESOS - CORREGIDO: 5 CRITERIOS
     doc.setFontSize(16);
@@ -604,7 +659,7 @@ function generarPDF() {
                 const posibilidad = data[`pos${posIdx}`] || "";
 
                 if (posibilidad) {
-                    doc.text(`  ${t('option')} ${row}: ${posibilidad}`, margen + 10, y);
+                    doc.text(`  ${t('options')} ${row}: ${posibilidad}`, margen + 10, y);
                     y += 8;
 
                     if (y > 280) {

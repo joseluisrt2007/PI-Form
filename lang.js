@@ -7,6 +7,11 @@ const translations = {
         'project': 'Proyecto:',
         'unnamed_project': '(Sin nombre)',
         
+        // =================== NUEVAS TRADUCCIONES PARA DESCRIPCIÓN ===================
+        'project_description': 'Descripción del proyecto',
+        'enter_project_description': 'Describa el objetivo, alcance y detalles del proyecto...',
+        'error_project_description': 'Ingresa una descripción para el proyecto',
+        
         // =================== BOTONES ===================
         'save_continue': '💾 Guardar y continuar',
         'back': '◀️ Regreso',
@@ -30,11 +35,14 @@ const translations = {
         'error_all_criteria': 'Completa todos los criterios',
         'error_all_weights': 'Ingresa un peso para cada criterio',
         
+        // =================== NUEVO ERROR PARA EVALUACION ===================
+        'error_calculate_all': 'Debes calcular todos los conceptos antes de continuar',
+        
         // =================== PÁGINAS ===================
         'criteria_weights': 'Criterios y pesos',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluación',
-        'explore_possibilities': 'Exploración de Posibilidades',
+        'explore_possibilities': 'Exploración de Opciones',
         'concept_formation': 'Formación de Conceptos',
         'risk_prevention': 'Prevenir',
         'diagram': 'Diagrama',
@@ -47,9 +55,10 @@ const translations = {
         'idea': 'Idea',
         'rating': 'Calificación (0-10)',
         'result': 'Resultado',
+        'options':'Opcion',
         'option': 'Concepto',
-        'possibilities': 'Explorar posibilidades',
-        'tasks_responsibles': 'Enlace de entradas y salidas a trevés de funciones/tareas',
+        'possibilities': 'Explorar opciones',
+        'tasks_responsibles': 'Enlace de entradas y salidas a través de funciones/tareas',
         
         // =================== CONCEPTOS ===================
         'best_concept': 'Mejor Concepto',
@@ -75,8 +84,8 @@ const translations = {
         'task': 'Tarea',
         'responsable_label': 'Entrada',
         'task_label': 'Funcion/Tarea',
-        'salida_label': 'Salida', // NUEVO
-        'enter_salida': 'Describe la salida', // NUEVO
+        'salida_label': 'Salida',
+        'enter_salida': 'Describe la salida',
         'tasks_1_15': 'Tareas 1-15',
         'tasks_16_30': 'Tareas 16-30',
         
@@ -132,6 +141,11 @@ const translations = {
         'project': 'Project:',
         'unnamed_project': '(Unnamed)',
         
+        // =================== NEW TRANSLATIONS FOR DESCRIPTION ===================
+        'project_description': 'Project Description',
+        'enter_project_description': 'Describe the objective, scope and details of the project...',
+        'error_project_description': 'Enter a description for the project',
+        
         // =================== BUTTONS ===================
         'save_continue': '💾 Save and continue',
         'back': '◀️ Back',
@@ -149,17 +163,20 @@ const translations = {
         'error_ratings_range': 'Ratings must be between 0 and 10.',
         'error_severity_occurrence': 'Severity and Occurrence must be integers between 1 and 10.',
         
-        // NUEVOS ERRORES PARA CRITERIOS.HTML
+        // NEW ERRORS FOR CRITERIOS.HTML
         'error_at_least_one_concept': 'Enter at least one idea/concept',
         'error_project_name': 'Enter a project name',
         'error_all_criteria': 'Complete all criteria',
         'error_all_weights': 'Enter a weight for each criteria',
         
+        // =================== NEW ERROR FOR EVALUATION ===================
+        'error_calculate_all': 'You must calculate all concepts before continuing',
+        
         // =================== PAGES ===================
         'criteria_weights': 'Criteria and weights',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluation',
-        'explore_possibilities': 'Explore Possibilities',
+        'explore_possibilities': 'Explore Options',
         'concept_formation': 'Concept Formation',
         'risk_prevention': 'Risk Prevention',
         'diagram': 'Diagram',
@@ -172,8 +189,9 @@ const translations = {
         'idea': 'Idea',
         'rating': 'Rating (0-10)',
         'result': 'Result',
+        'options':'Option',
         'option': 'Concept',
-        'possibilities': 'Explore possibilities',
+        'possibilities': 'Explore options',
         'tasks_responsibles': 'Linking inputs and outputs through functions/tasks',
         
         // =================== CONCEPTS ===================
@@ -196,12 +214,12 @@ const translations = {
         'action_date': 'Date when action was taken',
         'prevention': 'Prevention',
         
-        // =================== DIAGRAM/TASKS ===================
+        // =================== DIAGRAMA/TASKS ===================
         'task': 'Task',
         'responsable_label': 'Input',
         'task_label': 'Function/Task',
-        'salida_label': 'Output', // NUEVO
-        'enter_salida': 'Describe the output', // NUEJO
+        'salida_label': 'Output',
+        'enter_salida': 'Describe the output',
         'tasks_1_15': 'Tasks 1-15',
         'tasks_16_30': 'Tasks 16-30',
         
@@ -250,6 +268,9 @@ const translations = {
         'footer_text': 'José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García'
     }
 };
+
+// El resto del archivo lang.js permanece igual...
+// ========== SISTEMA DE TRADUCCIÓN (CONTINUACIÓN) ==========
 
 // Sistema de traducción
 let currentLang = localStorage.getItem('preferredLanguage') || 'es';

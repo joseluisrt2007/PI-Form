@@ -42,48 +42,58 @@ function obtenerConceptosExistentes() {
 }
 
 /**
- * Obtiene las opciones que conforman un concepto formado
- * @param {number} col - Número de la columna (1-3)
- * @returns {Array} Array de opciones seleccionadas con sus nombres de concepto
+ * Genera la sección con la lista de ideas
  */
-function obtenerOpcionesConcepto(col) {
+function generarSeccionIdeas() {
     const conceptosExistentes = obtenerConceptosExistentes();
-    const opciones = [];
+    
+    if (conceptosExistentes.length === 0) {
+        return '';
+    }
+    
+    let html = `
+        <div class="ideas-section">
+            <div class="section-title" data-i18n="ideas_concepts">Ideas</div>
+            <div class="ideas-list">
+                <ul>
+    `;
+    
+    // Listar todas las ideas
+    conceptosExistentes.forEach(conc => {
+        const idea = data[`concepto${conc}`] || `Idea ${conc}`;
+        html += `<li>${idea}</li>`;
+    });
+    
+    html += `
+                </ul>
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
+
+/**
+ * Obtiene las opciones seleccionadas para un concepto formado específico
+ * @param {number} col - Número de la columna (1-3)
+ * @returns {Array} Array de opciones seleccionadas
+ */
+function obtenerOpcionesSeleccionadas(col) {
+    const conceptosExistentes = obtenerConceptosExistentes();
+    const opcionesSeleccionadas = [];
     
     for (const conc of conceptosExistentes) {
-        // Obtener el nombre del concepto original
-        const nombreConcepto = data[`concepto${conc}`];
-        
         // Obtener la selección para esta columna
         const grupoKey = `pastel_grupo${(conc - 1) * 3 + col}`;
         const opcionSeleccionada = data[grupoKey] || '';
         
-        // Obtener el número de la opción (1, 2 o 3) y su texto completo
-        let opcionText = '';
-        let encontrado = false;
-        
-        // Buscar cuál de las 3 posibilidades fue seleccionada
-        for (let opcionNum = 1; opcionNum <= 3; opcionNum++) {
-            const posIdx = (conc - 1) * 3 + opcionNum;
-            const posibilidad = data[`pos${posIdx}`] || '';
-            
-            if (posibilidad === opcionSeleccionada) {
-                // Opción encontrada, mostrar concepto y opción
-                opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
-                encontrado = true;
-                break;
-            }
+        // Si hay opción seleccionada, agregarla a la lista
+        if (opcionSeleccionada.trim() !== '') {
+            opcionesSeleccionadas.push(opcionSeleccionada);
         }
-        
-        // Si no se encontró opción seleccionada, mostrar solo el concepto
-        if (!encontrado) {
-            opcionText = `<strong>${nombreConcepto}</strong> <em>${typeof t === 'function' ? t('no_selection') : 'Sin selección'}</em>`;
-        }
-        
-        opciones.push(opcionText);
     }
     
-    return opciones;
+    return opcionesSeleccionadas;
 }
 
 /**
@@ -105,26 +115,35 @@ function generarTablas() {
         return;
     }
     
-    // Siempre hay 3 conceptos formados (uno por columna del pastel)
+    // Sección 1: Lista de ideas
+    const ideasHTML = generarSeccionIdeas();
+    tablasContainer.innerHTML = ideasHTML;
+    
+    // Sección 2: Los 3 conceptos formados con sus opciones seleccionadas
     for (let col = 1; col <= 3; col++) {
         const section = document.createElement('div');
         section.className = 'concepto-section';
 
-        // Obtener las opciones del concepto formado
-        const opciones = obtenerOpcionesConcepto(col);
+        // Obtener SOLO las opciones seleccionadas para este concepto formado
+        const opcionesSeleccionadas = obtenerOpcionesSeleccionadas(col);
 
         // Obtener texto traducido para el título
         const titleText = (typeof t === 'function') 
             ? `${t('concept_formed') || 'Concepto formado'} ${col}` 
             : `Concepto formado ${col}`;
         
-        // Generar lista de opciones
-        const opcionesHTML = opciones.map(opcion => `<li>${opcion}</li>`).join('');
+        // Generar lista SOLO de opciones seleccionadas
+        let opcionesHTML = '';
+        if (opcionesSeleccionadas.length > 0) {
+            opcionesHTML = opcionesSeleccionadas.map(opcion => `<li>${opcion}</li>`).join('');
+        } else {
+            opcionesHTML = `<li><em>${typeof t === 'function' ? t('no_selection') : 'Sin selección'}</em></li>`;
+        }
         
         section.innerHTML = `
             <div class="concepto-title">${titleText}</div>
             <div class="opciones-list">
-                <strong data-i18n="options_forming_concept">Opciones que componen este concepto:</strong>
+                <strong data-i18n="options_forming_concept">Opciones seleccionadas:</strong>
                 <ul>${opcionesHTML}</ul>
             </div>
             <table>
@@ -138,11 +157,6 @@ function generarTablas() {
                 </thead>
                 <tbody>
                     ${[1, 2, 3, 4, 5].map(i => {
-                        // La clave se guarda como ca1, ca2, ca3, etc. para cada concepto formado
-                        // Para 3 conceptos formados: 
-                        // Concepto 1: ca1, ca2, ca3, ca4, ca5 (criterios 1-5)
-                        // Concepto 2: ca6, ca7, ca8, ca9, ca10 (criterios 1-5)
-                        // Concepto 3: ca11, ca12, ca13, ca14, ca15 (criterios 1-5)
                         const criterioIndex = i;
                         const dataKey = `ca${(col - 1) * 5 + i}`;
                         const savedValue = data[dataKey] || '';
@@ -162,7 +176,7 @@ function generarTablas() {
                                            min="0" max="10" step="0.1" value="${savedValue}" 
                                            placeholder="${placeholderText}" data-i18n-placeholder="enter_rating">
                                 </td>
-                                <td>${i === 1 ? `<span class="resultado" id="res${col}">0.00</span>` : ''}</td>
+                                <td>${i === 1 ? `<span class="resultado" id="res${col}">-</span>` : ''}</td> <!-- Cambiado a "-" -->
                             </tr>
                         `;
                     }).join('')}
@@ -176,7 +190,7 @@ function generarTablas() {
     // Aplicar todas las traducciones
     aplicarTraduccionesCompletas();
     
-    // Recalcular si hay datos
+    // Recalcular si hay datos existentes
     recalcularTodo();
     
     // Validar estado inicial
@@ -184,7 +198,19 @@ function generarTablas() {
     
     // Añadir event listeners a los inputs
     document.querySelectorAll('.calif').forEach(input => {
-        input.addEventListener('input', validateAll);
+        input.addEventListener('input', function() {
+            // Marcar el concepto como no calculado si se modifica algún campo
+            const conc = this.dataset.conc;
+            if (conc && data[`calculadoFormado${conc}`]) {
+                data[`calculadoFormado${conc}`] = false;
+                data[`resultado${parseInt(conc) + 3}`] = null;
+                const resultElement = document.getElementById(`res${conc}`);
+                if (resultElement) {
+                    resultElement.textContent = '-';
+                }
+            }
+            validateAll();
+        });
     });
 }
 
@@ -230,6 +256,14 @@ function aplicarTraduccionesCompletas() {
         }
     });
     
+    // Aplicar traducciones a título de ideas
+    document.querySelectorAll('.section-title[data-i18n]').forEach(title => {
+        const key = title.getAttribute('data-i18n');
+        if (typeof t === 'function') {
+            title.textContent = t(key) || title.textContent;
+        }
+    });
+    
     // Actualizar textos "Sin selección" en las listas
     document.querySelectorAll('.opciones-list li em').forEach(em => {
         if (typeof t === 'function' && em.textContent === 'Sin selección') {
@@ -255,12 +289,19 @@ function calcular(conc) {
     let total = 0;
     let valid = true;
     
-    // Ahora tenemos 5 criterios (1-5) en lugar de 4 (1-4)
+    // Primero verificar que todos los campos tengan valor, establecer a 0 si están vacíos
     for (let i = 1; i <= 5; i++) {
         const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
         if (!input) continue;
         
-        const calif = parseFloat(input.value) || 0;
+        // Si el campo está vacío, establecerlo a 0 automáticamente
+        if (input.value === '') {
+            input.value = '0';
+            const dataKey = `ca${(parseInt(conc) - 1) * 5 + i}`;
+            data[dataKey] = '0';
+        }
+        
+        const calif = parseFloat(input.value);
         const peso = parseFloat(data[`peso${i}`]) || 0;
         
         if (isNaN(calif) || calif < 0 || calif > 10) {
@@ -268,17 +309,23 @@ function calcular(conc) {
         }
         
         total += calif * peso;
+        
+        // Guardar el valor actualizado en data
+        const dataKey = `ca${(parseInt(conc) - 1) * 5 + i}`;
+        data[dataKey] = input.value;
     }
     
     const resultElement = document.getElementById(`res${conc}`);
     if (resultElement) {
         if (valid) {
-            resultElement.textContent = total.toFixed(2);
-            // Guardar resultado en datos
-            // Conceptos formados 1-3 se guardan como resultado4, resultado5, resultado6
-            data[`resultado${conc + 3}`] = total.toFixed(2);
+            const resultado = total.toFixed(2);
+            resultElement.textContent = resultado;
+            // Guardar resultado en datos (conceptos formados 1-3 se guardan como resultado4, resultado5, resultado6)
+            data[`resultado${conc + 3}`] = resultado;
+            data[`calculadoFormado${conc}`] = true; // Marcar como calculado
         } else {
             alertT('error_ratings_range');
+            data[`calculadoFormado${conc}`] = false; // Marcar como no calculado
         }
     }
     
@@ -286,51 +333,103 @@ function calcular(conc) {
 }
 
 /**
- * Recalcula todos los conceptos automáticamente si tienen datos
+ * Verifica si todos los conceptos formados han sido calculados
+ * @returns {boolean} True si todos los conceptos han sido calculados
+ */
+function todosCalculados() {
+    // Siempre hay 3 conceptos formados para evaluar
+    const totalConceptosFormados = 3;
+    let calculados = 0;
+    
+    for (let conc = 1; conc <= totalConceptosFormados; conc++) {
+        // Verificar si el concepto formado tiene un resultado calculado
+        if (data[`calculadoFormado${conc}`]) {
+            calculados++;
+        }
+    }
+    
+    return calculados === totalConceptosFormados;
+}
+
+/**
+ * Recalcula todos los conceptos automáticamente si tienen datos existentes
  */
 function recalcularTodo() {
     for (let conc = 1; conc <= 3; conc++) {
-        let hasData = false;
+        // Si ya hay un resultado guardado, mostrarlo
+        const resultadoGuardado = data[`resultado${conc + 3}`];
+        const resultElement = document.getElementById(`res${conc}`);
         
-        // Verificar si hay datos en alguno de los 5 criterios
+        if (resultadoGuardado && resultElement) {
+            resultElement.textContent = resultadoGuardado;
+            data[`calculadoFormado${conc}`] = true;
+        } else if (resultElement) {
+            // Si no hay resultado, mostrar "-"
+            resultElement.textContent = '-';
+        }
+        
+        // Verificar si hay calificaciones guardadas para este concepto formado
+        let hasSavedData = false;
         for (let i = 1; i <= 5; i++) {
-            const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
-            if (input && input.value !== '') {
-                hasData = true;
+            const dataKey = `ca${(conc - 1) * 5 + i}`;
+            if (data[dataKey] !== undefined) {
+                hasSavedData = true;
                 break;
             }
         }
         
-        if (hasData) {
-            calcular(conc);
+        // Si hay datos guardados, cargarlos en los inputs
+        if (hasSavedData) {
+            for (let i = 1; i <= 5; i++) {
+                const dataKey = `ca${(conc - 1) * 5 + i}`;
+                const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
+                if (input && data[dataKey] !== undefined) {
+                    input.value = data[dataKey];
+                }
+            }
+            
+            // Si ya estaba calculado, mantener el cálculo
+            if (data[`calculadoFormado${conc}`]) {
+                // Ya mostramos el resultado arriba
+            }
         }
     }
 }
 
 /**
- * Valida que todas las calificaciones sean válidas
+ * Valida que todas las calificaciones sean válidas y que todos los conceptos hayan sido calculados
  */
 function validateAll() {
     if (!guardarBtn || !errorMsg) return;
     
     let allValid = true;
+    let allCalculated = todosCalculados();
     
+    // Verificar que las calificaciones existentes sean válidas
     document.querySelectorAll('.calif').forEach(input => {
-        const val = parseFloat(input.value);
-        if (isNaN(val) || val < 0 || val > 10 || input.value === '') {
-            allValid = false;
+        if (input.value !== '') { // Solo validar si no está vacío
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 0 || val > 10) {
+                allValid = false;
+            }
         }
     });
     
-    guardarBtn.disabled = !allValid;
+    // El botón se habilita solo si todos los conceptos han sido calculados
+    // y las calificaciones existentes son válidas
+    guardarBtn.disabled = !(allValid && allCalculated);
     
     if (errorMsg) {
-        if (allValid) {
+        if (allValid && allCalculated) {
             errorMsg.textContent = '';
-        } else {
+        } else if (!allValid) {
             errorMsg.textContent = (typeof t === 'function') 
                 ? t('error_ratings') 
-                : 'Completa todas las calificaciones (0-10)';
+                : 'Las calificaciones deben estar entre 0 y 10';
+        } else if (!allCalculated) {
+            errorMsg.textContent = (typeof t === 'function')
+                ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
+                : 'Debes calcular todos los conceptos antes de continuar';
         }
     }
 }
@@ -339,16 +438,24 @@ function validateAll() {
  * Guarda los datos y navega a la siguiente página
  */
 function saveAndContinue() {
-    if (!guardarBtn) return;
+    // Primero verificar que todos los conceptos hayan sido calculados
+    if (!todosCalculados()) {
+        const errorMsgText = (typeof t === 'function')
+            ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
+            : 'Debes calcular todos los conceptos antes de continuar';
+        alert(errorMsgText);
+        return;
+    }
     
-    // Guardar todas las calificaciones
+    // Guardar todas las calificaciones actuales
     document.querySelectorAll('.calif').forEach(input => {
         const conc = input.dataset.conc;
         const crit = input.dataset.crit;
         if (conc && crit) {
-            // Guardar como ca1, ca2, ca3... ca15 (5 criterios × 3 conceptos formados)
+            // Si un campo está vacío (no debería pasar si ya se calcularon), guardar como 0
+            const value = input.value === '' ? '0' : input.value;
             const dataKey = `ca${(parseInt(conc) - 1) * 5 + parseInt(crit)}`;
-            data[dataKey] = input.value;
+            data[dataKey] = value;
         }
     });
     
@@ -467,4 +574,5 @@ window.recalcularTodo = recalcularTodo;
 window.validateAll = validateAll;
 window.saveAndContinue = saveAndContinue;
 window.obtenerConceptosExistentes = obtenerConceptosExistentes;
-window.obtenerOpcionesConcepto = obtenerOpcionesConcepto;
+window.obtenerOpcionesSeleccionadas = obtenerOpcionesSeleccionadas;
+window.todosCalculados = todosCalculados;

@@ -84,7 +84,7 @@ function generarTablas() {
                         
                         // Obtener textos traducidos
                         const optionText = (typeof t === 'function') 
-                            ? `${t('option') || 'Opción'} ${i}` 
+                            ? `${t('options') || 'Opción'} ${i}` 
                             : `Opción ${i}`;
                         
                         const placeholderText = (typeof t === 'function') 

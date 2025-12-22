@@ -47,6 +47,19 @@
             <input type="text" id="projectName" data-i18n-placeholder="enter_project_name" placeholder="Ingrese el nombre del proyecto">
         </div>
 
+        <!-- Descripción del proyecto (NUEVO) -->
+        <div class="section">
+            <label for="projectDescription" data-i18n="project_description">Descripción del proyecto</label>
+            <textarea 
+                id="projectDescription" 
+                rows="4" 
+                data-i18n-placeholder="enter_project_description" 
+                placeholder="Describa el objetivo y detalles del proyecto..."
+                maxlength="1000"
+            ></textarea>
+            <div class="char-counter" id="charCounter">0/1000 caracteres</div>
+        </div>
+
         <!-- Criterios y pesos -->
         <div class="section">
             <h2 data-i18n="criteria_weights">Criterios y pesos (la suma debe ser 10)</h2>

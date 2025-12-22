@@ -24,10 +24,36 @@ function updateProjectName() {
 }
 
 /**
+ * Actualiza el contador de caracteres para la descripción
+ */
+function updateCharCounter() {
+    const textarea = document.getElementById('projectDescription');
+    const counter = document.getElementById('charCounter');
+    
+    if (!textarea || !counter) return;
+    
+    const currentLength = textarea.value.length;
+    const maxLength = parseInt(textarea.getAttribute('maxlength')) || 1000;
+    
+    counter.textContent = `${currentLength}/${maxLength} caracteres`;
+    
+    // Cambiar color según el porcentaje usado
+    const percentage = (currentLength / maxLength) * 100;
+    
+    counter.classList.remove('warning', 'error');
+    if (percentage >= 80 && percentage < 90) {
+        counter.classList.add('warning');
+    } else if (percentage >= 90) {
+        counter.classList.add('error');
+    }
+}
+
+/**
  * Valida los formularios y habilita/deshabilita el botón de guardar
  */
 function validateAndEnable() {
     const projectName = document.getElementById('projectName').value.trim();
+    const projectDescription = document.getElementById('projectDescription').value.trim();
     const criterios = Array.from(document.querySelectorAll('.criterio')).map(el => el.value.trim());
     const pesos = Array.from(document.querySelectorAll('.peso')).map(el => parseFloat(el.value) || 0);
     const conceptos = Array.from(document.querySelectorAll('.concepto')).map(el => el.value.trim());
@@ -45,8 +71,9 @@ function validateAndEnable() {
     // MODIFICADO: Solo requerimos proyecto, criterios, pesos (suma 10), y al menos UN concepto
     const alMenosUnConcepto = conceptos.some(con => con.trim() !== '');
     const projectNameValido = projectName !== '';
+    const projectDescriptionValida = projectDescription !== ''; // Descripción es obligatoria
     
-    if (projectNameValido && criteriosLlenos && pesosLlenos && sumaPesos === 10 && alMenosUnConcepto) {
+    if (projectNameValido && projectDescriptionValida && criteriosLlenos && pesosLlenos && sumaPesos === 10 && alMenosUnConcepto) {
         guardarBtn.disabled = false;
         if (errorEl) errorEl.textContent = '';
     } else {
@@ -69,6 +96,12 @@ function validateAndEnable() {
                 const errorMsg = (typeof t === 'function') 
                     ? t('error_project_name') || 'Ingresa un nombre para el proyecto' 
                     : 'Ingresa un nombre para el proyecto';
+                errorEl.textContent = errorMsg;
+            } else if (!projectDescriptionValida) {
+                // Mensaje para descripción del proyecto
+                const errorMsg = (typeof t === 'function') 
+                    ? t('error_project_description') || 'Ingresa una descripción para el proyecto' 
+                    : 'Ingresa una descripción para el proyecto';
                 errorEl.textContent = errorMsg;
             } else if (!criteriosLlenos) {
                 // Mensaje para criterios (ahora 5)
@@ -95,6 +128,7 @@ function validateAndEnable() {
 function saveAndContinue() {
     // Guardar datos en el objeto data
     data.projectName = document.getElementById('projectName').value.trim();
+    data.projectDescription = document.getElementById('projectDescription').value.trim(); // Guardar descripción
     data.numCriterios = NUM_CRITERIOS; // Guardar el número de criterios
     
     document.querySelectorAll('.criterio').forEach(el => {
@@ -202,6 +236,15 @@ function setupInputEvents() {
             validateAndEnable();
         });
     });
+    
+    // Configurar eventos para el textarea de descripción
+    const descriptionTextarea = document.getElementById('projectDescription');
+    if (descriptionTextarea) {
+        descriptionTextarea.addEventListener('input', () => {
+            updateCharCounter();
+            validateAndEnable();
+        });
+    }
 }
 
 /**
@@ -238,6 +281,12 @@ function loadSavedData() {
         projectNameInput.value = data.projectName || '';
     }
     
+    // Cargar descripción del proyecto
+    const projectDescriptionInput = document.getElementById('projectDescription');
+    if (projectDescriptionInput) {
+        projectDescriptionInput.value = data.projectDescription || '';
+    }
+    
     // Cargar criterios (ahora hasta el 5to)
     document.querySelectorAll('.criterio').forEach(el => {
         const id = el.dataset.id;
@@ -258,6 +307,9 @@ function loadSavedData() {
     document.querySelectorAll('.concepto').forEach(el => {
         el.value = data[`concepto${el.dataset.id}`] || '';
     });
+    
+    // Actualizar contador de caracteres después de cargar datos
+    updateCharCounter();
 }
 
 /**
@@ -285,6 +337,7 @@ document.addEventListener('DOMContentLoaded', initializePage);
 
 // ========== EXPORTAR FUNCIONES PARA USO GLOBAL ==========
 window.updateProjectName = updateProjectName;
+window.updateCharCounter = updateCharCounter;
 window.validateAndEnable = validateAndEnable;
 window.saveAndContinue = saveAndContinue;
 window.NUM_CRITERIOS = NUM_CRITERIOS;

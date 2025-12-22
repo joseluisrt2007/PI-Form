@@ -15,6 +15,8 @@
     --border: #d1d5db;
     --card-bg: #ffffff;
     --header-bg: #1a56db;
+    --info: #3b82f6;
+    --success: #10b981;
 }
 
 * {
@@ -138,7 +140,8 @@ label {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+textarea {
     width: 100%;
     padding: 0.875rem 1rem;
     border: 2px solid var(--border);
@@ -147,14 +150,42 @@ input[type="number"] {
     background: var(--surface);
     color: var(--text-dark);
     transition: all 0.3s ease;
+    font-family: 'Roboto', Arial, sans-serif;
 }
 
 input[type="text"]:focus,
-input[type="number"]:focus {
+input[type="number"]:focus,
+textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     background: var(--surface);
+}
+
+/* Estilos específicos para textarea */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+    max-height: 300px;
+    line-height: 1.5;
+}
+
+/* Contador de caracteres */
+.char-counter {
+    text-align: right;
+    font-size: 0.875rem;
+    color: var(--info);
+    margin-top: 0.5rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.char-counter.warning {
+    color: #f59e0b;
+}
+
+.char-counter.error {
+    color: var(--error);
 }
 
 table {
@@ -423,6 +454,7 @@ td input:focus {
     --border: #475569;
     --card-bg: #1e293b;
     --header-bg: #1e293b;
+    --info: #60a5fa;
 }
 
 /* ========== ESTILOS MODO OSCURO ========== */
@@ -461,17 +493,27 @@ td input:focus {
 }
 
 [data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="number"] {
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] textarea {
     background: #2d3748;
     border-color: var(--border);
     color: var(--text-dark);
 }
 
 [data-theme="dark"] input[type="text"]:focus,
-[data-theme="dark"] input[type="number"]:focus {
+[data-theme="dark"] input[type="number"]:focus,
+[data-theme="dark"] textarea:focus {
     border-color: var(--primary-light);
     box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
     background: #374151;
+}
+
+[data-theme="dark"] textarea {
+    background: #2d3748;
+}
+
+[data-theme="dark"] .char-counter {
+    color: var(--info);
 }
 
 [data-theme="dark"] table th {

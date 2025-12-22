@@ -89,9 +89,9 @@ function generarTablas() {
                             <td>
                                 <input type="number" class="calif" data-conc="${conc}" data-crit="${i}" 
                                        min="0" max="10" step="0.1" 
-                                       value="${data[`calif${conc}_${i}`] || ''}">
+                                       value="${data[`calif${conc}_${i}`] || ''}"> <!-- Mantenemos vacío por defecto -->
                             </td>
-                            <td>${i === 1 ? `<span class="resultado" id="res${conc}">0.00</span>` : ''}</td>
+                            <td>${i === 1 ? `<span class="resultado" id="res${conc}">-</span>` : ''}</td> <!-- Cambiado a "-" -->
                         </tr>
                     `).join('')}
                 </tbody>
@@ -104,7 +104,7 @@ function generarTablas() {
     // Aplicar traducciones dinámicamente
     applyDynamicTranslations();
     
-    // Recalcular si hay datos
+    // Recalcular si hay datos existentes
     recalcularTodo();
     
     // Validar estado inicial
@@ -112,7 +112,19 @@ function generarTablas() {
     
     // Añadir event listeners a los inputs
     document.querySelectorAll('.calif').forEach(input => {
-        input.addEventListener('input', validateAll);
+        input.addEventListener('input', function() {
+            // Marcar el concepto como no calculado si se modifica algún campo
+            const conc = this.dataset.conc;
+            if (conc && data[`calculado${conc}`]) {
+                data[`calculado${conc}`] = false;
+                data[`resultado${conc}`] = null;
+                const resultElement = document.getElementById(`res${conc}`);
+                if (resultElement) {
+                    resultElement.textContent = '-';
+                }
+            }
+            validateAll();
+        });
     });
 }
 
@@ -143,12 +155,20 @@ function applyDynamicTranslations() {
 function calcular(conc) {
     let total = 0;
     let valid = true;
+    let allFieldsFilled = true;
     
-    for (let i = 1; i <= 5; i++) {  // CAMBIADO: Ahora incluye el 5
+    // Primero verificar que todos los campos tengan valor
+    for (let i = 1; i <= 5; i++) {
         const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
         if (!input) continue;
         
-        const calif = parseFloat(input.value) || 0;
+        // Si el campo está vacío, establecerlo a 0 automáticamente
+        if (input.value === '') {
+            input.value = '0';
+            data[`calif${conc}_${i}`] = '0';
+        }
+        
+        const calif = parseFloat(input.value);
         const peso = parseFloat(data[`peso${i}`]) || 0;
         
         if (isNaN(calif) || calif < 0 || calif > 10) {
@@ -156,19 +176,25 @@ function calcular(conc) {
         }
         
         total += calif * peso;
+        
+        // Guardar el valor actualizado en data
+        data[`calif${conc}_${i}`] = input.value;
     }
     
     const resultElement = document.getElementById(`res${conc}`);
     if (resultElement) {
         if (valid) {
-            resultElement.textContent = total.toFixed(2);
-            data[`resultado${conc}`] = total.toFixed(2);
+            const resultado = total.toFixed(2);
+            resultElement.textContent = resultado;
+            data[`resultado${conc}`] = resultado;
+            data[`calculado${conc}`] = true; // Marcar como calculado
         } else {
             // Mostrar mensaje de error usando traducción
             const errorMsg = (typeof t === 'function') 
                 ? t('error_ratings_range') 
                 : 'Las calificaciones deben estar entre 0 y 10';
             alert(errorMsg);
+            data[`calculado${conc}`] = false; // Marcar como no calculado
         }
     }
     
@@ -176,7 +202,7 @@ function calcular(conc) {
 }
 
 /**
- * Recalcula todos los conceptos automáticamente si tienen datos
+ * Recalcula todos los conceptos automáticamente si tienen datos existentes
  */
 function recalcularTodo() {
     for (let conc = 1; conc <= 5; conc++) {
@@ -186,47 +212,107 @@ function recalcularTodo() {
             continue;
         }
         
-        let hasData = false;
+        // Si ya hay un resultado guardado, mostrarlo
+        const resultadoGuardado = data[`resultado${conc}`];
+        const resultElement = document.getElementById(`res${conc}`);
         
-        for (let i = 1; i <= 5; i++) {  // CAMBIADO: Ahora incluye el 5
-            const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
-            if (input && input.value !== '') {
-                hasData = true;
+        if (resultadoGuardado && resultElement) {
+            resultElement.textContent = resultadoGuardado;
+            data[`calculado${conc}`] = true;
+        } else if (resultElement) {
+            // Si no hay resultado, mostrar "-"
+            resultElement.textContent = '-';
+        }
+        
+        // Verificar si hay calificaciones guardadas para este concepto
+        let hasSavedData = false;
+        for (let i = 1; i <= 5; i++) {
+            if (data[`calif${conc}_${i}`] !== undefined) {
+                hasSavedData = true;
                 break;
             }
         }
         
-        if (hasData) {
-            calcular(conc);
+        // Si hay datos guardados, cargarlos en los inputs
+        if (hasSavedData) {
+            for (let i = 1; i <= 5; i++) {
+                const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
+                if (input && data[`calif${conc}_${i}`] !== undefined) {
+                    input.value = data[`calif${conc}_${i}`];
+                }
+            }
+            
+            // Si ya estaba calculado, mantener el cálculo
+            if (data[`calculado${conc}`]) {
+                // Ya mostramos el resultado arriba
+            }
         }
     }
 }
 
 /**
- * Valida que todas las calificaciones sean válidas
+ * Verifica si todos los conceptos han sido calculados
+ * @returns {boolean} True si todos los conceptos han sido calculados
+ */
+function todosCalculados() {
+    const numeroDeConceptos = contarConceptos();
+    
+    // Si no hay conceptos, no se puede calcular nada
+    if (numeroDeConceptos === 0) {
+        return false;
+    }
+    
+    let calculados = 0;
+    
+    for (let conc = 1; conc <= 5; conc++) {
+        const conceptoNombre = data[`concepto${conc}`] || '';
+        if (conceptoNombre.trim() === '') {
+            continue;
+        }
+        
+        // Verificar si el concepto tiene un resultado calculado
+        if (data[`calculado${conc}`]) {
+            calculados++;
+        }
+    }
+    
+    return calculados === numeroDeConceptos;
+}
+
+/**
+ * Valida que todas las calificaciones sean válidas y que todos los conceptos hayan sido calculados
  */
 function validateAll() {
     if (!guardarBtn || !errorMsg) return;
     
     let allValid = true;
+    let allCalculated = todosCalculados();
     
-    // Solo validar inputs que existen (es decir, solo para conceptos con contenido)
+    // Verificar que las calificaciones existentes sean válidas
     document.querySelectorAll('.calif').forEach(input => {
-        const val = parseFloat(input.value);
-        if (isNaN(val) || val < 0 || val > 10 || input.value === '') {
-            allValid = false;
+        if (input.value !== '') { // Solo validar si no está vacío
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 0 || val > 10) {
+                allValid = false;
+            }
         }
     });
     
-    guardarBtn.disabled = !allValid;
+    // El botón se habilita solo si todos los conceptos han sido calculados
+    // y las calificaciones existentes son válidas
+    guardarBtn.disabled = !(allValid && allCalculated);
     
     if (errorMsg) {
-        if (allValid) {
+        if (allValid && allCalculated) {
             errorMsg.textContent = '';
-        } else {
+        } else if (!allValid) {
             errorMsg.textContent = (typeof t === 'function') 
                 ? t('error_ratings') 
-                : 'Completa todas las calificaciones (0-10)';
+                : 'Las calificaciones deben estar entre 0 y 10';
+        } else if (!allCalculated) {
+            errorMsg.textContent = (typeof t === 'function')
+                ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
+                : 'Debes calcular todos los conceptos antes de continuar';
         }
     }
 }
@@ -235,12 +321,23 @@ function validateAll() {
  * Guarda los datos y navega a la siguiente página
  */
 function saveAndContinue() {
-    // Guardar calificaciones
+    // Primero verificar que todos los conceptos hayan sido calculados
+    if (!todosCalculados()) {
+        const errorMsgText = (typeof t === 'function')
+            ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
+            : 'Debes calcular todos los conceptos antes de continuar';
+        alert(errorMsgText);
+        return;
+    }
+    
+    // Guardar todas las calificaciones actuales
     document.querySelectorAll('.calif').forEach(input => {
         const conc = input.dataset.conc;
         const crit = input.dataset.crit;
         if (conc && crit) {
-            data[`calif${conc}_${crit}`] = input.value;
+            // Si un campo está vacío (no debería pasar si ya se calcularon), guardar como 0
+            const value = input.value === '' ? '0' : input.value;
+            data[`calif${conc}_${crit}`] = value;
         }
     });
     
@@ -355,3 +452,4 @@ window.recalcularTodo = recalcularTodo;
 window.validateAll = validateAll;
 window.saveAndContinue = saveAndContinue;
 window.contarConceptos = contarConceptos;
+window.todosCalculados = todosCalculados;
