@@ -391,7 +391,7 @@ function saveData() {
  * SOLO NAVEGA a la siguiente página (sin guardar)
  */
 function continueToNext() {
-    window.location.href = 'prevenir.html';
+    window.location.href = 'opcionPrevencion.html';
 }
 
 /**

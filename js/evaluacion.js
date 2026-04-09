@@ -268,9 +268,10 @@ function saveData() {
 
 /**
  * SOLO NAVEGA a la siguiente página (sin guardar)
+ * MODIFICADO: Ahora va a opcionDiagramas.html
  */
 function continueToNext() {
-    window.location.href = 'morfologia.html';
+    window.location.href = 'opcionDiagramas.html';
 }
 
 /**

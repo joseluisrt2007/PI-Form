@@ -1,6 +1,5 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
-const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
 const tareasContainer = document.getElementById('tareasContainer');
 const guardarBtn = document.getElementById('guardarBtn');
 const continuarBtn = document.getElementById('continuarBtn');
@@ -45,7 +44,7 @@ function obtenerConceptosExistentes() {
  * Genera todo el contenido de la página
  */
 function generarContenido() {
-    generarMejorConcepto();
+    // ELIMINADO: generarMejorConcepto();
     generarTareas();
     aplicarTraduccionesEtiquetas();
     
@@ -55,94 +54,6 @@ function generarContenido() {
     }
     if (continuarBtn) {
         continuarBtn.disabled = false;
-    }
-}
-
-/**
- * Genera la sección del mejor concepto
- */
-function generarMejorConcepto() {
-    if (!mejorConceptoContainer) return;
-    
-    const resultados = [4, 5, 6].map(n => parseFloat(data[`resultado${n}`]) || 0);
-    let mejorIdx = resultados.indexOf(Math.max(...resultados));
-    if (resultados.every(r => r === 0)) mejorIdx = -1;
-    
-    const conceptosExistentes = obtenerConceptosExistentes();
-    
-    let mejorConceptoTexto;
-    if (mejorIdx >= 0) {
-        const conceptFormedText = (typeof t === 'function') 
-            ? t('concept_formed') || 'Concepto formado' 
-            : 'Concepto formado';
-        mejorConceptoTexto = `${conceptFormedText} ${mejorIdx + 1}`;
-    } else {
-        mejorConceptoTexto = (typeof t === 'function') 
-            ? t('no_concept_selected') || 'No se ha seleccionado concepto' 
-            : 'No se ha seleccionado concepto';
-    }
-
-    const opciones = [];
-    if (mejorIdx >= 0 && conceptosExistentes.length > 0) {
-        for (const conc of conceptosExistentes) {
-            const key = `pastel_grupo${(conc - 1) * 3 + (mejorIdx + 1)}`;
-            const noSelectionText = (typeof t === 'function') 
-                ? t('no_selection') || 'Sin selección' 
-                : 'Sin selección';
-            
-            const opcionSeleccionada = data[key] || '';
-            const nombreConcepto = data[`concepto${conc}`];
-            
-            let opcionText = '';
-            let encontrado = false;
-            
-            for (let opcionNum = 1; opcionNum <= 3; opcionNum++) {
-                const posIdx = (conc - 1) * 3 + opcionNum;
-                const posibilidad = data[`pos${posIdx}`] || '';
-                
-                if (posibilidad === opcionSeleccionada) {
-                    opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
-                    encontrado = true;
-                    break;
-                }
-            }
-            
-            if (!encontrado) {
-                opcionText = `<strong>${nombreConcepto}</strong> <em>${noSelectionText}</em>`;
-            }
-            
-            opciones.push(opcionText);
-        }
-    }
-
-    const bestConceptText = (typeof t === 'function') 
-        ? t('best_concept') || 'Mejor concepto' 
-        : 'Mejor concepto';
-    
-    const compositionText = (typeof t === 'function') 
-        ? t('concept_composition') || 'Composición del concepto' 
-        : 'Composición del concepto';
-
-    mejorConceptoContainer.innerHTML = `
-        <div class="mejor-concepto">
-            ${bestConceptText}: ${mejorConceptoTexto}
-        </div>
-        ${mejorIdx >= 0 && opciones.length > 0 ? `
-            <div class="opciones-list">
-                <strong>${compositionText}</strong>
-                <ul>
-                    ${opciones.map(opcion => `<li>${opcion}</li>`).join('')}
-                </ul>
-            </div>
-        ` : ''}
-    `;
-    
-    if (typeof t === 'function') {
-        mejorConceptoContainer.querySelectorAll('em').forEach(em => {
-            if (em.textContent === 'Sin selección') {
-                em.textContent = t('no_selection');
-            }
-        });
     }
 }
 
@@ -356,7 +267,6 @@ document.addEventListener('DOMContentLoaded', initializePage);
 // ========== EXPORTAR FUNCIONES PARA USO GLOBAL ==========
 window.updateProjectName = updateProjectName;
 window.generarContenido = generarContenido;
-window.generarMejorConcepto = generarMejorConcepto;
 window.generarTareas = generarTareas;
 window.aplicarTraduccionesEtiquetas = aplicarTraduccionesEtiquetas;
 window.saveData = saveData;

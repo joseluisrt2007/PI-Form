@@ -329,7 +329,7 @@ function saveData() {
  * SOLO NAVEGA a la siguiente página (sin guardar)
  */
 function continueToNext() {
-    window.location.href = 'diagrama.html';
+    window.location.href = 'resultados.html';
 }
 
 /**
