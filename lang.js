@@ -15,6 +15,27 @@ const translations = {
         'enter_project_description': 'Describa el objetivo, alcance y detalles del proyecto...',
         'error_project_description': 'Ingresa una descripción para el proyecto',
         
+        // NUEVAS TRADUCCIONES PARA OPCION DIAGRAMAS
+        'diagram_choice': 'Diagramas - Actividades de Mejora',
+        'diagram_question': 'Diagrama de Actividades',
+        'ask_diagram': '¿Quieres realizar los diagramas de actividades?',
+        'yes_diagram': '✅ Sí, realizar diagramas',
+        'no_diagram': '❌ No, saltar diagramas',
+        
+        // NUEVAS TRADUCCIONES PARA OPCION CONCEPTOS
+        'concept_choice': 'Conceptos - Actividades de Mejora',
+        'concept_question': 'Exploración y Evaluación de Conceptos',
+        'ask_concept': '¿Deseas hacer la exploración y evaluación de conceptos?',
+        'yes_concept': '✅ Sí, explorar y evaluar conceptos',
+        'no_concept': '⏭️ No, saltar exploración y evaluación de conceptos',
+        
+        // NUEVAS TRADUCCIONES PARA OPCION PREVENCION
+        'prevention_choice': 'Prevención - Actividades de Mejora',
+        'prevention_question': 'Prevención de Riesgos',
+        'ask_prevention': '¿Deseas realizar el análisis de prevención de riesgos?',
+        'yes_prevention': '✅ Sí, realizar prevención',
+        'no_prevention': '⏭️ No, saltar prevención',
+        
         // BOTONES (MODIFICADO: Separar Guardar y Continuar)
         'save': '💾 Guardar',
         'continue': '➡️ Continuar',
@@ -151,6 +172,27 @@ const translations = {
         'project_description': 'Project Description',
         'enter_project_description': 'Describe the objective, scope and details of the project...',
         'error_project_description': 'Enter a description for the project',
+        
+        // NEW TRANSLATIONS FOR OPTION DIAGRAMS
+        'diagram_choice': 'Diagrams - Improvement Activities',
+        'diagram_question': 'Activity Diagram',
+        'ask_diagram': 'Do you want to create the activity diagrams?',
+        'yes_diagram': '✅ Yes, create diagrams',
+        'no_diagram': '⏭️ No, skip diagrams',
+        
+        // NEW TRANSLATIONS FOR OPTION CONCEPTS
+        'concept_choice': 'Concepts - Improvement Activities',
+        'concept_question': 'Exploration and Evaluation of Concepts',
+        'ask_concept': 'Do you want to explore and evaluate concepts?',
+        'yes_concept': '✅ Yes, explore and evaluate concepts',
+        'no_concept': '⏭️ No,skip exploration and evaluation of concepts',
+        
+        // NEW TRANSLATIONS FOR OPTION PREVENTION
+        'prevention_choice': 'Prevention - Improvement Activities',
+        'prevention_question': 'Risk Prevention',
+        'ask_prevention': 'Do you want to perform risk prevention analysis?',
+        'yes_prevention': '✅ Yes, perform prevention',
+        'no_prevention': '⏭️ No, skip to prevention',
         
         // BUTTONS (MODIFIED: Separate Save and Continue)
         'save': '💾 Save',

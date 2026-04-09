@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="diagram_pt2">Diagrama pt.2 - Actividades de Mejora</title>
+    <title data-i18n="concept_choice">Conceptos - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="lang.js"></script>
     
-    <link rel="stylesheet" href="css/diagrama2.css">
+    <link rel="stylesheet" href="css/opcionConceptos.css">
 </head>
 <body>
     <header role="banner">
@@ -40,22 +40,30 @@
     </header>
 
     <div class="container">
-        <h1 data-i18n="diagram_pt2">Diagrama pt.2</h1>
-
-        <!-- ELIMINADO: <div id="mejorConceptoContainer"></div> -->
-
-        <div class="tabla-tareas">
-            <h2 data-i18n="tasks_responsibles">Tabla de tareas y responsables</h2>
-            <div id="tareasContainer"></div>
+        <div class="icon-container">
+            <div class="icon">💡</div>
         </div>
-
+        
+        <h1 data-i18n="concept_question">Exploración y Evaluación de Conceptos</h1>
+        
+        <p class="pregunta" data-i18n="ask_concept">¿Deseas hacer la exploración y evaluación de conceptos?</p>
+        
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
-            <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
-            <button class="btn-secondary" onclick="window.location.href='diagrama.html'" data-i18n="back">Regreso</button>
+            <button class="btn-si" id="btnSi">
+                <span class="btn-icon"></span>
+                <span data-i18n="yes_concept">Sí, explorar y evaluar conceptos</span>
+            </button>
+            <button class="btn-no" id="btnNo">
+                <span class="btn-icon"></span>
+                <span data-i18n="no_concept">No, saltar a diagramas</span>
+            </button>
+        </div>
+        
+        <div class="back-button">
+            <button class="btn-secondary" onclick="window.location.href='opcionDiagramas.html'" data-i18n="back">◀️ Regreso</button>
         </div>
     </div>
 
-    <script src="js/diagrama2.js"></script>
+    <script src="js/opcionConceptos.js"></script>
 </body>
 </html>
