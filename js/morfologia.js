@@ -1,6 +1,8 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const tablasContainer = document.getElementById('tablasContainer');
+const guardarBtn = document.getElementById('guardarBtn');
+const continuarBtn = document.getElementById('continuarBtn');
 
 // ========== FUNCIONES PRINCIPALES ==========
 
@@ -15,7 +17,6 @@ function updateProjectName() {
     if (data.projectName && data.projectName.trim()) {
         projectText.textContent = data.projectName;
     } else {
-        // Usar traducción para "(Sin nombre)"
         if (typeof t === 'function') {
             projectText.textContent = t('unnamed_project') || '(Sin nombre)';
         } else {
@@ -49,7 +50,6 @@ function generarTablas() {
     
     const numeroDeConceptos = contarConceptos();
     
-    // Si no hay conceptos, mostrar mensaje
     if (numeroDeConceptos === 0) {
         const message = document.createElement('div');
         message.className = 'no-conceptos-message';
@@ -61,7 +61,6 @@ function generarTablas() {
     for (let conc = 1; conc <= 5; conc++) {
         const conceptoNombre = data[`concepto${conc}`] || '';
         
-        // Solo crear tabla si el concepto tiene contenido
         if (conceptoNombre.trim() === '') {
             continue;
         }
@@ -82,7 +81,6 @@ function generarTablas() {
                         const posIdx = (conc - 1) * 3 + i;
                         const savedValue = data[`pos${posIdx}`] || '';
                         
-                        // Obtener textos traducidos
                         const optionText = (typeof t === 'function') 
                             ? `${t('options') || 'Opción'} ${i}` 
                             : `Opción ${i}`;
@@ -108,15 +106,21 @@ function generarTablas() {
         tablasContainer.appendChild(section);
     }
     
-    // Aplicar traducciones a elementos dinámicos
     applyDynamicTranslations();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 /**
  * Aplica traducciones a elementos generados dinámicamente
  */
 function applyDynamicTranslations() {
-    // Aplicar traducciones a los encabezados de tabla
     document.querySelectorAll('thead th[data-i18n]').forEach(th => {
         const key = th.getAttribute('data-i18n');
         if (typeof t === 'function') {
@@ -124,7 +128,6 @@ function applyDynamicTranslations() {
         }
     });
     
-    // Aplicar traducción al título de sección si existe
     const seccionTitulo = document.querySelector('.tabla-morfologia h2');
     if (seccionTitulo && seccionTitulo.hasAttribute('data-i18n')) {
         const key = seccionTitulo.getAttribute('data-i18n');
@@ -135,13 +138,9 @@ function applyDynamicTranslations() {
 }
 
 /**
- * Guarda los datos y navega a la siguiente página
+ * SOLO GUARDA los datos en localStorage (sin navegar)
  */
-function saveAndContinue() {
-    const guardarBtn = document.getElementById('guardarBtn');
-    if (!guardarBtn) return;
-    
-    // Guardar todas las posibilidades
+function saveData() {
     document.querySelectorAll('.posibilidad').forEach(input => {
         const idx = input.dataset.idx;
         if (idx) {
@@ -149,10 +148,14 @@ function saveAndContinue() {
         }
     });
     
-    // Guardar en localStorage
     localStorage.setItem('projectData', JSON.stringify(data));
-    
-    // Navegar a la siguiente página
+    console.log('Datos guardados correctamente');
+}
+
+/**
+ * SOLO NAVEGA a la siguiente página (sin guardar)
+ */
+function continueToNext() {
     window.location.href = 'gc1.html';
 }
 
@@ -171,7 +174,6 @@ function setupLanguageSelector() {
             setLanguage(this.value);
             updateProjectName();
             updateThemeButton();
-            // Regenerar tablas para aplicar traducciones
             generarTablas();
         } else {
             console.error('setLanguage function not found. Make sure lang.js is loaded.');
@@ -186,11 +188,9 @@ function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
     
-    // Aplicar tema guardado
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeButton();
     
-    // Cambiar tema al hacer clic
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
@@ -215,7 +215,6 @@ function updateThemeButton() {
     if (currentTheme === 'dark') {
         themeToggle.textContent = '☀️';
         themeToggle.title = 'Cambiar a modo claro';
-        // Actualizar tooltip traducido si está disponible
         if (typeof t === 'function') {
             themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
         }
@@ -229,12 +228,14 @@ function updateThemeButton() {
 }
 
 /**
- * Configura el botón de guardar
+ * Configura los botones de Guardar y Continuar
  */
-function setupSaveButton() {
-    const guardarBtn = document.getElementById('guardarBtn');
+function setupButtons() {
     if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveAndContinue);
+        guardarBtn.addEventListener('click', saveData);
+    }
+    if (continuarBtn) {
+        continuarBtn.addEventListener('click', continueToNext);
     }
 }
 
@@ -242,14 +243,19 @@ function setupSaveButton() {
  * Inicializa la página
  */
 function initializePage() {
-    // Configurar componentes
     setupLanguageSelector();
     setupThemeToggle();
-    setupSaveButton();
-    
-    // Actualizar UI
+    setupButtons();
     updateProjectName();
     generarTablas();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 // ========== EJECUCIÓN AL CARGAR EL DOM ==========
@@ -258,5 +264,6 @@ document.addEventListener('DOMContentLoaded', initializePage);
 // ========== EXPORTAR FUNCIONES PARA USO GLOBAL ==========
 window.updateProjectName = updateProjectName;
 window.generarTablas = generarTablas;
-window.saveAndContinue = saveAndContinue;
+window.saveData = saveData;
+window.continueToNext = continueToNext;
 window.contarConceptos = contarConceptos;

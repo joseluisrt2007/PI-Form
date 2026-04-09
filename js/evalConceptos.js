@@ -2,7 +2,7 @@
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const tablasContainer = document.getElementById('tablasContainer');
 const guardarBtn = document.getElementById('guardarBtn');
-const errorMsg = document.getElementById('errorMsg');
+const continuarBtn = document.getElementById('continuarBtn');
 
 // ========== FUNCIONES PRINCIPALES ==========
 
@@ -17,7 +17,6 @@ function updateProjectName() {
     if (data.projectName && data.projectName.trim()) {
         projectText.textContent = data.projectName;
     } else {
-        // Usar traducción para "(Sin nombre)"
         if (typeof t === 'function') {
             projectText.textContent = t('unnamed_project') || '(Sin nombre)';
         } else {
@@ -58,7 +57,6 @@ function generarSeccionIdeas() {
                 <ul>
     `;
     
-    // Listar todas las ideas
     conceptosExistentes.forEach(conc => {
         const idea = data[`concepto${conc}`] || `Idea ${conc}`;
         html += `<li>${idea}</li>`;
@@ -83,11 +81,9 @@ function obtenerOpcionesSeleccionadas(col) {
     const opcionesSeleccionadas = [];
     
     for (const conc of conceptosExistentes) {
-        // Obtener la selección para esta columna
         const grupoKey = `pastel_grupo${(conc - 1) * 3 + col}`;
         const opcionSeleccionada = data[grupoKey] || '';
         
-        // Si hay opción seleccionada, agregarla a la lista
         if (opcionSeleccionada.trim() !== '') {
             opcionesSeleccionadas.push(opcionSeleccionada);
         }
@@ -106,7 +102,6 @@ function generarTablas() {
     
     const conceptosExistentes = obtenerConceptosExistentes();
     
-    // Si no hay conceptos originales, mostrar mensaje
     if (conceptosExistentes.length === 0) {
         const message = document.createElement('div');
         message.className = 'no-conceptos-message';
@@ -115,24 +110,19 @@ function generarTablas() {
         return;
     }
     
-    // Sección 1: Lista de ideas
     const ideasHTML = generarSeccionIdeas();
     tablasContainer.innerHTML = ideasHTML;
     
-    // Sección 2: Los 3 conceptos formados con sus opciones seleccionadas
     for (let col = 1; col <= 3; col++) {
         const section = document.createElement('div');
         section.className = 'concepto-section';
 
-        // Obtener SOLO las opciones seleccionadas para este concepto formado
         const opcionesSeleccionadas = obtenerOpcionesSeleccionadas(col);
 
-        // Obtener texto traducido para el título
         const titleText = (typeof t === 'function') 
             ? `${t('concept_formed') || 'Concepto formado'} ${col}` 
             : `Concepto formado ${col}`;
         
-        // Generar lista SOLO de opciones seleccionadas
         let opcionesHTML = '';
         if (opcionesSeleccionadas.length > 0) {
             opcionesHTML = opcionesSeleccionadas.map(opcion => `<li>${opcion}</li>`).join('');
@@ -176,7 +166,7 @@ function generarTablas() {
                                            min="0" max="10" step="0.1" value="${savedValue}" 
                                            placeholder="${placeholderText}" data-i18n-placeholder="enter_rating">
                                 </td>
-                                <td>${i === 1 ? `<span class="resultado" id="res${col}">-</span>` : ''}</td> <!-- Cambiado a "-" -->
+                                <td>${i === 1 ? `<span class="resultado" id="res${col}">-</span>` : ''}</td>
                             </tr>
                         `;
                     }).join('')}
@@ -187,19 +177,19 @@ function generarTablas() {
         tablasContainer.appendChild(section);
     }
     
-    // Aplicar todas las traducciones
     aplicarTraduccionesCompletas();
-    
-    // Recalcular si hay datos existentes
     recalcularTodo();
     
-    // Validar estado inicial
-    validateAll();
+    // SIN RESTRICCIONES: Siempre habilitar los botones
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
     
-    // Añadir event listeners a los inputs
     document.querySelectorAll('.calif').forEach(input => {
         input.addEventListener('input', function() {
-            // Marcar el concepto como no calculado si se modifica algún campo
             const conc = this.dataset.conc;
             if (conc && data[`calculadoFormado${conc}`]) {
                 data[`calculadoFormado${conc}`] = false;
@@ -209,7 +199,13 @@ function generarTablas() {
                     resultElement.textContent = '-';
                 }
             }
-            validateAll();
+            // SIN RESTRICCIONES: Siempre habilitar los botones
+            if (guardarBtn) {
+                guardarBtn.disabled = false;
+            }
+            if (continuarBtn) {
+                continuarBtn.disabled = false;
+            }
         });
     });
 }
@@ -218,7 +214,6 @@ function generarTablas() {
  * Aplica todas las traducciones a elementos dinámicos
  */
 function aplicarTraduccionesCompletas() {
-    // Aplicar traducciones a placeholders
     document.querySelectorAll('input[data-i18n-placeholder]').forEach(input => {
         const key = input.getAttribute('data-i18n-placeholder');
         if (typeof t === 'function') {
@@ -226,7 +221,6 @@ function aplicarTraduccionesCompletas() {
         }
     });
     
-    // Aplicar traducciones a encabezados de tabla
     document.querySelectorAll('thead th[data-i18n]').forEach(th => {
         const key = th.getAttribute('data-i18n');
         if (typeof t === 'function') {
@@ -234,7 +228,6 @@ function aplicarTraduccionesCompletas() {
         }
     });
     
-    // Aplicar traducciones a textos fuertes
     document.querySelectorAll('strong[data-i18n]').forEach(strong => {
         const key = strong.getAttribute('data-i18n');
         if (typeof t === 'function') {
@@ -242,21 +235,18 @@ function aplicarTraduccionesCompletas() {
         }
     });
     
-    // Aplicar traducciones a botones de calcular
     document.querySelectorAll('.btn-calc').forEach(btn => {
         if (typeof t === 'function') {
             btn.textContent = t('calculate') || 'Calcular';
         }
     });
     
-    // Aplicar traducciones a títulos de concepto
     document.querySelectorAll('.concepto-title').forEach((title, index) => {
         if (typeof t === 'function') {
             title.textContent = `${t('concept_formed') || 'Concepto formado'} ${index + 1}`;
         }
     });
     
-    // Aplicar traducciones a título de ideas
     document.querySelectorAll('.section-title[data-i18n]').forEach(title => {
         const key = title.getAttribute('data-i18n');
         if (typeof t === 'function') {
@@ -264,7 +254,6 @@ function aplicarTraduccionesCompletas() {
         }
     });
     
-    // Actualizar textos "Sin selección" en las listas
     document.querySelectorAll('.opciones-list li em').forEach(em => {
         if (typeof t === 'function' && em.textContent === 'Sin selección') {
             em.textContent = t('no_selection');
@@ -282,73 +271,54 @@ function alertT(key) {
 }
 
 /**
- * Calcula el resultado de un concepto específico
+ * Calcula el resultado de un concepto específico - SIN RESTRICCIONES
  * @param {number} conc - Número del concepto formado (1-3)
  */
 function calcular(conc) {
     let total = 0;
-    let valid = true;
     
-    // Primero verificar que todos los campos tengan valor, establecer a 0 si están vacíos
     for (let i = 1; i <= 5; i++) {
         const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
         if (!input) continue;
         
-        // Si el campo está vacío, establecerlo a 0 automáticamente
         if (input.value === '') {
             input.value = '0';
             const dataKey = `ca${(parseInt(conc) - 1) * 5 + i}`;
             data[dataKey] = '0';
         }
         
-        const calif = parseFloat(input.value);
+        const calif = parseFloat(input.value) || 0;
         const peso = parseFloat(data[`peso${i}`]) || 0;
-        
-        if (isNaN(calif) || calif < 0 || calif > 10) {
-            valid = false;
-        }
         
         total += calif * peso;
         
-        // Guardar el valor actualizado en data
         const dataKey = `ca${(parseInt(conc) - 1) * 5 + i}`;
         data[dataKey] = input.value;
     }
     
     const resultElement = document.getElementById(`res${conc}`);
     if (resultElement) {
-        if (valid) {
-            const resultado = total.toFixed(2);
-            resultElement.textContent = resultado;
-            // Guardar resultado en datos (conceptos formados 1-3 se guardan como resultado4, resultado5, resultado6)
-            data[`resultado${conc + 3}`] = resultado;
-            data[`calculadoFormado${conc}`] = true; // Marcar como calculado
-        } else {
-            alertT('error_ratings_range');
-            data[`calculadoFormado${conc}`] = false; // Marcar como no calculado
-        }
+        const resultado = total.toFixed(2);
+        resultElement.textContent = resultado;
+        data[`resultado${conc + 3}`] = resultado;
+        data[`calculadoFormado${conc}`] = true;
     }
     
-    validateAll();
+    // SIN RESTRICCIONES: Siempre habilitar los botones
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 /**
- * Verifica si todos los conceptos formados han sido calculados
- * @returns {boolean} True si todos los conceptos han sido calculados
+ * Verifica si todos los conceptos formados han sido calculados - Siempre true
+ * @returns {boolean} Siempre true
  */
 function todosCalculados() {
-    // Siempre hay 3 conceptos formados para evaluar
-    const totalConceptosFormados = 3;
-    let calculados = 0;
-    
-    for (let conc = 1; conc <= totalConceptosFormados; conc++) {
-        // Verificar si el concepto formado tiene un resultado calculado
-        if (data[`calculadoFormado${conc}`]) {
-            calculados++;
-        }
-    }
-    
-    return calculados === totalConceptosFormados;
+    return true;
 }
 
 /**
@@ -356,7 +326,6 @@ function todosCalculados() {
  */
 function recalcularTodo() {
     for (let conc = 1; conc <= 3; conc++) {
-        // Si ya hay un resultado guardado, mostrarlo
         const resultadoGuardado = data[`resultado${conc + 3}`];
         const resultElement = document.getElementById(`res${conc}`);
         
@@ -364,11 +333,9 @@ function recalcularTodo() {
             resultElement.textContent = resultadoGuardado;
             data[`calculadoFormado${conc}`] = true;
         } else if (resultElement) {
-            // Si no hay resultado, mostrar "-"
             resultElement.textContent = '-';
         }
         
-        // Verificar si hay calificaciones guardadas para este concepto formado
         let hasSavedData = false;
         for (let i = 1; i <= 5; i++) {
             const dataKey = `ca${(conc - 1) * 5 + i}`;
@@ -378,7 +345,6 @@ function recalcularTodo() {
             }
         }
         
-        // Si hay datos guardados, cargarlos en los inputs
         if (hasSavedData) {
             for (let i = 1; i <= 5; i++) {
                 const dataKey = `ca${(conc - 1) * 5 + i}`;
@@ -387,82 +353,44 @@ function recalcularTodo() {
                     input.value = data[dataKey];
                 }
             }
-            
-            // Si ya estaba calculado, mantener el cálculo
-            if (data[`calculadoFormado${conc}`]) {
-                // Ya mostramos el resultado arriba
-            }
         }
     }
 }
 
 /**
- * Valida que todas las calificaciones sean válidas y que todos los conceptos hayan sido calculados
+ * Valida que todas las calificaciones sean válidas - SIN RESTRICCIONES
  */
 function validateAll() {
-    if (!guardarBtn || !errorMsg) return;
-    
-    let allValid = true;
-    let allCalculated = todosCalculados();
-    
-    // Verificar que las calificaciones existentes sean válidas
-    document.querySelectorAll('.calif').forEach(input => {
-        if (input.value !== '') { // Solo validar si no está vacío
-            const val = parseFloat(input.value);
-            if (isNaN(val) || val < 0 || val > 10) {
-                allValid = false;
-            }
-        }
-    });
-    
-    // El botón se habilita solo si todos los conceptos han sido calculados
-    // y las calificaciones existentes son válidas
-    guardarBtn.disabled = !(allValid && allCalculated);
-    
-    if (errorMsg) {
-        if (allValid && allCalculated) {
-            errorMsg.textContent = '';
-        } else if (!allValid) {
-            errorMsg.textContent = (typeof t === 'function') 
-                ? t('error_ratings') 
-                : 'Las calificaciones deben estar entre 0 y 10';
-        } else if (!allCalculated) {
-            errorMsg.textContent = (typeof t === 'function')
-                ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
-                : 'Debes calcular todos los conceptos antes de continuar';
-        }
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
     }
 }
 
 /**
- * Guarda los datos y navega a la siguiente página
+ * SOLO GUARDA los datos en localStorage (sin navegar)
  */
-function saveAndContinue() {
-    // Primero verificar que todos los conceptos hayan sido calculados
-    if (!todosCalculados()) {
-        const errorMsgText = (typeof t === 'function')
-            ? t('error_calculate_all') || 'Debes calcular todos los conceptos antes de continuar'
-            : 'Debes calcular todos los conceptos antes de continuar';
-        alert(errorMsgText);
-        return;
-    }
-    
-    // Guardar todas las calificaciones actuales
+function saveData() {
     document.querySelectorAll('.calif').forEach(input => {
         const conc = input.dataset.conc;
         const crit = input.dataset.crit;
         if (conc && crit) {
-            // Si un campo está vacío (no debería pasar si ya se calcularon), guardar como 0
             const value = input.value === '' ? '0' : input.value;
             const dataKey = `ca${(parseInt(conc) - 1) * 5 + parseInt(crit)}`;
             data[dataKey] = value;
         }
     });
     
-    // Guardar en localStorage
     localStorage.setItem('projectData', JSON.stringify(data));
-    
-    // Navegar a la siguiente página
+    console.log('Datos guardados correctamente');
+}
+
+/**
+ * SOLO NAVEGA a la siguiente página (sin guardar)
+ */
+function continueToNext() {
     window.location.href = 'prevenir.html';
 }
 
@@ -481,7 +409,6 @@ function setupLanguageSelector() {
             setLanguage(this.value);
             updateProjectName();
             updateThemeButton();
-            // Regenerar tablas para aplicar traducciones
             generarTablas();
         } else {
             console.error('setLanguage function not found. Make sure lang.js is loaded.');
@@ -496,11 +423,9 @@ function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
     
-    // Aplicar tema guardado
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeButton();
     
-    // Cambiar tema al hacer clic
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
@@ -525,7 +450,6 @@ function updateThemeButton() {
     if (currentTheme === 'dark') {
         themeToggle.textContent = '☀️';
         themeToggle.title = 'Cambiar a modo claro';
-        // Actualizar tooltip traducido si está disponible
         if (typeof t === 'function') {
             themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
         }
@@ -539,11 +463,14 @@ function updateThemeButton() {
 }
 
 /**
- * Configura el botón de guardar
+ * Configura los botones de Guardar y Continuar
  */
-function setupSaveButton() {
+function setupButtons() {
     if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveAndContinue);
+        guardarBtn.addEventListener('click', saveData);
+    }
+    if (continuarBtn) {
+        continuarBtn.addEventListener('click', continueToNext);
     }
 }
 
@@ -551,14 +478,19 @@ function setupSaveButton() {
  * Inicializa la página
  */
 function initializePage() {
-    // Configurar componentes
     setupLanguageSelector();
     setupThemeToggle();
-    setupSaveButton();
-    
-    // Actualizar UI
+    setupButtons();
     updateProjectName();
     generarTablas();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 // ========== EJECUCIÓN AL CARGAR EL DOM ==========
@@ -572,7 +504,8 @@ window.alertT = alertT;
 window.calcular = calcular;
 window.recalcularTodo = recalcularTodo;
 window.validateAll = validateAll;
-window.saveAndContinue = saveAndContinue;
+window.saveData = saveData;
+window.continueToNext = continueToNext;
 window.obtenerConceptosExistentes = obtenerConceptosExistentes;
 window.obtenerOpcionesSeleccionadas = obtenerOpcionesSeleccionadas;
 window.todosCalculados = todosCalculados;

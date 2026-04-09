@@ -2,6 +2,8 @@
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const mejorConceptoContainer = document.getElementById('mejorConceptoContainer');
 const tablasContainer = document.getElementById('tablasContainer');
+const guardarBtn = document.getElementById('guardarBtn');
+const continuarBtn = document.getElementById('continuarBtn');
 
 // ========== FUNCIONES PRINCIPALES ==========
 
@@ -16,7 +18,6 @@ function updateProjectName() {
     if (data.projectName && data.projectName.trim()) {
         projectText.textContent = data.projectName;
     } else {
-        // Usar traducción para "(Sin nombre)"
         if (typeof t === 'function') {
             projectText.textContent = t('unnamed_project') || '(Sin nombre)';
         } else {
@@ -46,6 +47,14 @@ function obtenerConceptosExistentes() {
 function generarContenido() {
     generarMejorConcepto();
     generarTablasPrevencion();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 /**
@@ -54,15 +63,12 @@ function generarContenido() {
 function generarMejorConcepto() {
     if (!mejorConceptoContainer) return;
     
-    // Determinar el mejor concepto basado en resultados
     const resultados = [4, 5, 6].map(n => parseFloat(data[`resultado${n}`]) || 0);
     let mejorIdx = resultados.indexOf(Math.max(...resultados));
     if (resultados.every(r => r === 0)) mejorIdx = -1;
     
-    // Obtener los conceptos existentes
     const conceptosExistentes = obtenerConceptosExistentes();
     
-    // Crear el texto del mejor concepto
     let mejorConceptoTexto;
     if (mejorIdx >= 0) {
         const conceptFormedText = (typeof t === 'function') 
@@ -75,24 +81,17 @@ function generarMejorConcepto() {
             : 'No se ha seleccionado concepto';
     }
 
-    // Obtener opciones del mejor concepto - CORREGIDO para usar solo conceptos existentes
     const opciones = [];
     if (mejorIdx >= 0 && conceptosExistentes.length > 0) {
-        // Para cada concepto existente, necesitamos la opción correspondiente al concepto seleccionado
         for (const conc of conceptosExistentes) {
-            // La fórmula correcta: (conc-1)*3 + (mejorIdx+1)
             const key = `pastel_grupo${(conc - 1) * 3 + (mejorIdx + 1)}`;
             const noSelectionText = (typeof t === 'function') 
                 ? t('no_selection') || 'Sin selección' 
                 : 'Sin selección';
             
-            // Obtener el texto de la opción seleccionada
             const opcionSeleccionada = data[key] || '';
-            
-            // Obtener el nombre del concepto original
             const nombreConcepto = data[`concepto${conc}`];
             
-            // Buscar cuál de las 3 posibilidades fue seleccionada para mostrar mejor
             let opcionText = '';
             let encontrado = false;
             
@@ -101,14 +100,12 @@ function generarMejorConcepto() {
                 const posibilidad = data[`pos${posIdx}`] || '';
                 
                 if (posibilidad === opcionSeleccionada) {
-                    // Opción encontrada, mostrar concepto y opción
                     opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
                     encontrado = true;
                     break;
                 }
             }
             
-            // Si no se encontró opción seleccionada, mostrar solo el concepto
             if (!encontrado) {
                 opcionText = `<strong>${nombreConcepto}</strong> <em>${noSelectionText}</em>`;
             }
@@ -117,7 +114,6 @@ function generarMejorConcepto() {
         }
     }
 
-    // GENERAR HTML
     const titulo = (typeof t === 'function') ? t('best_concept') || 'Mejor concepto' : 'Mejor concepto';
     mejorConceptoContainer.innerHTML = `
         <div class="mejor-concepto">
@@ -133,7 +129,6 @@ function generarMejorConcepto() {
         ` : ''}
     `;
     
-    // Aplicar traducciones a "Sin selección"
     if (typeof t === 'function') {
         mejorConceptoContainer.querySelectorAll('em').forEach(em => {
             if (em.textContent === 'Sin selección') {
@@ -155,7 +150,6 @@ function generarTablasPrevencion() {
         const section = document.createElement('div');
         section.className = 'tabla-prevencion';
         
-        // Obtener textos traducidos
         const preventionText = (typeof t === 'function') 
             ? t('prevention') || 'Prevención' 
             : 'Prevención';
@@ -263,12 +257,11 @@ function generarTablasPrevencion() {
         tablasContainer.appendChild(section);
     }
     
-    // Recalcular riesgos si hay datos
     recalcularRiesgosSiExisten();
 }
 
 /**
- * Calcula el riesgo con validación estricta 1-10
+ * Calcula el riesgo - SIN RESTRICCIONES
  * @param {number} tabla - Número de tabla (1-3)
  */
 function calcularRiesgo(tabla) {
@@ -277,17 +270,12 @@ function calcularRiesgo(tabla) {
     
     if (!sevInput || !ocuInput) return;
     
-    const sev = parseFloat(sevInput.value);
-    const ocu = parseFloat(ocuInput.value);
-
-    if (isNaN(sev) || isNaN(ocu) || sev < 1 || sev > 10 || ocu < 1 || ocu > 10) {
-        const errorMsg = (typeof t === 'function') 
-            ? t('error_severity_occurrence') 
-            : 'Severidad y Ocurrencia deben ser valores entre 1 y 10';
-        alert(errorMsg);
-        return;
-    }
-
+    let sev = parseFloat(sevInput.value);
+    let ocu = parseFloat(ocuInput.value);
+    
+    if (isNaN(sev)) sev = 0;
+    if (isNaN(ocu)) ocu = 0;
+    
     const riesgo = (sev * ocu).toFixed(2);
     const riesgoElement = document.getElementById(`riesgo${tabla}`);
     if (riesgoElement) {
@@ -310,20 +298,15 @@ function recalcularRiesgosSiExisten() {
 }
 
 /**
- * Guarda los datos y navega a la siguiente página
+ * SOLO GUARDA los datos en localStorage (sin navegar)
  */
-function saveAndContinue() {
-    const guardarBtn = document.getElementById('guardarBtn');
-    if (!guardarBtn) return;
-    
-    // Guardar valores de inputs con data-key
+function saveData() {
     document.querySelectorAll('input[data-key]').forEach(input => {
         if (input.dataset.key) {
             data[input.dataset.key] = input.value;
         }
     });
     
-    // Guardar valores de severidad y ocurrencia
     document.querySelectorAll('.sev').forEach(input => {
         const tabla = input.dataset.tabla;
         if (tabla) {
@@ -338,10 +321,14 @@ function saveAndContinue() {
         }
     });
     
-    // Guardar en localStorage
     localStorage.setItem('projectData', JSON.stringify(data));
-    
-    // Navegar a la siguiente página
+    console.log('Datos guardados correctamente');
+}
+
+/**
+ * SOLO NAVEGA a la siguiente página (sin guardar)
+ */
+function continueToNext() {
     window.location.href = 'diagrama.html';
 }
 
@@ -360,7 +347,6 @@ function setupLanguageSelector() {
             setLanguage(this.value);
             updateProjectName();
             updateThemeButton();
-            // Regenerar contenido para aplicar traducciones
             generarContenido();
         } else {
             console.error('setLanguage function not found. Make sure lang.js is loaded.');
@@ -375,11 +361,9 @@ function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
     
-    // Aplicar tema guardado
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeButton();
     
-    // Cambiar tema al hacer clic
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
@@ -404,7 +388,6 @@ function updateThemeButton() {
     if (currentTheme === 'dark') {
         themeToggle.textContent = '☀️';
         themeToggle.title = 'Cambiar a modo claro';
-        // Actualizar tooltip traducido si está disponible
         if (typeof t === 'function') {
             themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
         }
@@ -418,12 +401,14 @@ function updateThemeButton() {
 }
 
 /**
- * Configura el botón de guardar
+ * Configura los botones de Guardar y Continuar
  */
-function setupSaveButton() {
-    const guardarBtn = document.getElementById('guardarBtn');
+function setupButtons() {
     if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveAndContinue);
+        guardarBtn.addEventListener('click', saveData);
+    }
+    if (continuarBtn) {
+        continuarBtn.addEventListener('click', continueToNext);
     }
 }
 
@@ -431,14 +416,19 @@ function setupSaveButton() {
  * Inicializa la página
  */
 function initializePage() {
-    // Configurar componentes
     setupLanguageSelector();
     setupThemeToggle();
-    setupSaveButton();
-    
-    // Actualizar UI
+    setupButtons();
     updateProjectName();
     generarContenido();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 // ========== EJECUCIÓN AL CARGAR EL DOM ==========
@@ -451,5 +441,6 @@ window.generarMejorConcepto = generarMejorConcepto;
 window.generarTablasPrevencion = generarTablasPrevencion;
 window.calcularRiesgo = calcularRiesgo;
 window.recalcularRiesgosSiExisten = recalcularRiesgosSiExisten;
-window.saveAndContinue = saveAndContinue;
+window.saveData = saveData;
+window.continueToNext = continueToNext;
 window.obtenerConceptosExistentes = obtenerConceptosExistentes;

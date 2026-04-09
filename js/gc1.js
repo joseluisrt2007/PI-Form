@@ -1,6 +1,8 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const tablasContainer = document.getElementById('tablasContainer');
+const guardarBtn = document.getElementById('guardarBtn');
+const continuarBtn = document.getElementById('continuarBtn');
 
 // ========== FUNCIONES PRINCIPALES ==========
 
@@ -15,7 +17,6 @@ function updateProjectName() {
     if (data.projectName && data.projectName.trim()) {
         projectText.textContent = data.projectName;
     } else {
-        // Usar traducción para "(Sin nombre)"
         if (typeof t === 'function') {
             projectText.textContent = t('unnamed_project') || '(Sin nombre)';
         } else {
@@ -49,7 +50,6 @@ function generarTablas() {
     
     const numeroDeConceptos = contarConceptos();
     
-    // Si no hay conceptos, mostrar mensaje
     if (numeroDeConceptos === 0) {
         const message = document.createElement('div');
         message.className = 'no-conceptos-message';
@@ -61,7 +61,6 @@ function generarTablas() {
     for (let conc = 1; conc <= 5; conc++) {
         const conceptoNombre = data[`concepto${conc}`] || '';
         
-        // Solo crear tabla si el concepto tiene contenido
         if (conceptoNombre.trim() === '') {
             continue;
         }
@@ -109,18 +108,22 @@ function generarTablas() {
         tablasContainer.appendChild(section);
     }
     
-    // Aplicar traducciones a elementos dinámicos
     applyDynamicTranslations();
-    
-    // Configurar checkboxes y cargar selecciones guardadas
     configurarCheckboxes();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 /**
  * Aplica traducciones a elementos generados dinámicamente
  */
 function applyDynamicTranslations() {
-    // Aplicar traducciones a los encabezados de tabla
     document.querySelectorAll('thead th[data-i18n]').forEach(th => {
         const key = th.getAttribute('data-i18n');
         if (typeof t === 'function') {
@@ -128,7 +131,6 @@ function applyDynamicTranslations() {
         }
     });
     
-    // Aplicar traducciones a las opciones (Opción 1, Opción 2, Opción 3)
     document.querySelectorAll('thead th[data-i18n-col]').forEach(th => {
         const colNum = th.getAttribute('data-i18n-col');
         let optionText = `Opción ${colNum}`;
@@ -138,7 +140,6 @@ function applyDynamicTranslations() {
         th.textContent = optionText;
     });
     
-    // Aplicar traducción al título de sección si existe
     const seccionTitulo = document.querySelector('.tabla-conceptos h2');
     if (seccionTitulo && seccionTitulo.hasAttribute('data-i18n')) {
         const key = seccionTitulo.getAttribute('data-i18n');
@@ -149,7 +150,7 @@ function applyDynamicTranslations() {
 }
 
 /**
- * Configura los checkboxes con selección única por columna
+ * Configura los checkboxes con selección única por columna - SIN RESTRICCIONES
  */
 function configurarCheckboxes() {
     document.querySelectorAll('.chk').forEach(chk => {
@@ -157,7 +158,6 @@ function configurarCheckboxes() {
         const col = chk.dataset.col;
         const pos = chk.dataset.pos;
 
-        // Cargar selección guardada
         const groupKey = `pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`;
         if (data[groupKey] === data[`pos${pos}`]) {
             chk.checked = true;
@@ -170,19 +170,16 @@ function configurarCheckboxes() {
 }
 
 /**
- * Maneja el cambio de estado de un checkbox
+ * Maneja el cambio de estado de un checkbox - SIN RESTRICCIONES
  */
 function handleCheckboxChange(checkbox, conc, col, pos, groupKey) {
     if (checkbox.checked) {
-        // Desmarcar otros checkboxes en la misma columna
         document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`).forEach(other => {
             if (other !== checkbox) other.checked = false;
         });
         
-        // Guardar selección
         data[groupKey] = data[`pos${pos}`] || '';
     } else {
-        // Si se desmarca y no hay otro seleccionado, limpiar
         const anyChecked = Array.from(
             document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`)
         ).some(c => c.checked);
@@ -192,22 +189,21 @@ function handleCheckboxChange(checkbox, conc, col, pos, groupKey) {
         }
     }
     
-    // Guardar cambios inmediatamente (opcional)
     localStorage.setItem('projectData', JSON.stringify(data));
 }
 
 /**
- * Guarda los datos y navega a la siguiente página
+ * SOLO GUARDA los datos en localStorage (sin navegar)
  */
-function saveAndContinue() {
-    const guardarBtn = document.getElementById('guardarBtn');
-    if (!guardarBtn) return;
-    
-    // Los datos ya se guardan automáticamente al cambiar checkboxes
-    // Pero hacemos una última confirmación
+function saveData() {
     localStorage.setItem('projectData', JSON.stringify(data));
-    
-    // Navegar a la siguiente página
+    console.log('Datos guardados correctamente');
+}
+
+/**
+ * SOLO NAVEGA a la siguiente página (sin guardar)
+ */
+function continueToNext() {
     window.location.href = 'evalConceptos.html';
 }
 
@@ -226,7 +222,6 @@ function setupLanguageSelector() {
             setLanguage(this.value);
             updateProjectName();
             updateThemeButton();
-            // Regenerar tablas para aplicar nuevas traducciones
             generarTablas();
         } else {
             console.error('setLanguage function not found. Make sure lang.js is loaded.');
@@ -241,11 +236,9 @@ function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
     
-    // Aplicar tema guardado
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeButton();
     
-    // Cambiar tema al hacer clic
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
@@ -270,7 +263,6 @@ function updateThemeButton() {
     if (currentTheme === 'dark') {
         themeToggle.textContent = '☀️';
         themeToggle.title = 'Cambiar a modo claro';
-        // Actualizar tooltip traducido si está disponible
         if (typeof t === 'function') {
             themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
         }
@@ -284,12 +276,14 @@ function updateThemeButton() {
 }
 
 /**
- * Configura el botón de guardar
+ * Configura los botones de Guardar y Continuar
  */
-function setupSaveButton() {
-    const guardarBtn = document.getElementById('guardarBtn');
+function setupButtons() {
     if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveAndContinue);
+        guardarBtn.addEventListener('click', saveData);
+    }
+    if (continuarBtn) {
+        continuarBtn.addEventListener('click', continueToNext);
     }
 }
 
@@ -297,14 +291,19 @@ function setupSaveButton() {
  * Inicializa la página
  */
 function initializePage() {
-    // Configurar componentes
     setupLanguageSelector();
     setupThemeToggle();
-    setupSaveButton();
-    
-    // Actualizar UI
+    setupButtons();
     updateProjectName();
     generarTablas();
+    
+    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
+    if (guardarBtn) {
+        guardarBtn.disabled = false;
+    }
+    if (continuarBtn) {
+        continuarBtn.disabled = false;
+    }
 }
 
 // ========== EJECUCIÓN AL CARGAR EL DOM ==========
@@ -314,5 +313,6 @@ document.addEventListener('DOMContentLoaded', initializePage);
 window.updateProjectName = updateProjectName;
 window.generarTablas = generarTablas;
 window.configurarCheckboxes = configurarCheckboxes;
-window.saveAndContinue = saveAndContinue;
+window.saveData = saveData;
+window.continueToNext = continueToNext;
 window.contarConceptos = contarConceptos;
