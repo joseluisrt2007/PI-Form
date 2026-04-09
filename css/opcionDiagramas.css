@@ -9,19 +9,19 @@
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 25px -5px rgba(59, 130, 246, 0.15);
     --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-    --section-bg: #ffffff;
-    --accent-border: #3b82f6;
     --surface: #ffffff;
     --border: #e5e7eb;
     --card-bg: #ffffff;
     --header-bg: #1a56db;
-    --list-bg: #f8fafc;
+    --success: #10b981;
+    --success-dark: #059669;
+    --gray: #6b7280;
+    --gray-dark: #4b5563;
     --select-text: #1f2937;
     --select-bg: #ffffff;
     --select-border: #e5e7eb;
 }
 
-/* ===== RESET Y ESTILOS BASE ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -171,168 +171,66 @@ header {
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .container {
-    max-width: 1400px;
+    max-width: 700px;
     margin: 3rem auto;
-    padding: 2.5rem;
+    padding: 3rem 2.5rem;
     background: var(--card-bg);
     border-radius: 20px;
     box-shadow: var(--card-shadow);
     border: 1px solid var(--border);
+    text-align: center;
 }
 
+/* ===== ICONO ===== */
+.icon-container {
+    margin-bottom: 1.5rem;
+}
+
+.icon {
+    font-size: 5rem;
+    display: inline-block;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ===== TÍTULO ===== */
 h1 {
     text-align: center;
     color: var(--primary-dark);
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
-/* ===== TABLA DE TAREAS ===== */
-.tabla-tareas h2 {
+/* ===== PREGUNTA ===== */
+.pregunta {
     text-align: center;
-    color: var(--primary-dark);
-    font-size: 1.75rem;
-    margin-bottom: 3rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-/* Fila de tarea */
-.tarea-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding: 2rem;
-    background: var(--section-bg);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.tarea-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary-light);
-}
-
-.tarea-row + .tarea-row {
-    margin-top: 0.5rem;
-}
-
-/* Filas impares con fondo diferente */
-.tarea-row:nth-child(odd) {
-    background: rgba(59, 130, 246, 0.02);
-}
-
-/* Responsable, tarea y salida */
-.responsable,
-.tarea,
-.salida {
-    flex: 1;
-}
-
-.responsable {
-    margin-right: 3rem;
-    position: relative;
-}
-
-.tarea {
-    margin-right: 3rem;
-    position: relative;
-}
-
-/* Flechas entre columnas */
-.responsable::after {
-    content: "→";
-    position: absolute;
-    right: -2.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: var(--primary-light);
-    font-weight: bold;
-}
-
-.tarea::after {
-    content: "→";
-    position: absolute;
-    right: -2.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: var(--primary-light);
-    font-weight: bold;
-}
-
-/* Flecha hacia abajo entre filas */
-.tarea-row::after {
-    content: "↓";
-    position: absolute;
-    bottom: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 2rem;
-    color: var(--primary);
-    font-weight: bold;
-    z-index: 1;
-}
-
-/* Última fila no necesita flecha hacia abajo */
-.tarea-row:last-child::after {
-    content: none;
-}
-
-.responsable label,
-.tarea label,
-.salida label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    color: var(--primary);
-    font-size: 1.125rem;
-    letter-spacing: -0.3px;
-}
-
-/* Inputs de texto */
-input[type="text"] {
-    width: 100%;
-    padding: 1.25rem 1.5rem;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 1.0625rem;
-    transition: all 0.3s ease;
-    background: var(--surface);
+    font-size: 1.25rem;
     color: var(--text-dark);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
 }
 
-input[type="text"]:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-    background: var(--surface);
-}
-
-input[type="text"]::placeholder {
-    color: #6b7280;
-    opacity: 0.7;
-}
-
-/* ===== BOTONES MODIFICADOS ===== */
+/* ===== BOTONES ===== */
 .buttons {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    margin-top: 4rem;
+    margin-bottom: 2rem;
     flex-wrap: wrap;
 }
 
-/* Botón primario (Guardar y Continuar) */
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+.btn-si {
+    background: linear-gradient(135deg, var(--success), var(--success-dark));
     color: var(--text-light);
     padding: 1rem 2rem;
     border: none;
@@ -340,30 +238,27 @@ input[type="text"]::placeholder {
     font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 160px;
-    text-align: center;
+    min-width: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-lg);
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+.btn-si:hover {
+    background: linear-gradient(135deg, var(--success-dark), #047857);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
 }
 
-.btn-primary:focus-visible {
-    outline: 4px solid rgba(59, 130, 246, 0.5);
-    outline-offset: 6px;
-}
-
-.btn-primary:active {
+.btn-si:active {
     transform: translateY(-2px);
 }
 
-/* Botón secundario (Regreso) */
-.btn-secondary {
-    background: linear-gradient(135deg, #6b7280, #4b5563);
+.btn-no {
+    background: linear-gradient(135deg, var(--gray), var(--gray-dark));
     color: var(--text-light);
     padding: 1rem 2rem;
     border: none;
@@ -371,65 +266,61 @@ input[type="text"]::placeholder {
     font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
     box-shadow: var(--shadow-lg);
+}
+
+.btn-no:hover {
+    background: linear-gradient(135deg, var(--gray-dark), #374151);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(107, 114, 128, 0.3);
+}
+
+.btn-no:active {
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    font-size: 1.25rem;
+}
+
+/* Botón de regreso */
+.back-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: var(--text-light);
+    padding: 0.875rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 160px;
-    text-align: center;
 }
 
 .btn-secondary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-}
-
-.btn-secondary:focus-visible {
-    outline: 4px solid rgba(107, 114, 128, 0.3);
-    outline-offset: 4px;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(107, 114, 128, 0.25);
 }
 
 .btn-secondary:active {
     transform: translateY(-1px);
 }
 
-/* ===== DISEÑO RESPONSIVE ===== */
-@media (max-width: 992px) {
-    /* Filas de tarea en columnas */
-    .tarea-row {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1.5rem;
-    }
-
-    .responsable,
-    .tarea {
-        margin-right: 0;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Ocultar flechas horizontales en móvil */
-    .responsable::after,
-    .tarea::after {
-        content: none;
-    }
-
-    /* Cambiar flecha hacia abajo a derecha en móvil */
-    .tarea-row::after {
-        content: "→";
-        position: absolute;
-        right: -1.5rem;
-        top: 50%;
-        bottom: auto;
-        left: auto;
-        transform: translateY(-50%) rotate(90deg);
-    }
-
-    .tarea-row:last-child::after {
-        content: none;
-    }
-}
-
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-    /* Header responsive */
     header {
         flex-direction: column;
         gap: 1rem;
@@ -466,7 +357,6 @@ input[type="text"]::placeholder {
         font-size: 1rem;
     }
 
-    /* Controles responsive */
     .header-controls {
         flex-direction: row;
         gap: 15px;
@@ -489,55 +379,38 @@ input[type="text"]::placeholder {
         padding: 8px 12px;
     }
 
-    /* Contenedor principal */
     .container {
         margin: 2rem 1rem;
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
         border-radius: 16px;
     }
 
     h1 {
-        font-size: 2rem;
-        margin-bottom: 2rem;
+        font-size: 1.75rem;
     }
 
-    /* Tabla de tareas */
-    .tabla-tareas h2 {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
+    .pregunta {
+        font-size: 1.125rem;
     }
 
-    .tarea-row {
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .responsable label,
-    .tarea label,
-    .salida label {
-        font-size: 1rem;
-    }
-
-    input[type="text"] {
-        padding: 1rem;
-        font-size: 1rem;
-    }
-
-    /* Botones */
     .buttons {
         flex-direction: column;
         align-items: center;
-        margin-top: 3rem;
         gap: 1rem;
     }
 
-    .btn-primary,
-    .btn-secondary {
+    .btn-si,
+    .btn-no {
         width: 100%;
         max-width: 280px;
         min-width: auto;
-        font-size: 1.125rem;
-        padding: 1rem 1.5rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
     }
 }
 
@@ -567,28 +440,21 @@ input[type="text"]::placeholder {
     }
 
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
 
-    .tabla-tareas h2 {
-        font-size: 1.375rem;
-    }
-
-    .responsable label,
-    .tarea label,
-    .salida label {
-        font-size: 0.95rem;
-    }
-
-    input[type="text"] {
-        padding: 0.875rem;
-        font-size: 0.95rem;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-        padding: 0.875rem 1rem;
+    .pregunta {
         font-size: 1rem;
+    }
+
+    .icon {
+        font-size: 3.5rem;
+    }
+
+    .btn-si,
+    .btn-no {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
     }
 }
 
@@ -604,19 +470,19 @@ input[type="text"]::placeholder {
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
     --shadow-lg: 0 10px 25px -5px rgba(30, 64, 175, 0.3);
     --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    --section-bg: #1e293b;
-    --accent-border: #3b82f6;
     --surface: #1e293b;
     --border: #475569;
     --card-bg: #1e293b;
     --header-bg: #1e293b;
-    --list-bg: #2d3748;
+    --success: #10b981;
+    --success-dark: #059669;
+    --gray: #4b5563;
+    --gray-dark: #374151;
     --select-text: #f1f5f9;
     --select-bg: #2d3748;
     --select-border: #475569;
 }
 
-/* Estilos específicos para tema oscuro */
 [data-theme="dark"] body {
     background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
     color: var(--text-dark);
@@ -672,45 +538,8 @@ input[type="text"]::placeholder {
     color: var(--text-light);
 }
 
-[data-theme="dark"] .tabla-tareas h2 {
-    color: var(--text-light);
-}
-
-[data-theme="dark"] .tarea-row {
-    background: var(--section-bg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-}
-
-[data-theme="dark"] .tarea-row:hover {
-    border-color: var(--primary-light);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .tarea-row:nth-child(odd) {
-    background: rgba(96, 165, 250, 0.05);
-}
-
-[data-theme="dark"] .responsable label,
-[data-theme="dark"] .tarea label,
-[data-theme="dark"] .salida label {
-    color: var(--primary-light);
-}
-
-[data-theme="dark"] input[type="text"] {
-    background: #374151;
-    border-color: var(--border);
+[data-theme="dark"] .pregunta {
     color: var(--text-dark);
-}
-
-[data-theme="dark"] input[type="text"]:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
-    background: #4b5563;
-}
-
-[data-theme="dark"] input[type="text"]::placeholder {
-    color: #9ca3af;
 }
 
 [data-theme="dark"] .theme-toggle {
@@ -724,25 +553,18 @@ input[type="text"]::placeholder {
     border-color: rgba(96, 165, 250, 0.6);
 }
 
-[data-theme="dark"] .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+[data-theme="dark"] .btn-si {
+    background: linear-gradient(135deg, var(--success), var(--success-dark));
 }
 
-[data-theme="dark"] .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-dark), #1e40af);
+[data-theme="dark"] .btn-si:hover {
+    background: linear-gradient(135deg, var(--success-dark), #047857);
+}
+
+[data-theme="dark"] .btn-no {
+    background: linear-gradient(135deg, var(--gray), var(--gray-dark));
 }
 
 [data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #4b5563, #374151);
-}
-
-[data-theme="dark"] .btn-secondary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-}
-
-[data-theme="dark"] .responsable::after,
-[data-theme="dark"] .tarea::after,
-[data-theme="dark"] .tarea-row::after {
-    color: var(--primary-light);
 }

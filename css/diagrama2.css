@@ -189,63 +189,6 @@ h1 {
     letter-spacing: -0.5px;
 }
 
-/* ===== MEJOR CONCEPTO ===== */
-.mejor-concepto {
-    text-align: center;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 2.5rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(26, 86, 219, 0.1), rgba(26, 86, 219, 0.05));
-    border-radius: 16px;
-    border: 2px solid rgba(26, 86, 219, 0.2);
-}
-
-/* ===== LISTA DE OPCIONES ===== */
-.opciones-list {
-    max-width: 900px;
-    margin: 0 auto 3rem;
-    padding: 2rem;
-    background: var(--list-bg);
-    border-radius: 16px;
-    border-left: 6px solid var(--accent-border);
-    box-shadow: var(--shadow-sm);
-}
-
-.opciones-list strong {
-    display: block;
-    margin-bottom: 1.25rem;
-    font-size: 1.25rem;
-    color: var(--primary-dark);
-    font-weight: 600;
-    letter-spacing: -0.3px;
-}
-
-.opciones-list ul {
-    margin: 0;
-    padding-left: 1.5rem;
-    list-style-type: none;
-}
-
-.opciones-list li {
-    margin-bottom: 1rem;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    color: var(--text-dark);
-    padding-left: 1rem;
-    position: relative;
-}
-
-.opciones-list li:before {
-    content: "•";
-    color: var(--primary);
-    font-size: 1.5rem;
-    position: absolute;
-    left: -0.5rem;
-    top: -0.1rem;
-}
-
 /* ===== TABLA DE TAREAS ===== */
 .tabla-tareas h2 {
     text-align: center;
@@ -558,23 +501,6 @@ input[type="text"]::placeholder {
         margin-bottom: 2rem;
     }
 
-    /* Mejor concepto */
-    .mejor-concepto {
-        font-size: 1.5rem;
-        padding: 1.25rem;
-        margin-bottom: 2rem;
-    }
-
-    /* Listas */
-    .opciones-list {
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .opciones-list li {
-        font-size: 1rem;
-    }
-
     /* Tabla de tareas */
     .tabla-tareas h2 {
         font-size: 1.5rem;
@@ -642,18 +568,6 @@ input[type="text"]::placeholder {
 
     h1 {
         font-size: 1.8rem;
-    }
-
-    .mejor-concepto {
-        font-size: 1.25rem;
-    }
-
-    .opciones-list {
-        padding: 1.25rem;
-    }
-
-    .opciones-list li {
-        font-size: 0.95rem;
     }
 
     .tabla-tareas h2 {
@@ -756,29 +670,6 @@ input[type="text"]::placeholder {
 
 [data-theme="dark"] h1 {
     color: var(--text-light);
-}
-
-[data-theme="dark"] .mejor-concepto {
-    color: var(--primary-light);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
-    border-color: rgba(59, 130, 246, 0.3);
-}
-
-[data-theme="dark"] .opciones-list {
-    background: var(--list-bg);
-    border-left-color: var(--accent-border);
-}
-
-[data-theme="dark"] .opciones-list strong {
-    color: var(--primary-light);
-}
-
-[data-theme="dark"] .opciones-list li {
-    color: var(--text-dark);
-}
-
-[data-theme="dark"] .opciones-list li:before {
-    color: var(--primary-light);
 }
 
 [data-theme="dark"] .tabla-tareas h2 {
