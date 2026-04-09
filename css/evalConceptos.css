@@ -372,7 +372,7 @@ input[type="number"]:invalid {
     border-color: var(--error);
 }
 
-/* ===== BOTONES ===== */
+/* ===== BOTONES MODIFICADOS ===== */
 .buttons {
     display: flex;
     justify-content: center;
@@ -381,21 +381,23 @@ input[type="number"]:invalid {
     flex-wrap: wrap;
 }
 
-/* Botón primario */
+/* Botón primario (Guardar y Continuar) */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     transform: translateY(-6px);
     box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
@@ -406,23 +408,15 @@ input[type="number"]:invalid {
     outline-offset: 6px;
 }
 
-.btn-primary:active:not(:disabled) {
+.btn-primary:active {
     transform: translateY(-2px);
 }
 
-.btn-primary:disabled {
-    background: linear-gradient(135deg, #9ca3af, #6b7280);
-    cursor: not-allowed;
-    transform: none;
-    opacity: 0.7;
-    box-shadow: none;
-}
-
-/* Botón de regreso (SIN CAMBIO DE COLOR AL HOVER) */
+/* Botón de regreso */
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
     font-size: 1.125rem;
@@ -431,12 +425,13 @@ input[type="number"]:invalid {
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: 0.5px;
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-secondary:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-    /* NO cambiar el color de fondo - igual que en gc1.css */
 }
 
 .btn-secondary:focus-visible {
@@ -489,29 +484,6 @@ input[type="number"]:invalid {
 .resultado:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
-}
-
-/* ===== MENSAJES DE ERROR ===== */
-.error {
-    color: var(--error);
-    text-align: center;
-    font-size: 1.125rem;
-    font-weight: 600;
-    padding: 1rem;
-    background: rgba(220, 38, 38, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(220, 38, 38, 0.2);
-    margin-top: 2rem;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.error:not(:empty) {
-    opacity: 1;
-    max-height: 200px;
-    margin-top: 2rem;
 }
 
 /* ===== DISEÑO RESPONSIVE ===== */
@@ -638,9 +610,10 @@ input[type="number"]:invalid {
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 350px;
+        max-width: 280px;
+        min-width: auto;
         font-size: 1.125rem;
-        padding: 1rem 2rem;
+        padding: 1rem 1.5rem;
     }
 
     .btn-calc {
@@ -648,11 +621,6 @@ input[type="number"]:invalid {
         max-width: 300px;
         font-size: 1.0625rem;
         padding: 0.875rem 2rem;
-    }
-
-    /* Error */
-    .error:not(:empty) {
-        margin-top: 1.5rem;
     }
 }
 
@@ -701,6 +669,12 @@ input[type="number"]:invalid {
 
     td:last-child {
         font-size: 1.125rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
     }
 }
 
@@ -872,11 +846,10 @@ input[type="number"]:invalid {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 
-[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+[data-theme="dark"] .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
-/* Modo oscuro para botón secundario */
 [data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #4b5563, #374151);
 }
@@ -884,7 +857,6 @@ input[type="number"]:invalid {
 [data-theme="dark"] .btn-secondary:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-    /* NO cambiar el color de fondo en modo oscuro tampoco */
 }
 
 [data-theme="dark"] .btn-calc {
@@ -895,11 +867,6 @@ input[type="number"]:invalid {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
-[data-theme="dark"] .error:not(:empty) {
-    background: rgba(248, 113, 113, 0.05);
-    border-color: rgba(248, 113, 113, 0.2);
-}
-
 [data-theme="dark"] .resultado {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
     border-color: rgba(16, 185, 129, 0.4);
@@ -908,6 +875,7 @@ input[type="number"]:invalid {
 [data-theme="dark"] .resultado:hover {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+
 /* ===== ESTILOS PARA LA SECCIÓN DE IDEAS ===== */
 .ideas-section {
     margin-bottom: 3rem;
@@ -950,7 +918,7 @@ input[type="number"]:invalid {
     transform: translateY(-3px);
 }
 
-/* ===== TEMA OSCURO ===== */
+/* ===== TEMA OSCURO PARA SECCIÓN DE IDEAS ===== */
 [data-theme="dark"] .ideas-section {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
     border-color: var(--border);
@@ -961,7 +929,7 @@ input[type="number"]:invalid {
     color: var(--text-dark);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE PARA SECCIÓN DE IDEAS ===== */
 @media (max-width: 768px) {
     .ideas-section {
         padding: 1.5rem;

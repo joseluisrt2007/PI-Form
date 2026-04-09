@@ -251,6 +251,7 @@ input[type="number"]:invalid {
     transform: translateY(-1px);
 }
 
+/* ========== BOTONES MODIFICADOS ========== */
 .buttons {
     display: flex;
     justify-content: center;
@@ -262,17 +263,19 @@ input[type="number"]:invalid {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     transform: translateY(-6px);
     box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
@@ -280,32 +283,28 @@ input[type="number"]:invalid {
 
 .btn-primary:focus-visible {
     outline: 4px solid rgba(59, 130, 246, 0.5);
-    outline-offset: 6px;
+    outline-offset: 4px;
 }
 
-.btn-primary:active:not(:disabled) {
+.btn-primary:active {
     transform: translateY(-2px);
 }
 
-.btn-primary:disabled {
-    background: linear-gradient(135deg, #9ca3af, #6b7280);
-    cursor: not-allowed;
-    transform: none;
-    opacity: 0.7;
-    box-shadow: none;
-}
+/* Eliminado el estilo :disabled */
 
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-secondary:hover {
@@ -315,35 +314,15 @@ input[type="number"]:invalid {
 
 .btn-secondary:focus-visible {
     outline: 4px solid rgba(107, 114, 128, 0.5);
-    outline-offset: 6px;
+    outline-offset: 4px;
 }
 
 .btn-secondary:active {
     transform: translateY(-2px);
 }
 
-/* ========== ÁREA DE ERRORES ========== */
-.error {
-    color: var(--error);
-    text-align: center;
-    font-size: 1.125rem;
-    font-weight: 600;
-    padding: 1rem;
-    background: rgba(220, 38, 38, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(220, 38, 38, 0.2);
-    margin-top: 2rem;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.error:not(:empty) {
-    opacity: 1;
-    max-height: 200px;
-    margin-top: 2rem;
-}
+/* Área de error - ELIMINADA (ya no se usa) */
+/* .error { ... } */
 
 .resultado {
     display: inline-block;
@@ -427,14 +406,16 @@ input[type="number"]:invalid {
         flex-direction: column;
         align-items: center;
         margin-top: 3rem;
+        gap: 1rem;
     }
 
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 400px;
+        max-width: 280px;
+        min-width: auto;
         font-size: 1.125rem;
-        padding: 1rem 2rem;
+        padding: 1rem 1.5rem;
     }
 
     .btn-calc {
@@ -442,10 +423,6 @@ input[type="number"]:invalid {
         max-width: 300px;
         font-size: 1.0625rem;
         padding: 0.875rem 2rem;
-    }
-
-    .error:not(:empty) {
-        margin-top: 1.5rem;
     }
 }
 
@@ -475,11 +452,17 @@ input[type="number"]:invalid {
     table {
         display: block;
         overflow-x: auto;
-        white-space: nowarp;
+        white-space: nowrap;
     }
 
     td:last-child {
         font-size: 1.125rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
     }
 }
 
@@ -639,7 +622,7 @@ input[type="number"]:invalid {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 
-[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+[data-theme="dark"] .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
@@ -658,11 +641,6 @@ input[type="number"]:invalid {
 
 [data-theme="dark"] .btn-calc:hover {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
-}
-
-[data-theme="dark"] .error:not(:empty) {
-    background: rgba(248, 113, 113, 0.05);
-    border-color: rgba(248, 113, 113, 0.2);
 }
 
 [data-theme="dark"] .resultado {

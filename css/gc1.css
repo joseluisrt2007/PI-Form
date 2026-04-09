@@ -351,7 +351,7 @@ input[type="checkbox"]:focus-visible {
     white-space: normal;
 }
 
-/* ===== BUTTONS ===== */
+/* ===== BOTONES MODIFICADOS ===== */
 .buttons {
     display: flex;
     justify-content: center;
@@ -363,7 +363,7 @@ input[type="checkbox"]:focus-visible {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
     font-size: 1.125rem;
@@ -372,6 +372,8 @@ input[type="checkbox"]:focus-visible {
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: 0.5px;
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-primary:hover {
@@ -389,10 +391,12 @@ input[type="checkbox"]:focus-visible {
     transform: translateY(-1px);
 }
 
+/* Eliminado el estilo :disabled */
+
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
     font-size: 1.125rem;
@@ -401,6 +405,8 @@ input[type="checkbox"]:focus-visible {
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: 0.5px;
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-secondary:hover {
@@ -535,9 +541,10 @@ input[type="checkbox"]:focus-visible {
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 350px;
+        max-width: 280px;
+        min-width: auto;
         font-size: 1.125rem;
-        padding: 1rem 2rem;
+        padding: 1rem 1.5rem;
     }
 }
 
@@ -594,6 +601,12 @@ input[type="checkbox"]:focus-visible {
         position: sticky;
         right: 0;
         background-color: var(--surface);
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
     }
 }
 

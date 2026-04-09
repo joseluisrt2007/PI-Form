@@ -390,7 +390,7 @@ tr:hover td input {
     background-color: rgba(59, 130, 246, 0.02);
 }
 
-/* ===== BOTONES ===== */
+/* ===== BOTONES MODIFICADOS ===== */
 /* Botón de cálculo */
 .btn-calc {
     display: block;
@@ -426,18 +426,20 @@ tr:hover td input {
     flex-wrap: wrap;
 }
 
-/* Botón primario */
+/* Botón primario (Guardar y Continuar) */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-primary:hover {
@@ -455,24 +457,25 @@ tr:hover td input {
     transform: translateY(-2px);
 }
 
-/* ===== BOTÓN SECUNDARIO (REGRESO) - SIN CAMBIO DE COLOR AL HOVER ===== */
+/* Botón secundario (Regreso) */
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-secondary:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-    /* NO cambiar el color de fondo - igual que en gc1.css */
 }
 
 .btn-secondary:focus-visible {
@@ -612,9 +615,10 @@ tr:hover td input {
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 350px;
+        max-width: 280px;
+        min-width: auto;
         font-size: 1.125rem;
-        padding: 1rem 2rem;
+        padding: 1rem 1.5rem;
     }
 
     .btn-calc {
@@ -685,6 +689,12 @@ tr:hover td input {
 
     .riesgo-cell {
         font-size: 1.375rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
     }
 }
 
@@ -868,7 +878,6 @@ tr:hover td input {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
-/* ===== BOTÓN SECUNDARIO EN TEMA OSCURO - SIN CAMBIO DE COLOR AL HOVER ===== */
 [data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #4b5563, #374151);
 }
@@ -876,7 +885,6 @@ tr:hover td input {
 [data-theme="dark"] .btn-secondary:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-    /* NO cambiar el color de fondo en modo oscuro tampoco */
 }
 
 [data-theme="dark"] .btn-calc {

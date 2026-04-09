@@ -202,6 +202,7 @@ input[type="text"]::placeholder {
     opacity: 0.7;
 }
 
+/* ========== BOTONES MODIFICADOS ========== */
 .buttons {
     display: flex;
     justify-content: center;
@@ -213,14 +214,16 @@ input[type="text"]::placeholder {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-primary:hover {
@@ -238,17 +241,21 @@ input[type="text"]::placeholder {
     transform: translateY(-2px);
 }
 
+/* Eliminado el estilo :disabled */
+
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
-    padding: 1.125rem 3rem;
+    padding: 1rem 2rem;
     border: none;
     border-radius: 16px;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .btn-secondary:hover {
@@ -342,14 +349,16 @@ input[type="text"]::placeholder {
         flex-direction: column;
         align-items: center;
         margin-top: 3rem;
+        gap: 1rem;
     }
 
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 400px;
+        max-width: 280px;
+        min-width: auto;
         font-size: 1.125rem;
-        padding: 1rem 2rem;
+        padding: 1rem 1.5rem;
     }
 }
 
@@ -383,6 +392,12 @@ input[type="text"]::placeholder {
 
     input[type="text"] {
         font-size: 0.95rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
     }
 }
 
