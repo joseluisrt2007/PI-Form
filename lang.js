@@ -1,19 +1,24 @@
-// lang.js - Sistema de traducción centralizado
+// Sistema de traducción centralizado
 const translations = {
     'es': {
-        // =================== GENERAL ===================
+        // GENERAL
         'app_title': 'Desarrollo de Formularios para Actividades de Mejora',
         'main_menu': 'Menú Principal',
         'project': 'Proyecto:',
         'unnamed_project': '(Sin nombre)',
+        'completion_page': 'Proceso Completado',
+        'congratulations_message': '¡Felicidades por llegar hasta aquí!',
+        'wait_instructions': 'Espera indicaciones de tu profesor para continuar.',
         
-        // =================== NUEVAS TRADUCCIONES PARA DESCRIPCIÓN ===================
+        // NUEVAS TRADUCCIONES PARA DESCRIPCIÓN
         'project_description': 'Descripción del proyecto',
         'enter_project_description': 'Describa el objetivo, alcance y detalles del proyecto...',
         'error_project_description': 'Ingresa una descripción para el proyecto',
         
-        // =================== BOTONES ===================
-        'save_continue': '💾 Guardar y continuar',
+        // BOTONES (MODIFICADO: Separar Guardar y Continuar)
+        'save': '💾 Guardar',
+        'continue': '➡️ Continuar',
+        'save_continue': '💾 Guardar y continuar', // Se mantiene por compatibilidad
         'back': '◀️ Regreso',
         'start': '🚀 Iniciar',
         'calculate': '🧮 Calcular',
@@ -23,22 +28,20 @@ const translations = {
         'theme_light': 'Cambiar a modo claro',
         'theme_dark': 'Cambiar a modo oscuro',
         
-        // =================== ERRORES ===================
+        // ERRORES 
         'error_sum_weights': 'La suma de los pesos debe ser exactamente 10',
         'error_ratings': 'Complete todas las calificaciones (0-10).',
         'error_ratings_range': 'Las calificaciones deben estar entre 0 y 10.',
         'error_severity_occurrence': 'Severidad y Ocurrencia deben ser números enteros entre 1 y 10.',
-        
-        // NUEVOS ERRORES PARA CRITERIOS.HTML
         'error_at_least_one_concept': 'Ingresa al menos una idea/concepto',
         'error_project_name': 'Ingresa un nombre para el proyecto',
         'error_all_criteria': 'Completa todos los criterios',
         'error_all_weights': 'Ingresa un peso para cada criterio',
         
-        // =================== NUEVO ERROR PARA EVALUACION ===================
+        // NUEVO ERROR PARA EVALUACION
         'error_calculate_all': 'Debes calcular todos los conceptos antes de continuar',
         
-        // =================== PÁGINAS ===================
+        // PÁGINAS 
         'criteria_weights': 'Criterios y pesos',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluación',
@@ -49,7 +52,7 @@ const translations = {
         'diagram_pt2': 'Diagrama pt.2',
         'results': 'Resultados',
         
-        // =================== TABLAS ===================
+        // TABLAS 
         'criteria': 'Criterio',
         'weight': 'Peso',
         'idea': 'Idea',
@@ -60,14 +63,14 @@ const translations = {
         'possibilities': 'Explorar opciones',
         'tasks_responsibles': 'Enlace de entradas y salidas a través de funciones/tareas',
         
-        // =================== CONCEPTOS ===================
+        // CONCEPTOS 
         'best_concept': 'Mejor Concepto',
         'no_concept_selected': 'Ninguno seleccionado',
         'concept_composition': 'Opciones que componen este concepto:',
         'concept_formed': 'Concepto Formado',
         'options_forming_concept': 'Opciones que componen este concepto:',
         
-        // =================== PREVENCIÓN DE RIESGOS ===================
+        // PREVENCIÓN DE RIESGOS
         'potential_failure': 'Falla potencial',
         'effect': 'Efecto',
         'severity': 'Severidad (1-10)',
@@ -80,7 +83,7 @@ const translations = {
         'action_date': 'Fecha en la que se realizó la acción',
         'prevention': 'Prevención',
         
-        // =================== DIAGRAMA/TAREAS ===================
+        // DIAGRAMA/TAREAS 
         'task': 'Tarea',
         'responsable_label': 'Entrada',
         'task_label': 'Funcion/Tarea',
@@ -89,7 +92,7 @@ const translations = {
         'tasks_1_15': 'Tareas 1-15',
         'tasks_16_30': 'Tareas 16-30',
         
-        // =================== PDF Y RESULTADOS ===================
+        // PDF Y RESULTADOS
         'pdf_generated': '¡Informe generado con éxito!',
         'pdf_download_info': 'El informe PDF de su proyecto ha sido generado y descargado automáticamente.',
         'pdf_filename': 'Nombre del archivo:',
@@ -97,7 +100,7 @@ const translations = {
         'report_generated': 'Informe generado',
         'download_again': 'Descargar nuevamente',
         
-        // =================== FORMULARIOS ===================
+        // FORMULARIOS 
         'project_name': 'Nombre del proyecto',
         'enter_project_name': 'Ingrese el nombre del proyecto',
         'enter_possibility': 'Ingrese posibilidad',
@@ -110,17 +113,17 @@ const translations = {
         'enter_task': 'Ingresa tarea',
         'enter_responsible': 'Ingresa responsable',
         
-        // =================== GC1 (FORMACIÓN DE CONCEPTOS) ===================
+        // GC1 (FORMACIÓN DE CONCEPTOS) 
         'select_option': 'Seleccionar opción',
         'no_selection': 'Sin selección',
         'selected_option': 'Opción seleccionada',
         'concept_options': 'Opciones que componen este concepto:',
         
-        // =================== EVAL CONCEPTOS ===================
+        // EVAL CONCEPTOS 
         'evaluation_concepts_formed': 'Evaluación de Conceptos Formados',
         'concepts_formed': 'Conceptos Formados',
         
-        // =================== MENSAJES VARIOS ===================
+        // MENSAJES VARIOS 
         'loading': 'Cargando...',
         'saving': 'Guardando...',
         'calculating': 'Calculando...',
@@ -130,24 +133,29 @@ const translations = {
         'cancel': 'Cancelar',
         'close': 'Cerrar',
         
-        // =================== PIE DE PÁGINA ===================
+        // PIE DE PÁGINA
         'footer_text': 'José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García'
     },
     
     'en': {
-        // =================== GENERAL ===================
+        // GENERAL 
         'app_title': 'Development of Forms for Improvement Activities',
         'main_menu': 'Main Menu',
         'project': 'Project:',
         'unnamed_project': '(Unnamed)',
+        'completion_page': 'Process Completed',
+        'congratulations_message': 'Congratulations on reaching this point!',
+        'wait_instructions': 'Wait for instructions from your teacher to continue.',
         
-        // =================== NEW TRANSLATIONS FOR DESCRIPTION ===================
+        // NEW TRANSLATIONS FOR DESCRIPTION 
         'project_description': 'Project Description',
         'enter_project_description': 'Describe the objective, scope and details of the project...',
         'error_project_description': 'Enter a description for the project',
         
-        // =================== BUTTONS ===================
-        'save_continue': '💾 Save and continue',
+        // BUTTONS (MODIFIED: Separate Save and Continue)
+        'save': '💾 Save',
+        'continue': '➡️ Continue',
+        'save_continue': '💾 Save and continue', // Kept for compatibility
         'back': '◀️ Back',
         'start': '🚀 Start',
         'calculate': '🧮 Calculate',
@@ -157,22 +165,20 @@ const translations = {
         'theme_light': 'Switch to light mode',
         'theme_dark': 'Switch to dark mode',
         
-        // =================== ERRORS ===================
+        // ERRORS
         'error_sum_weights': 'Sum of weights must be exactly 10',
         'error_ratings': 'Complete all ratings (0-10).',
         'error_ratings_range': 'Ratings must be between 0 and 10.',
         'error_severity_occurrence': 'Severity and Occurrence must be integers between 1 and 10.',
-        
-        // NEW ERRORS FOR CRITERIOS.HTML
         'error_at_least_one_concept': 'Enter at least one idea/concept',
         'error_project_name': 'Enter a project name',
         'error_all_criteria': 'Complete all criteria',
         'error_all_weights': 'Enter a weight for each criteria',
         
-        // =================== NEW ERROR FOR EVALUATION ===================
+        // NEW ERROR FOR EVALUATION 
         'error_calculate_all': 'You must calculate all concepts before continuing',
         
-        // =================== PAGES ===================
+        // PAGES
         'criteria_weights': 'Criteria and weights',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluation',
@@ -183,7 +189,7 @@ const translations = {
         'diagram_pt2': 'Diagram pt.2',
         'results': 'Results',
         
-        // =================== TABLES ===================
+        // TABLES 
         'criteria': 'Criteria',
         'weight': 'Weight',
         'idea': 'Idea',
@@ -194,14 +200,14 @@ const translations = {
         'possibilities': 'Explore options',
         'tasks_responsibles': 'Linking inputs and outputs through functions/tasks',
         
-        // =================== CONCEPTS ===================
+        // CONCEPTS 
         'best_concept': 'Best Concept',
         'no_concept_selected': 'None selected',
         'concept_composition': 'Options that form this concept:',
         'concept_formed': 'Concept Formed',
         'options_forming_concept': 'Options that form this concept:',
         
-        // =================== RISK PREVENTION ===================
+        // RISK PREVENTION 
         'potential_failure': 'Potential failure',
         'effect': 'Effect',
         'severity': 'Severity (1-10)',
@@ -214,7 +220,7 @@ const translations = {
         'action_date': 'Date when action was taken',
         'prevention': 'Prevention',
         
-        // =================== DIAGRAMA/TASKS ===================
+        // DIAGRAMA/TASKS 
         'task': 'Task',
         'responsable_label': 'Input',
         'task_label': 'Function/Task',
@@ -223,7 +229,7 @@ const translations = {
         'tasks_1_15': 'Tasks 1-15',
         'tasks_16_30': 'Tasks 16-30',
         
-        // =================== PDF AND RESULTS ===================
+        // PDF AND RESULTS 
         'pdf_generated': 'Report generated successfully!',
         'pdf_download_info': 'Your project PDF report has been generated and downloaded automatically.',
         'pdf_filename': 'Filename:',
@@ -231,7 +237,7 @@ const translations = {
         'report_generated': 'Report generated',
         'download_again': 'Download again',
         
-        // =================== FORMS ===================
+        // FORMS 
         'project_name': 'Project name',
         'enter_project_name': 'Enter project name',
         'enter_possibility': 'Enter possibility',
@@ -244,17 +250,17 @@ const translations = {
         'enter_task': 'Enter task',
         'enter_responsible': 'Enter responsible',
         
-        // =================== GC1 (CONCEPT FORMATION) ===================
+        // GC1 (CONCEPT FORMATION) 
         'select_option': 'Select option',
         'no_selection': 'No selection',
         'selected_option': 'Selected option',
         'concept_options': 'Options that form this concept:',
         
-        // =================== EVAL CONCEPTS ===================
+        // EVAL CONCEPTS 
         'evaluation_concepts_formed': 'Evaluation of Formed Concepts',
         'concepts_formed': 'Formed Concepts',
         
-        // =================== VARIOUS MESSAGES ===================
+        // VARIOUS MESSAGES 
         'loading': 'Loading...',
         'saving': 'Saving...',
         'calculating': 'Calculating...',
@@ -264,13 +270,10 @@ const translations = {
         'cancel': 'Cancel',
         'close': 'Close',
         
-        // =================== FOOTER ===================
+        // FOOTER 
         'footer_text': 'José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García'
     }
 };
-
-// El resto del archivo lang.js permanece igual...
-// ========== SISTEMA DE TRADUCCIÓN (CONTINUACIÓN) ==========
 
 // Sistema de traducción
 let currentLang = localStorage.getItem('preferredLanguage') || 'es';

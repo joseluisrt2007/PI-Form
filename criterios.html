@@ -47,7 +47,7 @@
             <input type="text" id="projectName" data-i18n-placeholder="enter_project_name" placeholder="Ingrese el nombre del proyecto">
         </div>
 
-        <!-- Descripción del proyecto (NUEVO) -->
+        <!-- Descripción del proyecto - SIN RESTRICCIÓN DE CARACTERES -->
         <div class="section">
             <label for="projectDescription" data-i18n="project_description">Descripción del proyecto</label>
             <textarea 
@@ -55,9 +55,7 @@
                 rows="4" 
                 data-i18n-placeholder="enter_project_description" 
                 placeholder="Describa el objetivo y detalles del proyecto..."
-                maxlength="1000"
             ></textarea>
-            <div class="char-counter" id="charCounter">0/1000 caracteres</div>
         </div>
 
         <!-- Criterios y pesos -->
@@ -87,10 +85,7 @@
             <h2 data-i18n="ideas_concepts">Ideas / Conceptos</h2>
             <table>
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th data-i18n="idea">Idea</th>
-                    </tr>
+                    <tr><th>#</th><th data-i18n="idea">Idea</th></tr>
                 </thead>
                 <tbody>
                     <tr><td>1</td><td><input type="text" class="concepto" data-id="1"></td></tr>
@@ -103,7 +98,8 @@
         </div>
 
         <div class="buttons">
-            <button class="btn-primary" id="guardarBtn" disabled data-i18n="save_continue">Guardar y continuar</button>
+            <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
+            <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
             <button class="btn-secondary" onclick="window.location.href='index.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
