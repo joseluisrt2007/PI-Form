@@ -69,8 +69,8 @@ const translations = {
         'explore_possibilities': 'Exploración de Opciones',
         'concept_formation': 'Formación de Conceptos',
         'risk_prevention': 'Prevenir',
-        'diagram': 'Diagrama',
-        'diagram_pt2': 'Diagrama pt.2',
+        'diagram': 'Diagrama de tareas y/o funciones',
+        'diagram_pt2': 'Diagrama de tareas y/o funciones pt.2',
         'results': 'Resultados',
         
         // TABLAS 
@@ -227,8 +227,8 @@ const translations = {
         'explore_possibilities': 'Explore Options',
         'concept_formation': 'Concept Formation',
         'risk_prevention': 'Risk Prevention',
-        'diagram': 'Diagram',
-        'diagram_pt2': 'Diagram pt.2',
+        'diagram': 'Diagram of tasks and/or functions',
+        'diagram_pt2': 'Diagram of tasks and/or functions pt.2',
         'results': 'Results',
         
         // TABLES 
