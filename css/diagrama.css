@@ -19,9 +19,10 @@
     --select-text: #1f2937;
     --select-bg: #ffffff;
     --select-border: #e5e7eb;
+    --completed-bg: #d1fae5;
+    --completed-text: #065f46;
 }
 
-/* ===== RESET Y ESTILOS BASE ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -36,7 +37,6 @@ body {
     line-height: 1.5;
 }
 
-/* ===== HEADER ===== */
 header {
     background-color: var(--header-bg);
     color: var(--text-light);
@@ -84,7 +84,6 @@ header {
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* ===== CONTROLES DEL HEADER ===== */
 .header-controls {
     display: flex;
     align-items: center;
@@ -92,7 +91,6 @@ header {
     justify-content: flex-end;
 }
 
-/* Selector de idioma */
 .language-selector select {
     padding: 10px 14px;
     border-radius: 12px;
@@ -105,8 +103,6 @@ header {
     transition: all 0.3s ease;
     min-width: 120px;
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a56db' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -116,7 +112,6 @@ header {
 
 .language-selector select:hover {
     border-color: var(--primary);
-    background-color: var(--select-bg);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
 }
@@ -125,23 +120,8 @@ header {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-    background-color: var(--select-bg);
 }
 
-.language-selector select option {
-    background-color: var(--select-bg);
-    color: var(--select-text);
-    padding: 12px;
-    font-size: 0.9rem;
-}
-
-.language-selector select option:checked {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: var(--primary);
-    font-weight: 600;
-}
-
-/* Botón de tema */
 .theme-toggle {
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -165,11 +145,6 @@ header {
     transform: rotate(15deg) scale(1.05);
 }
 
-.theme-toggle:active {
-    transform: scale(0.95);
-}
-
-/* ===== CONTENEDOR PRINCIPAL ===== */
 .container {
     max-width: 1400px;
     margin: 3rem auto;
@@ -189,148 +164,103 @@ h1 {
     letter-spacing: -0.5px;
 }
 
-/* ===== TABLA DE TAREAS ===== */
 .tabla-tareas h2 {
     text-align: center;
     color: var(--primary-dark);
     font-size: 1.75rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
 }
 
-/* Fila de tarea */
-.tarea-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding: 2rem;
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
     background: var(--section-bg);
     border-radius: 16px;
+    overflow: hidden;
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    position: relative;
 }
 
-.tarea-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary-light);
-}
-
-.tarea-row + .tarea-row {
-    margin-top: 0.5rem;
-}
-
-/* Filas impares con fondo diferente */
-.tarea-row:nth-child(odd) {
-    background: rgba(59, 130, 246, 0.02);
-}
-
-/* Responsable, tarea y salida */
-.responsable,
-.tarea,
-.salida {
-    flex: 1;
-}
-
-.responsable {
-    margin-right: 3rem;
-    position: relative;
-}
-
-.tarea {
-    margin-right: 3rem;
-    position: relative;
-}
-
-/* Flechas entre columnas */
-.responsable::after {
-    content: "→";
-    position: absolute;
-    right: -2.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: var(--primary-light);
-    font-weight: bold;
-}
-
-.tarea::after {
-    content: "→";
-    position: absolute;
-    right: -2.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 2rem;
-    color: var(--primary-light);
-    font-weight: bold;
-}
-
-/* Flecha hacia abajo entre filas */
-.tarea-row::after {
-    content: "↓";
-    position: absolute;
-    bottom: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 2rem;
-    color: var(--primary);
-    font-weight: bold;
-    z-index: 1;
-}
-
-/* Última fila no necesita flecha hacia abajo */
-.tarea-row:last-child::after {
-    content: none;
-}
-
-.responsable label,
-.tarea label,
-.salida label {
-    display: block;
-    margin-bottom: 0.75rem;
+th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 1rem;
+    text-align: center;
     font-weight: 600;
-    color: var(--primary);
-    font-size: 1.125rem;
-    letter-spacing: -0.3px;
+    font-size: 1rem;
 }
 
-/* Inputs de texto */
-input[type="text"] {
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    text-align: center;
+}
+
+td input[type="text"] {
     width: 100%;
-    padding: 1.25rem 1.5rem;
+    padding: 0.75rem;
     border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 1.0625rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
     background: var(--surface);
     color: var(--text-dark);
 }
 
-input[type="text"]:focus {
+td input[type="text"]:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-input[type="text"]::placeholder {
-    color: #6b7280;
-    opacity: 0.7;
+td input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: var(--primary);
 }
 
-/* ===== BOTONES MODIFICADOS ===== */
+.btn-eliminar-fila {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-eliminar-fila:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+/* Flechas horizontales */
+.flecha {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Botones principales */
 .buttons {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    margin-top: 4rem;
+    margin-top: 3rem;
     flex-wrap: wrap;
 }
 
-/* Botón primario (Guardar y Continuar) */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
     color: var(--text-light);
@@ -348,20 +278,10 @@ input[type="text"]::placeholder {
 
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    transform: translateY(-6px);
+    transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
 }
 
-.btn-primary:focus-visible {
-    outline: 4px solid rgba(59, 130, 246, 0.5);
-    outline-offset: 6px;
-}
-
-.btn-primary:active {
-    transform: translateY(-2px);
-}
-
-/* Botón secundario (Regreso) */
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
@@ -382,213 +302,124 @@ input[type="text"]::placeholder {
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
 }
 
-.btn-secondary:focus-visible {
-    outline: 4px solid rgba(107, 114, 128, 0.3);
-    outline-offset: 4px;
+/* ===== CELDAS OCULTAS ===== */
+td.celda-oculta {
+    background-color: #f3f4f6;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.btn-secondary:active {
-    transform: translateY(-1px);
+td.celda-oculta .contenido-oculto {
+    display: none;
 }
 
-/* ===== DISEÑO RESPONSIVE ===== */
-@media (max-width: 992px) {
-    /* Filas de tarea en columnas */
-    .tarea-row {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1.5rem;
-    }
-
-    .responsable,
-    .tarea {
-        margin-right: 0;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Ocultar flechas horizontales en móvil */
-    .responsable::after,
-    .tarea::after {
-        content: none;
-    }
-
-    /* Cambiar flecha hacia abajo a derecha en móvil */
-    .tarea-row::after {
-        content: "→";
-        position: absolute;
-        right: -1.5rem;
-        top: 50%;
-        bottom: auto;
-        left: auto;
-        transform: translateY(-50%) rotate(90deg);
-    }
-
-    .tarea-row:last-child::after {
-        content: none;
-    }
+td.celda-oculta .mensaje-oculto {
+    display: block;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
 }
 
+td.celda-oculta .mensaje-oculto:hover {
+    color: var(--primary);
+}
+
+/* ===== FLECHAS VERTICALES ===== */
+.flecha-vertical-row {
+    background: transparent !important;
+    box-shadow: none !important;
+    height: 50px;
+}
+
+/* Celda de flecha vertical clickeable - AJUSTADA MÁS A LA IZQUIERDA */
+.flecha-vertical-clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left !important;
+    padding-left: 600px !important;
+}
+
+.flecha-vertical-clickable:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Celda de flecha vertical oculta */
+.flecha-vertical-oculta {
+    background-color: #f3f4f6;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+    height: 50px;
+}
+
+.flecha-vertical-oculta .mensaje-oculto {
+    display: block;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* ===== REMARCAR CUADRO DE FUNCIÓN ===== */
+.tarea-input {
+    border: 3px solid var(--primary) !important;
+    background-color: rgba(59, 130, 246, 0.05) !important;
+    font-weight: 500 !important;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-    /* Header responsive */
     header {
         flex-direction: column;
         gap: 1rem;
-        padding: 1.25rem 1rem;
-        font-size: 1.3rem;
-        text-align: center;
-    }
-
-    .header-left,
-    .header-center,
-    .header-right {
-        width: 100%;
-        text-align: center;
-    }
-
-    .header-left {
-        order: 1;
-    }
-
-    .header-center {
-        order: 3;
-        margin-top: 0.5rem;
-    }
-
-    .header-right {
-        order: 2;
-    }
-
-    .app-title {
-        font-size: 1.3rem;
-    }
-
-    .project-name-container {
-        font-size: 1rem;
-    }
-
-    /* Controles responsive */
-    .header-controls {
-        flex-direction: row;
-        gap: 15px;
-        justify-content: center;
-    }
-
-    .theme-toggle {
-        order: 1;
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-    }
-
-    .language-selector {
-        order: 2;
-    }
-
-    .language-selector select {
-        min-width: 100px;
-        padding: 8px 12px;
-    }
-
-    /* Contenedor principal */
-    .container {
-        margin: 2rem 1rem;
-        padding: 1.5rem;
-        border-radius: 16px;
-    }
-
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    /* Tabla de tareas */
-    .tabla-tareas h2 {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .tarea-row {
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .responsable label,
-    .tarea label,
-    .salida label {
-        font-size: 1rem;
-    }
-
-    input[type="text"] {
         padding: 1rem;
-        font-size: 1rem;
+        text-align: center;
     }
-
-    /* Botones */
-    .buttons {
-        flex-direction: column;
-        align-items: center;
-        margin-top: 3rem;
-        gap: 1rem;
-    }
-
-    .btn-primary,
-    .btn-secondary {
+    
+    .header-left, .header-center, .header-right {
         width: 100%;
-        max-width: 280px;
-        min-width: auto;
-        font-size: 1.125rem;
-        padding: 1rem 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .app-title {
-        font-size: 1.2rem;
+        text-align: center;
     }
     
-    .project-name-container {
-        font-size: 0.95rem;
+    .container {
+        margin: 1rem;
+        padding: 1rem;
     }
     
-    .header-controls {
-        gap: 10px;
-    }
-    
-    .theme-toggle {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-    }
-    
-    .language-selector select {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        min-width: 90px;
-    }
-
     h1 {
         font-size: 1.8rem;
     }
-
-    .tabla-tareas h2 {
-        font-size: 1.375rem;
+    
+    th, td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
     }
-
-    .responsable label,
-    .tarea label,
-    .salida label {
-        font-size: 0.95rem;
+    
+    td input[type="text"] {
+        padding: 0.5rem;
+        font-size: 0.85rem;
     }
-
-    input[type="text"] {
-        padding: 0.875rem;
-        font-size: 0.95rem;
+    
+    .flecha {
+        font-size: 1.2rem;
     }
-
-    .btn-primary,
-    .btn-secondary {
-        padding: 0.875rem 1rem;
-        font-size: 1rem;
+    
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    .flecha-vertical-clickable {
+        padding-left: 15px !important;
     }
 }
 
@@ -605,144 +436,34 @@ input[type="text"]::placeholder {
     --shadow-lg: 0 10px 25px -5px rgba(30, 64, 175, 0.3);
     --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     --section-bg: #1e293b;
-    --accent-border: #3b82f6;
     --surface: #1e293b;
     --border: #475569;
     --card-bg: #1e293b;
     --header-bg: #1e293b;
-    --list-bg: #2d3748;
     --select-text: #f1f5f9;
     --select-bg: #2d3748;
     --select-border: #475569;
+    --completed-bg: #064e3b;
+    --completed-text: #a7f3d0;
 }
 
-/* Estilos específicos para tema oscuro */
-[data-theme="dark"] body {
-    background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
-    color: var(--text-dark);
-}
-
-[data-theme="dark"] header {
-    background-color: var(--header-bg);
-    border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(10px);
-}
-
-[data-theme="dark"] .project-name-container {
-    color: #cbd5e1;
-}
-
-[data-theme="dark"] .language-selector select {
-    border-color: var(--select-border);
-    background-color: var(--select-bg);
-    color: var(--select-text);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-}
-
-[data-theme="dark"] .language-selector select:hover {
-    border-color: var(--primary-light);
-    background-color: #374151;
-    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
-}
-
-[data-theme="dark"] .language-selector select:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+[data-theme="dark"] td.celda-oculta {
     background-color: #374151;
 }
 
-[data-theme="dark"] .language-selector select option {
-    background-color: #2d3748;
-    color: #f1f5f9;
-}
-
-[data-theme="dark"] .language-selector select option:checked {
-    background-color: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-}
-
-[data-theme="dark"] .container {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    box-shadow: var(--card-shadow);
-}
-
-[data-theme="dark"] h1 {
-    color: var(--text-light);
-}
-
-[data-theme="dark"] .tabla-tareas h2 {
-    color: var(--text-light);
-}
-
-[data-theme="dark"] .tarea-row {
-    background: var(--section-bg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-}
-
-[data-theme="dark"] .tarea-row:hover {
-    border-color: var(--primary-light);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .tarea-row:nth-child(odd) {
-    background: rgba(96, 165, 250, 0.05);
-}
-
-[data-theme="dark"] .responsable label,
-[data-theme="dark"] .tarea label,
-[data-theme="dark"] .salida label {
-    color: var(--primary-light);
-}
-
-[data-theme="dark"] input[type="text"] {
-    background: #374151;
-    border-color: var(--border);
-    color: var(--text-dark);
-}
-
-[data-theme="dark"] input[type="text"]:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
-    background: #4b5563;
-}
-
-[data-theme="dark"] input[type="text"]::placeholder {
+[data-theme="dark"] td.celda-oculta .mensaje-oculto {
     color: #9ca3af;
 }
 
-[data-theme="dark"] .theme-toggle {
-    border-color: rgba(96, 165, 250, 0.3);
-    background: rgba(59, 130, 246, 0.1);
-    color: #60a5fa;
+[data-theme="dark"] .flecha-vertical-oculta {
+    background-color: #374151;
 }
 
-[data-theme="dark"] .theme-toggle:hover {
-    background: rgba(59, 130, 246, 0.2);
-    border-color: rgba(96, 165, 250, 0.6);
+[data-theme="dark"] .flecha-vertical-oculta .mensaje-oculto {
+    color: #9ca3af;
 }
 
-[data-theme="dark"] .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-}
-
-[data-theme="dark"] .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-dark), #1e40af);
-}
-
-[data-theme="dark"] .btn-secondary {
-    background: linear-gradient(135deg, #4b5563, #374151);
-}
-
-[data-theme="dark"] .btn-secondary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
-}
-
-[data-theme="dark"] .responsable::after,
-[data-theme="dark"] .tarea::after,
-[data-theme="dark"] .tarea-row::after {
-    color: var(--primary-light);
+[data-theme="dark"] .tarea-input {
+    background-color: rgba(96, 165, 250, 0.1) !important;
+    border-color: var(--primary-light) !important;
 }

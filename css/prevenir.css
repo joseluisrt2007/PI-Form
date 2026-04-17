@@ -904,3 +904,28 @@ tr:hover td input {
     background-color: rgba(96, 165, 250, 0.05);
     border-color: var(--primary-light);
 }
+/* ===== BOTÓN ELIMINAR TABLA ===== */
+.btn-eliminar-tabla {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-eliminar-tabla:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+}
+
+/* Contenedor de botones de tabla */
+.tabla-buttons {
+    text-align: center;
+    margin-top: 1rem;
+}
