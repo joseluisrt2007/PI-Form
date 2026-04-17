@@ -2,7 +2,7 @@
 const translations = {
     'es': {
         // GENERAL
-        'app_title': 'Desarrollo de Formularios para Actividades de Mejora',
+        'app_title': 'Herramientas del Pensamiento de Diseño para Actividades de Mejora',
         'main_menu': 'Menú Principal',
         'project': 'Proyecto:',
         'unnamed_project': '(Sin nombre)',
@@ -18,7 +18,7 @@ const translations = {
         // NUEVAS TRADUCCIONES PARA OPCION DIAGRAMAS
         'diagram_choice': 'Diagramas - Actividades de Mejora',
         'diagram_question': 'Diagrama de Actividades',
-        'ask_diagram': '¿Quieres realizar los diagramas de actividades?',
+        'ask_diagram': '¿Quieres realizar los diagramas de funciones?',
         'yes_diagram': '✅ Sí, realizar diagramas',
         'no_diagram': '❌ No, saltar diagramas',
         
@@ -63,26 +63,27 @@ const translations = {
         'error_calculate_all': 'Debes calcular todos los conceptos antes de continuar',
         
         // PÁGINAS 
-        'criteria_weights': 'Criterios y pesos',
+        'description_data': 'Descripción',
+        'criteria_weights': 'Necesidades y prioridades',
         'ideas_concepts': 'Ideas',
-        'concept_evaluation': 'Evaluación',
+        'concept_evaluation': 'Evaluación de ideas',
         'explore_possibilities': 'Exploración de Opciones',
         'concept_formation': 'Formación de Conceptos',
         'risk_prevention': 'Prevenir',
-        'diagram': 'Diagrama de tareas y/o funciones',
-        'diagram_pt2': 'Diagrama de tareas y/o funciones pt.2',
+        'diagram': 'Diagrama de funciones',
+        'diagram_pt2': 'Diagrama de funciones pt.2',
         'results': 'Resultados',
         
         // TABLAS 
-        'criteria': 'Criterio',
-        'weight': 'Peso',
+        'criteria': 'Necesidad',
+        'weight': 'Prioridad',
         'idea': 'Idea',
         'rating': 'Calificación (0-10)',
         'result': 'Resultado',
         'options':'Opcion',
         'option': 'Concepto',
         'possibilities': 'Explorar opciones',
-        'tasks_responsibles': 'Enlace de entradas y salidas a través de funciones/tareas',
+        'tasks_responsibles': 'Enlace de entradas y salidas a través de funciones',
         
         // CONCEPTOS 
         'best_concept': 'Mejor Concepto',
@@ -99,19 +100,20 @@ const translations = {
         'risk': 'Riesgo',
         'actions_to_take': 'Acción/Acciones a realizar',
         'responsible': 'Responsable',
-        'today_date': 'Fecha de hoy',
+        'today_date': 'Fecha de registro',
         'action_taken': 'Acción tomada',
         'action_date': 'Fecha en la que se realizó la acción',
-        'prevention': 'Prevención',
+        'prevention': 'Falla potencial',
         
         // DIAGRAMA/TAREAS 
         'task': 'Tarea',
         'responsable_label': 'Entrada',
-        'task_label': 'Funcion/Tarea',
+        'task_label': 'Funcion',
         'salida_label': 'Salida',
         'enter_salida': 'Describe la salida',
-        'tasks_1_15': 'Tareas 1-15',
+        'tasks_1_15': 'Tareas',
         'tasks_16_30': 'Tareas 16-30',
+        'add_row': 'Agregar fila',
         
         // PDF Y RESULTADOS
         'pdf_generated': '¡Informe generado con éxito!',
@@ -125,14 +127,14 @@ const translations = {
         'project_name': 'Nombre del proyecto',
         'enter_project_name': 'Ingrese el nombre del proyecto',
         'enter_possibility': 'Ingrese posibilidad',
-        'enter_criteria': 'Ingrese criterio',
-        'enter_weight': 'Ingrese peso',
+        'enter_criteria': 'Ingrese necesidad',
+        'enter_weight': 'Ingrese prioridad',
         'enter_idea': 'Ingrese idea',
         'enter_rating': 'Ingrese calificación (0-10)',
         'enter_severity': 'Ingrese severidad (1-10)',
         'enter_occurrence': 'Ingrese ocurrencia (1-10)',
         'enter_task': 'Ingresa tarea',
-        'enter_responsible': 'Ingresa responsable',
+        'enter_responsible': 'Ingresa la entrada',
         
         // GC1 (FORMACIÓN DE CONCEPTOS) 
         'select_option': 'Seleccionar opción',
@@ -155,12 +157,12 @@ const translations = {
         'close': 'Cerrar',
         
         // PIE DE PÁGINA
-        'footer_text': 'José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García'
+        'footer_text': 'José Luis Rodríguez Téllez — Salvador González García'
     },
     
     'en': {
         // GENERAL 
-        'app_title': 'Development of Forms for Improvement Activities',
+        'app_title': 'Design Thinking Tools for Improvement Activities',
         'main_menu': 'Main Menu',
         'project': 'Project:',
         'unnamed_project': '(Unnamed)',
@@ -176,7 +178,7 @@ const translations = {
         // NEW TRANSLATIONS FOR OPTION DIAGRAMS
         'diagram_choice': 'Diagrams - Improvement Activities',
         'diagram_question': 'Activity Diagram',
-        'ask_diagram': 'Do you want to create the activity diagrams?',
+        'ask_diagram': 'Do you want to create the activity diagrams of functions?',
         'yes_diagram': '✅ Yes, create diagrams',
         'no_diagram': '⏭️ No, skip diagrams',
         
@@ -221,19 +223,21 @@ const translations = {
         'error_calculate_all': 'You must calculate all concepts before continuing',
         
         // PAGES
-        'criteria_weights': 'Criteria and weights',
+        'description_data': 'Description',
+        'criteria_weights': 'Necesidades y prioridades',
+        'criteria_weights': 'Needs and priorities',
         'ideas_concepts': 'Ideas',
-        'concept_evaluation': 'Evaluation',
+        'concept_evaluation': 'Evaluation of ideas',
         'explore_possibilities': 'Explore Options',
         'concept_formation': 'Concept Formation',
         'risk_prevention': 'Risk Prevention',
-        'diagram': 'Diagram of tasks and/or functions',
-        'diagram_pt2': 'Diagram of tasks and/or functions pt.2',
+        'diagram': 'Diagram of functions',
+        'diagram_pt2': 'Diagram of functions pt.2',
         'results': 'Results',
         
         // TABLES 
-        'criteria': 'Criteria',
-        'weight': 'Weight',
+        'criteria': 'Need',
+        'weight': 'Priority',
         'idea': 'Idea',
         'rating': 'Rating (0-10)',
         'result': 'Result',
@@ -257,19 +261,20 @@ const translations = {
         'risk': 'Risk',
         'actions_to_take': 'Action/Actions to take',
         'responsible': 'Responsible',
-        'today_date': 'Today\'s date',
+        'today_date': 'Registration date',
         'action_taken': 'Action taken',
         'action_date': 'Date when action was taken',
-        'prevention': 'Prevention',
+        'prevention': 'Potential failure',
         
         // DIAGRAMA/TASKS 
         'task': 'Task',
         'responsable_label': 'Input',
-        'task_label': 'Function/Task',
+        'task_label': 'Function',
         'salida_label': 'Output',
         'enter_salida': 'Describe the output',
-        'tasks_1_15': 'Tasks 1-15',
+        'tasks_1_15': 'Tasks',
         'tasks_16_30': 'Tasks 16-30',
+        'add_row': 'Add row',
         
         // PDF AND RESULTS 
         'pdf_generated': 'Report generated successfully!',
@@ -283,14 +288,14 @@ const translations = {
         'project_name': 'Project name',
         'enter_project_name': 'Enter project name',
         'enter_possibility': 'Enter possibility',
-        'enter_criteria': 'Enter criteria',
-        'enter_weight': 'Enter weight',
+        'enter_criteria': 'Enter need',
+        'enter_weight': 'Enter priority',
         'enter_idea': 'Enter idea',
         'enter_rating': 'Enter rating (0-10)',
         'enter_severity': 'Enter severity (1-10)',
         'enter_occurrence': 'Enter occurrence (1-10)',
         'enter_task': 'Enter task',
-        'enter_responsible': 'Enter responsible',
+        'enter_responsible': 'Enter input',
         
         // GC1 (CONCEPT FORMATION) 
         'select_option': 'Select option',
@@ -313,7 +318,7 @@ const translations = {
         'close': 'Close',
         
         // FOOTER 
-        'footer_text': 'José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García'
+        'footer_text': 'José Luis Rodríguez Téllez — Salvador González García'
     }
 };
 
