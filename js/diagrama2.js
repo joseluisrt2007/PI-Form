@@ -156,10 +156,11 @@ function saveData() {
 }
 
 /**
- * SOLO NAVEGA a la página de resultados (sin guardar)
+ * GUARDA y NAVEGA a la página de opción conceptos
  */
 function continueToNext() {
-    window.location.href = 'opcionConceptos.html';
+    saveData();  // Primero guarda los datos
+    window.location.href = 'opcionConceptos.html';  // Luego navega
 }
 
 /**

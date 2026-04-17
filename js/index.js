@@ -2,14 +2,11 @@
 if (!localStorage.getItem('projectData')) {
     localStorage.setItem('projectData', JSON.stringify({}));
 }
-
-// ========== FUNCIONES GLOBALES ==========
-
 /**
  * Navega a la página de criterios
  */
 function goToCriterios() {
-    window.location.href = 'criterios.html';
+    window.location.href = 'descripcion.html';
 }
 
 /**

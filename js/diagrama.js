@@ -1,17 +1,16 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
-const tareasContainer = document.getElementById('tareasContainer');
+const tareasBody = document.getElementById('tareasBody');
 const guardarBtn = document.getElementById('guardarBtn');
 const continuarBtn = document.getElementById('continuarBtn');
+const agregarTareaBtn = document.getElementById('agregarTareaBtn');
+
+let contadorFilas = 0;
 
 // ========== FUNCIONES PRINCIPALES ==========
 
-/**
- * Actualiza el nombre del proyecto en la barra de navegación
- */
 function updateProjectName() {
     const projectText = document.getElementById('projectNameText');
-    
     if (!projectText) return;
     
     if (data.projectName && data.projectName.trim()) {
@@ -25,146 +24,466 @@ function updateProjectName() {
     }
 }
 
-/**
- * Obtiene los números de concepto que tienen contenido
- * @returns {Array} Array con los números de concepto que existen
- */
-function obtenerConceptosExistentes() {
-    const conceptos = [];
-    for (let conc = 1; conc <= 5; conc++) {
-        const concepto = data[`concepto${conc}`] || '';
-        if (concepto.trim() !== '') {
-            conceptos.push(conc);
-        }
-    }
-    return conceptos;
-}
-
-/**
- * Genera todo el contenido de la página
- */
 function generarContenido() {
-    // ELIMINADO: generarMejorConcepto();
-    generarTareas();
-    aplicarTraduccionesEtiquetas();
+    cargarFilasGuardadas();
+    actualizarTraduccionesDinamicas();
     
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
-    }
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
 }
 
-/**
- * Genera las 15 filas de tareas con responsables
- */
-function generarTareas() {
-    if (!tareasContainer) return;
-    
-    tareasContainer.innerHTML = '';
-    
-    const responsableLabel = (typeof t === 'function') 
-        ? t('responsable_label') || 'Responsable' 
-        : 'Responsable';
-    
-    const taskLabel = (typeof t === 'function') 
-        ? t('task_label') || 'Tarea' 
-        : 'Tarea';
-    
-    const salidaLabel = (typeof t === 'function') 
-        ? t('salida_label') || 'Salida' 
-        : 'Salida';
-    
-    const responsablePlaceholder = (typeof t === 'function') 
-        ? t('enter_responsible') || 'Ingresa responsable' 
-        : 'Ingresa responsable';
-    
-    const taskPlaceholder = (typeof t === 'function') 
-        ? t('enter_task') || 'Describe la tarea' 
-        : 'Describe la tarea';
-    
-    const salidaPlaceholder = (typeof t === 'function') 
-        ? t('enter_salida') || 'Describe la salida' 
-        : 'Describe la salida';
-    
-    for (let i = 1; i <= 15; i++) {
-        const responsable = data[`persona${i}`] || '';
-        const tarea = data[`tarea${i}`] || '';
-        const salida = data[`salida${i}`] || '';
-
-        const tareaDiv = document.createElement('div');
-        tareaDiv.className = 'tarea-row';
-        tareaDiv.innerHTML = `
-            <div class="responsable">
-                <label>${responsableLabel}</label>
-                <input type="text" value="${responsable}" 
-                       data-key="persona${i}" 
-                       placeholder="${responsablePlaceholder}">
-            </div>
-            <div class="tarea">
-                <label>${taskLabel}</label>
-                <input type="text" value="${tarea}" 
-                       data-key="tarea${i}" 
-                       placeholder="${taskPlaceholder}">
-            </div>
-            <div class="salida">
-                <label>${salidaLabel}</label>
-                <input type="text" value="${salida}" 
-                       data-key="salida${i}" 
-                       placeholder="${salidaPlaceholder}">
-            </div>
-        `;
-        tareasContainer.appendChild(tareaDiv);
-    }
-}
-
-/**
- * Aplica traducciones a elementos específicos de la página
- */
-function aplicarTraduccionesEtiquetas() {
+function actualizarTraduccionesDinamicas() {
     const tituloTabla = document.querySelector('.tabla-tareas h2');
-    if (tituloTabla && tituloTabla.hasAttribute('data-i18n')) {
-        const key = tituloTabla.getAttribute('data-i18n');
+    if (tituloTabla) {
         if (typeof t === 'function') {
-            tituloTabla.textContent = t(key) || tituloTabla.textContent;
+            tituloTabla.textContent = t('tasks_responsibles') || 'Enlace de entradas y salidas a través de funciones';
         }
     }
     
-    const tituloPrincipal = document.querySelector('.container h1');
-    if (tituloPrincipal && tituloPrincipal.hasAttribute('data-i18n')) {
-        const key = tituloPrincipal.getAttribute('data-i18n');
+    const tituloPrincipal = document.querySelector('h1');
+    if (tituloPrincipal) {
         if (typeof t === 'function') {
-            tituloPrincipal.textContent = t(key) || tituloPrincipal.textContent;
+            tituloPrincipal.textContent = t('diagram') || 'Diagrama de funciones';
         }
+    }
+    
+    const ths = document.querySelectorAll('#tareasTable thead th');
+    if (ths.length >= 7 && typeof t === 'function') {
+        ths[1].textContent = t('responsable_label') || 'Entrada';
+        ths[3].textContent = t('task_label') || 'Función';
+        ths[5].textContent = t('salida_label') || 'Salida';
+    }
+    
+    if (agregarTareaBtn && typeof t === 'function') {
+        agregarTareaBtn.innerHTML = `+ ${t('add_row') || 'Agregar fila'}`;
+    }
+    
+    document.querySelectorAll('.persona-input').forEach(input => {
+        input.placeholder = (typeof t === 'function') ? t('enter_responsible') || 'Ingresa la entrada' : 'Ingresa la entrada';
+    });
+    document.querySelectorAll('.tarea-input').forEach(input => {
+        input.placeholder = (typeof t === 'function') ? t('enter_task') || 'Ingresa tarea' : 'Ingresa tarea';
+        input.style.border = '3px solid var(--primary)';
+        input.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+        input.style.fontWeight = '500';
+    });
+    document.querySelectorAll('.salida-input').forEach(input => {
+        input.placeholder = (typeof t === 'function') ? t('enter_salida') || 'Describe la salida' : 'Describe la salida';
+    });
+}
+
+function cargarFilasGuardadas() {
+    if (!tareasBody) return;
+    tareasBody.innerHTML = '';
+    
+    const numFilas = data.numeroTareas || 1;
+    contadorFilas = numFilas;
+    
+    for (let i = 1; i <= numFilas; i++) {
+        if (i > 1) {
+            agregarFlechaVertical(i - 1);
+        }
+        agregarFilaPrincipal(i, false);
     }
 }
 
-/**
- * SOLO GUARDA los datos en localStorage (sin navegar)
- */
-function saveData() {
-    document.querySelectorAll('input[data-key]').forEach(input => {
-        if (input.dataset.key) {
-            data[input.dataset.key] = input.value.trim();
+function agregarFlechaVertical(filaIdOrigen) {
+    const flechaRow = document.createElement('tr');
+    flechaRow.className = 'flecha-vertical-row';
+    flechaRow.setAttribute('data-flecha-id', filaIdOrigen);
+    
+    const estaOculta = data[`flecha_vertical_oculta_${filaIdOrigen}`] || false;
+    
+    if (estaOculta) {
+        flechaRow.innerHTML = `
+            <td colspan="7" class="flecha-vertical-oculta" data-flecha-id="${filaIdOrigen}">
+                <div class="mensaje-oculto">👆 Click para mostrar flecha</div>
+            </td>
+        `;
+        const celda = flechaRow.querySelector('td');
+        celda.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleFlechaVertical(filaIdOrigen, celda);
+        });
+    } else {
+        flechaRow.innerHTML = `
+            <td colspan="7" class="flecha-vertical-clickable" data-flecha-id="${filaIdOrigen}">
+                ↓
+            </td>
+        `;
+        const celda = flechaRow.querySelector('td');
+        celda.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleFlechaVertical(filaIdOrigen, celda);
+        });
+    }
+    
+    tareasBody.appendChild(flechaRow);
+}
+
+function toggleFlechaVertical(filaIdOrigen, celda) {
+    const estaOculta = data[`flecha_vertical_oculta_${filaIdOrigen}`] || false;
+    const nuevoEstado = !estaOculta;
+    
+    data[`flecha_vertical_oculta_${filaIdOrigen}`] = nuevoEstado;
+    
+    if (nuevoEstado) {
+        celda.className = 'flecha-vertical-oculta';
+        celda.setAttribute('colspan', '7');
+        celda.innerHTML = '<div class="mensaje-oculto">👆 Click para mostrar flecha</div>';
+    } else {
+        celda.className = 'flecha-vertical-clickable';
+        celda.setAttribute('colspan', '7');
+        celda.innerHTML = '↓';
+    }
+    
+    localStorage.setItem('projectData', JSON.stringify(data));
+}
+
+function crearCeldaOcultable(tipo, filaId, contenido, esInput = false, inputType = 'text', placeholder = '') {
+    const celda = document.createElement('td');
+    celda.className = 'celda-clickable';
+    celda.setAttribute('data-tipo', tipo);
+    celda.setAttribute('data-fila', filaId);
+    
+    const estaOculta = data[`celda_oculta_${tipo}_${filaId}`] || false;
+    
+    if (estaOculta) {
+        celda.classList.add('celda-oculta');
+        celda.innerHTML = `
+            <div class="contenido-oculto">${contenido}</div>
+            <div class="mensaje-oculto">👆 Click para mostrar</div>
+        `;
+    } else {
+        if (esInput) {
+            const input = document.createElement('input');
+            input.type = inputType;
+            input.value = contenido;
+            input.placeholder = placeholder;
+            input.maxLength = 30;
+            input.setAttribute('data-key', `${tipo}${filaId}`);
+            input.classList.add(`${tipo}-input`);
+            input.style.width = '100%';
+            input.style.padding = '0.75rem';
+            input.style.border = '2px solid var(--border)';
+            input.style.borderRadius = '10px';
+            input.style.background = 'var(--surface)';
+            input.style.color = 'var(--text-dark)';
+            
+            if (tipo === 'tarea') {
+                input.style.border = '3px solid var(--primary)';
+                input.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+                input.style.fontWeight = '500';
+            }
+            
+            input.addEventListener('change', function() {
+                const key = this.getAttribute('data-key');
+                if (key) {
+                    data[key] = this.value;
+                    localStorage.setItem('projectData', JSON.stringify(data));
+                }
+            });
+            
+            celda.appendChild(input);
+        } else {
+            celda.innerHTML = contenido;
+            if (tipo === 'flecha1' || tipo === 'flecha2') {
+                celda.classList.add('flecha');
+                celda.style.fontSize = '1.8rem';
+                celda.style.fontWeight = 'bold';
+                celda.style.textAlign = 'center';
+            }
+            if (tipo === 'numero') {
+                celda.style.textAlign = 'center';
+                celda.style.fontWeight = '600';
+            }
         }
+    }
+    
+    celda.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT') {
+            return;
+        }
+        toggleCelda(celda, tipo, filaId, contenido, esInput, inputType, placeholder);
     });
     
+    return celda;
+}
+
+function toggleCelda(celda, tipo, filaId, contenido, esInput, inputType, placeholder) {
+    const estaOculta = data[`celda_oculta_${tipo}_${filaId}`] || false;
+    const nuevoEstado = !estaOculta;
+    
+    data[`celda_oculta_${tipo}_${filaId}`] = nuevoEstado;
+    
+    if (nuevoEstado) {
+        celda.classList.add('celda-oculta');
+        celda.innerHTML = `
+            <div class="contenido-oculto">${contenido}</div>
+            <div class="mensaje-oculto">👆 Click para mostrar</div>
+        `;
+    } else {
+        celda.classList.remove('celda-oculta');
+        if (esInput) {
+            const input = document.createElement('input');
+            input.type = inputType;
+            input.value = contenido;
+            input.placeholder = placeholder;
+            input.maxLength = 30;
+            input.setAttribute('data-key', `${tipo}${filaId}`);
+            input.classList.add(`${tipo}-input`);
+            input.style.width = '100%';
+            input.style.padding = '0.75rem';
+            input.style.border = '2px solid var(--border)';
+            input.style.borderRadius = '10px';
+            input.style.background = 'var(--surface)';
+            input.style.color = 'var(--text-dark)';
+            
+            if (tipo === 'tarea') {
+                input.style.border = '3px solid var(--primary)';
+                input.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+                input.style.fontWeight = '500';
+            }
+            
+            input.addEventListener('change', function() {
+                const key = this.getAttribute('data-key');
+                if (key) {
+                    data[key] = this.value;
+                    localStorage.setItem('projectData', JSON.stringify(data));
+                    const nuevaCelda = this.parentElement;
+                    const nuevoTipo = nuevaCelda.getAttribute('data-tipo');
+                    const nuevaFila = nuevaCelda.getAttribute('data-fila');
+                    data[`${nuevoTipo}${nuevaFila}`] = this.value;
+                    localStorage.setItem('projectData', JSON.stringify(data));
+                }
+            });
+            
+            celda.innerHTML = '';
+            celda.appendChild(input);
+        } else {
+            celda.innerHTML = contenido;
+            if (tipo === 'flecha1' || tipo === 'flecha2') {
+                celda.classList.add('flecha');
+                celda.style.fontSize = '1.8rem';
+                celda.style.fontWeight = 'bold';
+                celda.style.textAlign = 'center';
+            }
+            if (tipo === 'numero') {
+                celda.style.textAlign = 'center';
+                celda.style.fontWeight = '600';
+            }
+        }
+    }
+    
+    localStorage.setItem('projectData', JSON.stringify(data));
+}
+
+function agregarFilaPrincipal(filaId, esNueva = false) {
+    const entrada = !esNueva ? (data[`persona${filaId}`] || '') : '';
+    const funcion = !esNueva ? (data[`tarea${filaId}`] || '') : '';
+    const salida = !esNueva ? (data[`salida${filaId}`] || '') : '';
+    
+    const placeholderEntrada = (typeof t === 'function') ? t('enter_responsible') || 'Ingresa la entrada' : 'Ingresa la entrada';
+    const placeholderFuncion = (typeof t === 'function') ? t('enter_task') || 'Ingresa tarea' : 'Ingresa tarea';
+    const placeholderSalida = (typeof t === 'function') ? t('enter_salida') || 'Describe la salida' : 'Describe la salida';
+    
+    const row = document.createElement('tr');
+    row.setAttribute('data-fila-id', filaId);
+    row.className = 'fila-principal';
+    
+    const celdaNumero = crearCeldaOcultable('numero', filaId, filaId.toString(), false);
+    const celdaEntrada = crearCeldaOcultable('persona', filaId, entrada, true, 'text', placeholderEntrada);
+    const celdaFlecha1 = crearCeldaOcultable('flecha1', filaId, '→', false);
+    const celdaFuncion = crearCeldaOcultable('tarea', filaId, funcion, true, 'text', placeholderFuncion);
+    const celdaFlecha2 = crearCeldaOcultable('flecha2', filaId, '→', false);
+    const celdaSalida = crearCeldaOcultable('salida', filaId, salida, true, 'text', placeholderSalida);
+    
+    const celdaEliminar = document.createElement('td');
+    celdaEliminar.setAttribute('data-tipo', 'eliminar');
+    celdaEliminar.setAttribute('data-fila', filaId);
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = '🗑️';
+    btnEliminar.className = 'btn-eliminar-fila';
+    btnEliminar.setAttribute('data-id', filaId);
+    btnEliminar.addEventListener('click', function(e) {
+        e.stopPropagation();
+        eliminarFila(filaId);
+    });
+    celdaEliminar.appendChild(btnEliminar);
+    
+    row.appendChild(celdaNumero);
+    row.appendChild(celdaEntrada);
+    row.appendChild(celdaFlecha1);
+    row.appendChild(celdaFuncion);
+    row.appendChild(celdaFlecha2);
+    row.appendChild(celdaSalida);
+    row.appendChild(celdaEliminar);
+    
+    tareasBody.appendChild(row);
+}
+
+function agregarNuevaFila() {
+    contadorFilas++;
+    
+    if (contadorFilas > 1) {
+        agregarFlechaVertical(contadorFilas - 1);
+    }
+    
+    agregarFilaPrincipal(contadorFilas, true);
+    
+    data.numeroTareas = contadorFilas;
+    localStorage.setItem('projectData', JSON.stringify(data));
+    actualizarTraduccionesDinamicas();
+}
+
+function eliminarFila(filaId) {
+    const row = document.querySelector(`tr.fila-principal[data-fila-id="${filaId}"]`);
+    if (row) {
+        row.remove();
+        
+        const flechaAntes = document.querySelector(`.flecha-vertical-row[data-flecha-id="${filaId - 1}"]`);
+        if (flechaAntes) flechaAntes.remove();
+        
+        // Eliminar datos de la fila eliminada
+        delete data[`persona${filaId}`];
+        delete data[`tarea${filaId}`];
+        delete data[`salida${filaId}`];
+        
+        const tipos = ['numero', 'persona', 'flecha1', 'tarea', 'flecha2', 'salida', 'eliminar'];
+        tipos.forEach(tipo => {
+            delete data[`celda_oculta_${tipo}_${filaId}`];
+        });
+        delete data[`flecha_vertical_oculta_${filaId - 1}`];
+        
+        // Renombrar datos de filas siguientes
+        for (let i = filaId + 1; i <= 50; i++) {
+            if (data[`persona${i}`] !== undefined) {
+                data[`persona${i - 1}`] = data[`persona${i}`];
+                delete data[`persona${i}`];
+            }
+            if (data[`tarea${i}`] !== undefined) {
+                data[`tarea${i - 1}`] = data[`tarea${i}`];
+                delete data[`tarea${i}`];
+            }
+            if (data[`salida${i}`] !== undefined) {
+                data[`salida${i - 1}`] = data[`salida${i}`];
+                delete data[`salida${i}`];
+            }
+            
+            tipos.forEach(tipo => {
+                if (data[`celda_oculta_${tipo}_${i}`] !== undefined) {
+                    data[`celda_oculta_${tipo}_${i - 1}`] = data[`celda_oculta_${tipo}_${i}`];
+                    delete data[`celda_oculta_${tipo}_${i}`];
+                }
+            });
+            
+            if (data[`flecha_vertical_oculta_${i}`] !== undefined) {
+                data[`flecha_vertical_oculta_${i - 1}`] = data[`flecha_vertical_oculta_${i}`];
+                delete data[`flecha_vertical_oculta_${i}`];
+            }
+        }
+        
+        reconstruirTabla();
+        localStorage.setItem('projectData', JSON.stringify(data));
+    }
+}
+
+function reconstruirTabla() {
+    const filasRestantes = document.querySelectorAll('tr.fila-principal');
+    const numFilas = filasRestantes.length;
+    
+    if (numFilas === 0) {
+        contadorFilas = 1;
+        data.numeroTareas = 1;
+        
+        // Limpiar TODOS los datos antiguos
+        for (let i = 1; i <= 50; i++) {
+            delete data[`persona${i}`];
+            delete data[`tarea${i}`];
+            delete data[`salida${i}`];
+            const tipos = ['numero', 'persona', 'flecha1', 'tarea', 'flecha2', 'salida', 'eliminar'];
+            tipos.forEach(tipo => {
+                delete data[`celda_oculta_${tipo}_${i}`];
+            });
+            delete data[`flecha_vertical_oculta_${i}`];
+        }
+        
+        localStorage.setItem('projectData', JSON.stringify(data));
+        cargarFilasGuardadas();
+        return;
+    }
+    
+    // Guardar datos de filas existentes
+    const filasData = [];
+    filasRestantes.forEach(fila => {
+        const oldId = parseInt(fila.getAttribute('data-fila-id'));
+        const filaInfo = {
+            oldId: oldId,
+            persona: data[`persona${oldId}`] || '',
+            tarea: data[`tarea${oldId}`] || '',
+            salida: data[`salida${oldId}`] || '',
+            celdasOcultas: {}
+        };
+        const tipos = ['numero', 'persona', 'flecha1', 'tarea', 'flecha2', 'salida', 'eliminar'];
+        tipos.forEach(tipo => {
+            if (data[`celda_oculta_${tipo}_${oldId}`]) {
+                filaInfo.celdasOcultas[tipo] = true;
+            }
+        });
+        filasData.push(filaInfo);
+    });
+    
+    // Limpiar todo
+    tareasBody.innerHTML = '';
+    
+    // Limpiar TODOS los datos antiguos
+    for (let i = 1; i <= 50; i++) {
+        delete data[`persona${i}`];
+        delete data[`tarea${i}`];
+        delete data[`salida${i}`];
+        const tipos = ['numero', 'persona', 'flecha1', 'tarea', 'flecha2', 'salida', 'eliminar'];
+        tipos.forEach(tipo => {
+            delete data[`celda_oculta_${tipo}_${i}`];
+        });
+        delete data[`flecha_vertical_oculta_${i}`];
+    }
+    
+    // Reconstruir
+    contadorFilas = filasData.length;
+    data.numeroTareas = contadorFilas;
+    
+    for (let i = 0; i < filasData.length; i++) {
+        const nuevoId = i + 1;
+        const filaInfo = filasData[i];
+        
+        if (filaInfo.persona) data[`persona${nuevoId}`] = filaInfo.persona;
+        if (filaInfo.tarea) data[`tarea${nuevoId}`] = filaInfo.tarea;
+        if (filaInfo.salida) data[`salida${nuevoId}`] = filaInfo.salida;
+        
+        Object.keys(filaInfo.celdasOcultas).forEach(tipo => {
+            data[`celda_oculta_${tipo}_${nuevoId}`] = true;
+        });
+        
+        if (nuevoId > 1) {
+            agregarFlechaVertical(nuevoId - 1);
+        }
+        agregarFilaPrincipal(nuevoId, false);
+    }
+    
+    localStorage.setItem('projectData', JSON.stringify(data));
+    actualizarTraduccionesDinamicas();
+}
+
+function saveData() {
     localStorage.setItem('projectData', JSON.stringify(data));
     console.log('Datos guardados correctamente');
 }
 
-/**
- * SOLO NAVEGA a la siguiente página (sin guardar)
- */
 function continueToNext() {
-    window.location.href = 'diagrama2.html';
+    saveData();
+    window.location.href = 'opcionConceptos.html';
 }
 
-/**
- * Configura el selector de idioma
- */
 function setupLanguageSelector() {
     const langSelector = document.getElementById('languageSelector');
     if (!langSelector) return;
@@ -177,16 +496,14 @@ function setupLanguageSelector() {
             setLanguage(this.value);
             updateProjectName();
             updateThemeButton();
-            generarContenido();
+            actualizarTraduccionesDinamicas();
+            cargarFilasGuardadas();
         } else {
             console.error('setLanguage function not found. Make sure lang.js is loaded.');
         }
     });
 }
 
-/**
- * Configura el tema oscuro/claro
- */
 function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
@@ -198,7 +515,6 @@ function setupThemeToggle() {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
             const newTheme = current === 'dark' ? 'light' : 'dark';
-            
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeButton();
@@ -206,45 +522,20 @@ function setupThemeToggle() {
     }
 }
 
-/**
- * Actualiza el icono y tooltip del botón de tema
- */
 function updateThemeButton() {
     const themeToggle = document.getElementById('themeToggle');
     if (!themeToggle) return;
     
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    
-    if (currentTheme === 'dark') {
-        themeToggle.textContent = '☀️';
-        themeToggle.title = 'Cambiar a modo claro';
-        if (typeof t === 'function') {
-            themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
-        }
-    } else {
-        themeToggle.textContent = '🌙';
-        themeToggle.title = 'Cambiar a modo oscuro';
-        if (typeof t === 'function') {
-            themeToggle.title = t('theme_dark') || 'Cambiar a modo oscuro';
-        }
-    }
+    themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
 }
 
-/**
- * Configura los botones de Guardar y Continuar
- */
 function setupButtons() {
-    if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveData);
-    }
-    if (continuarBtn) {
-        continuarBtn.addEventListener('click', continueToNext);
-    }
+    if (guardarBtn) guardarBtn.addEventListener('click', saveData);
+    if (continuarBtn) continuarBtn.addEventListener('click', continueToNext);
+    if (agregarTareaBtn) agregarTareaBtn.addEventListener('click', agregarNuevaFila);
 }
 
-/**
- * Inicializa la página
- */
 function initializePage() {
     setupLanguageSelector();
     setupThemeToggle();
@@ -252,23 +543,16 @@ function initializePage() {
     updateProjectName();
     generarContenido();
     
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
-    }
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
 }
 
-// ========== EJECUCIÓN AL CARGAR EL DOM ==========
 document.addEventListener('DOMContentLoaded', initializePage);
 
-// ========== EXPORTAR FUNCIONES PARA USO GLOBAL ==========
 window.updateProjectName = updateProjectName;
 window.generarContenido = generarContenido;
-window.generarTareas = generarTareas;
-window.aplicarTraduccionesEtiquetas = aplicarTraduccionesEtiquetas;
 window.saveData = saveData;
 window.continueToNext = continueToNext;
-window.obtenerConceptosExistentes = obtenerConceptosExistentes;
+window.agregarNuevaFila = agregarNuevaFila;
+window.eliminarFila = eliminarFila;
+window.actualizarTraduccionesDinamicas = actualizarTraduccionesDinamicas;

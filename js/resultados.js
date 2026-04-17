@@ -599,63 +599,43 @@ function generarPDF() {
     }
 
     // ==================== 5. PLAN DE ACCIÓN (SOLO SI HAY) ====================
-    if (tieneTareas()) {
-        if (y > 230) { doc.addPage(); y = margen; }
+if (tieneTareas()) {
+    if (y > 230) { doc.addPage(); y = margen; }
+    
+    doc.setFontSize(16);
+    doc.setTextColor(21, 101, 192);
+    doc.setFont("helvetica", "bold");
+    doc.text(t('action_plan'), margen, y);
+    y += 15;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    
+    let filaNum = 1;
+    
+    for (let i = 1; i <= 30; i++) {
+        const persona = data[`persona${i}`] || "";
+        const tarea = data[`tarea${i}`] || "";
+        const salida = data[`salida${i}`] || "";
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('action_plan'), margen, y);
-        y += 15;
-
-        // Tareas 1-15
-        doc.setFontSize(14);
-        doc.setTextColor(13, 71, 161);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('tasks_1_15'), margen, y);
-        y += 12;
-
-        for (let i = 1; i <= 15; i++) {
-            const persona = data[`persona${i}`];
-            const tarea = data[`tarea${i}`];
-            const salida = data[`salida${i}`];
-            if ((persona && persona.trim()) || (tarea && tarea.trim()) || (salida && salida.trim())) {
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("helvetica", "normal");
-                const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
-                doc.text(texto, margen + 10, y);
-                y += 10;
-                if (y > 280) { doc.addPage(); y = margen; }
-            }
+        if (persona.trim() || tarea.trim() || salida.trim()) {
+            if (y > 270) { doc.addPage(); y = margen; }
+            
+            // Alinear en columnas fijas
+            const numTexto = `${filaNum}.`;
+            doc.text(numTexto, margen, y);
+            doc.text(persona, margen + 25, y);
+            doc.text(tarea, margen + 85, y);
+            doc.text(salida, margen + 145, y);
+            
+            y += 8;
+            filaNum++;
         }
-        y += 15;
-
-        // Tareas 16-30
-        if (y > 250) { doc.addPage(); y = margen; }
-        
-        doc.setFontSize(14);
-        doc.setTextColor(13, 71, 161);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('tasks_16_30'), margen, y);
-        y += 12;
-
-        for (let i = 16; i <= 30; i++) {
-            const persona = data[`persona${i}`];
-            const tarea = data[`tarea${i}`];
-            const salida = data[`salida${i}`];
-            if ((persona && persona.trim()) || (tarea && tarea.trim()) || (salida && salida.trim())) {
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont("helvetica", "normal");
-                const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
-                doc.text(texto, margen + 10, y);
-                y += 10;
-                if (y > 280) { doc.addPage(); y = margen; }
-            }
-        }
-        y += 15;
     }
+    
+    y += 10;
+}
 
     // ==================== 6. EXPLORACIÓN DE OPCIONES (SOLO SI HAY) ====================
     if (tieneExploracionOpciones()) {

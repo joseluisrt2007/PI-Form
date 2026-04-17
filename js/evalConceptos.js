@@ -388,10 +388,11 @@ function saveData() {
 }
 
 /**
- * SOLO NAVEGA a la siguiente página (sin guardar)
+ * GUARDA y NAVEGA a la siguiente página
  */
 function continueToNext() {
-    window.location.href = 'opcionPrevencion.html';
+    saveData();  // Primero guarda los datos
+    window.location.href = 'opcionPrevencion.html';  // Luego navega
 }
 
 /**

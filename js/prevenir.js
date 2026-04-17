@@ -4,15 +4,14 @@ const mejorConceptoContainer = document.getElementById('mejorConceptoContainer')
 const tablasContainer = document.getElementById('tablasContainer');
 const guardarBtn = document.getElementById('guardarBtn');
 const continuarBtn = document.getElementById('continuarBtn');
+const agregarTablaBtn = document.getElementById('agregarTablaBtn');
+
+let contadorTablas = 1;
 
 // ========== FUNCIONES PRINCIPALES ==========
 
-/**
- * Actualiza el nombre del proyecto en la barra de navegación
- */
 function updateProjectName() {
     const projectText = document.getElementById('projectNameText');
-    
     if (!projectText) return;
     
     if (data.projectName && data.projectName.trim()) {
@@ -26,10 +25,6 @@ function updateProjectName() {
     }
 }
 
-/**
- * Obtiene los números de concepto que tienen contenido
- * @returns {Array} Array con los números de concepto que existen
- */
 function obtenerConceptosExistentes() {
     const conceptos = [];
     for (let conc = 1; conc <= 5; conc++) {
@@ -41,25 +36,226 @@ function obtenerConceptosExistentes() {
     return conceptos;
 }
 
-/**
- * Genera todo el contenido de la página
- */
 function generarContenido() {
     generarMejorConcepto();
-    generarTablasPrevencion();
+    cargarTablasGuardadas();
     
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
+}
+
+function cargarTablasGuardadas() {
+    if (!tablasContainer) return;
+    tablasContainer.innerHTML = '';
+    
+    const numTablas = data.numeroPrevenciones || 1;
+    contadorTablas = numTablas;
+    
+    for (let i = 1; i <= numTablas; i++) {
+        generarTablaPrevencion(i, false);
     }
 }
 
-/**
- * Genera la sección del mejor concepto
- */
+function generarTablaPrevencion(tablaId, esNueva = false) {
+    const section = document.createElement('div');
+    section.className = 'tabla-prevencion';
+    section.setAttribute('data-tabla-id', tablaId);
+    
+    const preventionText = (typeof t === 'function') ? t('prevention') || 'Prevención' : 'Prevención';
+    
+    const getTranslatedText = (key) => {
+        return (typeof t === 'function') ? t(key) || key : key;
+    };
+    
+    const getPlaceholder = (key) => {
+        const translations = {
+            'enter_task': 'Ingresa información',
+            'enter_severity': '1-10',
+            'enter_occurrence': '1-10',
+            'enter_responsible': 'Responsable'
+        };
+        return (typeof t === 'function') ? t(key) || translations[key] : translations[key];
+    };
+    
+    const fallaPotencial = !esNueva ? (data[`fallaPotencial${tablaId}`] || '') : '';
+    const efecto = !esNueva ? (data[`efecto${tablaId}`] || '') : '';
+    const sev = !esNueva ? (data[`sev${tablaId}`] || '') : '';
+    const ocu = !esNueva ? (data[`ocu${tablaId}`] || '') : '';
+    const riesgo = !esNueva ? (data[`riesgo${tablaId}`] || '0.00') : '0.00';
+    const accionReal = !esNueva ? (data[`accionReal${tablaId}`] || '') : '';
+    const responsable = !esNueva ? (data[`responsable${tablaId}`] || '') : '';
+    const fechaCell = !esNueva ? (data[`fechaCell${tablaId}`] || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0];
+    const accionTom = !esNueva ? (data[`accionTom${tablaId}`] || '') : '';
+    const fecha = !esNueva ? (data[`fecha${tablaId}`] || '') : '';
+    
+    section.innerHTML = `
+        <div class="tabla-title">${preventionText} ${tablaId}</div>
+        <table>
+            <tr>
+                <th>${getTranslatedText('potential_failure')}</th>
+                <td><input type="text" data-key="fallaPotencial${tablaId}" value="${fallaPotencial.replace(/"/g, '&quot;')}" placeholder="${getPlaceholder('enter_task')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('effect')}</th>
+                <td><input type="text" data-key="efecto${tablaId}" value="${efecto.replace(/"/g, '&quot;')}" placeholder="${getPlaceholder('enter_task')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('severity')}</th>
+                <td><input type="number" class="sev" data-tabla="${tablaId}" min="1" max="10" step="1" value="${sev}" placeholder="${getPlaceholder('enter_severity')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('occurrence')}</th>
+                <td><input type="number" class="ocu" data-tabla="${tablaId}" min="1" max="10" step="1" value="${ocu}" placeholder="${getPlaceholder('enter_occurrence')}"></td>
+            </tr>
+        </table>
+        
+        <!-- BOTÓN DE CALCULAR AQUÍ (más arriba, antes de acciones) -->
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <button class="btn-calc" onclick="calcularRiesgo(${tablaId})">
+                ${getTranslatedText('risk_calculation')}
+            </button>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <div class="riesgo-cell" style="margin-bottom: 1.5rem;">
+                <span style="font-weight: 600;">${getTranslatedText('risk') || 'Riesgo'}:</span>
+                <span class="riesgo" id="riesgo${tablaId}" style="font-size: 1.5rem; font-weight: 700; margin-left: 0.5rem;">${riesgo}</span>
+            </div>
+        </div>
+        
+        <table>
+            <tr>
+                <th>${getTranslatedText('actions_to_take')}</th>
+                <td><input type="text" data-key="accionReal${tablaId}" value="${accionReal.replace(/"/g, '&quot;')}" placeholder="${getPlaceholder('enter_task')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('responsible')}</th>
+                <td><input type="text" data-key="responsable${tablaId}" value="${responsable.replace(/"/g, '&quot;')}" placeholder="${getPlaceholder('enter_responsible')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('today_date')}</th>
+                <td><input type="date" data-key="fechaCell${tablaId}" value="${fechaCell}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('action_taken')}</th>
+                <td><input type="text" data-key="accionTom${tablaId}" value="${accionTom.replace(/"/g, '&quot;')}" placeholder="${getPlaceholder('enter_task')}"></td>
+            </tr>
+            <tr>
+                <th>${getTranslatedText('action_date')}</th>
+                <td><input type="date" data-key="fecha${tablaId}" value="${fecha}"></td>
+            </tr>
+        </table>
+        
+        <div class="tabla-buttons" style="text-align: center; margin-top: 1rem;">
+            ${tablaId > 1 ? `<button class="btn-eliminar-tabla" onclick="eliminarTabla(${tablaId})">🗑️ Eliminar</button>` : ''}
+        </div>
+    `;
+    tablasContainer.appendChild(section);
+}
+
+function agregarTabla() {
+    contadorTablas++;
+    generarTablaPrevencion(contadorTablas, true);
+    data.numeroPrevenciones = contadorTablas;
+    localStorage.setItem('projectData', JSON.stringify(data));
+    configurarEventosInputs();
+}
+
+function eliminarTabla(tablaId) {
+    if (confirm('¿Eliminar esta prevención?')) {
+        const tablaElement = document.querySelector(`.tabla-prevencion[data-tabla-id="${tablaId}"]`);
+        if (tablaElement) {
+            tablaElement.remove();
+            
+            delete data[`fallaPotencial${tablaId}`];
+            delete data[`efecto${tablaId}`];
+            delete data[`sev${tablaId}`];
+            delete data[`ocu${tablaId}`];
+            delete data[`riesgo${tablaId}`];
+            delete data[`accionReal${tablaId}`];
+            delete data[`responsable${tablaId}`];
+            delete data[`fechaCell${tablaId}`];
+            delete data[`accionTom${tablaId}`];
+            delete data[`fecha${tablaId}`];
+            
+            const tablasRestantes = document.querySelectorAll('.tabla-prevencion').length;
+            contadorTablas = tablasRestantes;
+            data.numeroPrevenciones = contadorTablas;
+            
+            renumerarTablas();
+            localStorage.setItem('projectData', JSON.stringify(data));
+        }
+    }
+}
+
+function renumerarTablas() {
+    const tablas = document.querySelectorAll('.tabla-prevencion');
+    let nuevoId = 1;
+    
+    tablas.forEach(tabla => {
+        const oldId = parseInt(tabla.getAttribute('data-tabla-id'));
+        tabla.setAttribute('data-tabla-id', nuevoId);
+        
+        const title = tabla.querySelector('.tabla-title');
+        const preventionText = (typeof t === 'function') ? t('prevention') || 'Prevención' : 'Prevención';
+        if (title) title.textContent = `${preventionText} ${nuevoId}`;
+        
+        tabla.querySelectorAll('input[data-key]').forEach(input => {
+            const oldKey = input.getAttribute('data-key');
+            const newKey = oldKey.replace(/\d+$/, nuevoId);
+            input.setAttribute('data-key', newKey);
+            if (data[oldKey] !== undefined) {
+                data[newKey] = data[oldKey];
+                delete data[oldKey];
+            }
+        });
+        
+        tabla.querySelectorAll('.sev').forEach(input => {
+            input.setAttribute('data-tabla', nuevoId);
+        });
+        tabla.querySelectorAll('.ocu').forEach(input => {
+            input.setAttribute('data-tabla', nuevoId);
+        });
+        
+        const riesgoSpan = tabla.querySelector(`#riesgo${oldId}`);
+        if (riesgoSpan) {
+            riesgoSpan.id = `riesgo${nuevoId}`;
+            if (data[`riesgo${oldId}`] !== undefined) {
+                data[`riesgo${nuevoId}`] = data[`riesgo${oldId}`];
+                delete data[`riesgo${oldId}`];
+            }
+        }
+        
+        const btnCalc = tabla.querySelector('.btn-calc');
+        if (btnCalc) {
+            btnCalc.setAttribute('onclick', `calcularRiesgo(${nuevoId})`);
+        }
+        
+        const btnEliminar = tabla.querySelector('.btn-eliminar-tabla');
+        if (btnEliminar) {
+            btnEliminar.setAttribute('onclick', `eliminarTabla(${nuevoId})`);
+        }
+        
+        nuevoId++;
+    });
+    
+    contadorTablas = nuevoId - 1;
+}
+
+function configurarEventosInputs() {
+    document.querySelectorAll('.sev, .ocu').forEach(input => {
+        input.removeEventListener('input', handleRiskInput);
+        input.addEventListener('input', handleRiskInput);
+    });
+}
+
+function handleRiskInput() {
+    const tabla = this.dataset.tabla;
+    if (tabla) {
+        calcularRiesgo(parseInt(tabla));
+    }
+}
+
 function generarMejorConcepto() {
     if (!mejorConceptoContainer) return;
     
@@ -71,24 +267,17 @@ function generarMejorConcepto() {
     
     let mejorConceptoTexto;
     if (mejorIdx >= 0) {
-        const conceptFormedText = (typeof t === 'function') 
-            ? t('concept_formed') || 'Concepto formado' 
-            : 'Concepto formado';
+        const conceptFormedText = (typeof t === 'function') ? t('concept_formed') || 'Concepto formado' : 'Concepto formado';
         mejorConceptoTexto = `${conceptFormedText} ${mejorIdx + 1}`;
     } else {
-        mejorConceptoTexto = (typeof t === 'function') 
-            ? t('no_concept_selected') || 'No se ha seleccionado concepto' 
-            : 'No se ha seleccionado concepto';
+        mejorConceptoTexto = (typeof t === 'function') ? t('no_concept_selected') || 'No se ha seleccionado concepto' : 'No se ha seleccionado concepto';
     }
 
     const opciones = [];
     if (mejorIdx >= 0 && conceptosExistentes.length > 0) {
         for (const conc of conceptosExistentes) {
             const key = `pastel_grupo${(conc - 1) * 3 + (mejorIdx + 1)}`;
-            const noSelectionText = (typeof t === 'function') 
-                ? t('no_selection') || 'Sin selección' 
-                : 'Sin selección';
-            
+            const noSelectionText = (typeof t === 'function') ? t('no_selection') || 'Sin selección' : 'Sin selección';
             const opcionSeleccionada = data[key] || '';
             const nombreConcepto = data[`concepto${conc}`];
             
@@ -98,7 +287,6 @@ function generarMejorConcepto() {
             for (let opcionNum = 1; opcionNum <= 3; opcionNum++) {
                 const posIdx = (conc - 1) * 3 + opcionNum;
                 const posibilidad = data[`pos${posIdx}`] || '';
-                
                 if (posibilidad === opcionSeleccionada) {
                     opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
                     encontrado = true;
@@ -109,7 +297,6 @@ function generarMejorConcepto() {
             if (!encontrado) {
                 opcionText = `<strong>${nombreConcepto}</strong> <em>${noSelectionText}</em>`;
             }
-            
             opciones.push(opcionText);
         }
     }
@@ -138,132 +325,6 @@ function generarMejorConcepto() {
     }
 }
 
-/**
- * Genera las 3 tablas de prevención
- */
-function generarTablasPrevencion() {
-    if (!tablasContainer) return;
-    
-    tablasContainer.innerHTML = '';
-    
-    for (let tabla = 1; tabla <= 3; tabla++) {
-        const section = document.createElement('div');
-        section.className = 'tabla-prevencion';
-        
-        const preventionText = (typeof t === 'function') 
-            ? t('prevention') || 'Prevención' 
-            : 'Prevención';
-        
-        const getTranslatedText = (key) => {
-            return (typeof t === 'function') ? t(key) || key : key;
-        };
-        
-        const getPlaceholder = (key) => {
-            const translations = {
-                'enter_task': 'Ingresa información',
-                'enter_severity': '1-10',
-                'enter_occurrence': '1-10',
-                'enter_responsible': 'Responsable'
-            };
-            return (typeof t === 'function') ? t(key) || translations[key] : translations[key];
-        };
-        
-        section.innerHTML = `
-            <div class="tabla-title">${preventionText} ${tabla}</div>
-            <table>
-                <tr>
-                    <th>${getTranslatedText('potential_failure')}</th>
-                    <td>
-                        <input type="text" data-key="fallaPotencial${tabla}" 
-                               value="${data[`fallaPotencial${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_task')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('effect')}</th>
-                    <td>
-                        <input type="text" data-key="efecto${tabla}" 
-                               value="${data[`efecto${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_task')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('severity')}</th>
-                    <td>
-                        <input type="number" class="sev" data-tabla="${tabla}" 
-                               min="1" max="10" step="1" 
-                               value="${data[`sev${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_severity')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('occurrence')}</th>
-                    <td>
-                        <input type="number" class="ocu" data-tabla="${tabla}" 
-                               min="1" max="10" step="1" 
-                               value="${data[`ocu${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_occurrence')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('risk')}</th>
-                    <td class="riesgo-cell">
-                        <span class="riesgo" id="riesgo${tabla}">${data[`riesgo${tabla}`] || '0.00'}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('actions_to_take')}</th>
-                    <td>
-                        <input type="text" data-key="accionReal${tabla}" 
-                               value="${data[`accionReal${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_task')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('responsible')}</th>
-                    <td>
-                        <input type="text" data-key="responsable${tabla}" 
-                               value="${data[`responsable${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_responsible')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('today_date')}</th>
-                    <td>
-                        <input type="date" data-key="fechaCell${tabla}" 
-                               value="${data[`fechaCell${tabla}`] || new Date().toISOString().split('T')[0]}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('action_taken')}</th>
-                    <td>
-                        <input type="text" data-key="accionTom${tabla}" 
-                               value="${data[`accionTom${tabla}`] || ''}" 
-                               placeholder="${getPlaceholder('enter_task')}">
-                    </td>
-                </tr>
-                <tr>
-                    <th>${getTranslatedText('action_date')}</th>
-                    <td>
-                        <input type="date" data-key="fecha${tabla}" 
-                               value="${data[`fecha${tabla}`] || ''}">
-                    </td>
-                </tr>
-            </table>
-            <button class="btn-calc" onclick="calcularRiesgo(${tabla})">
-                ${getTranslatedText('risk_calculation')}
-            </button>
-        `;
-        tablasContainer.appendChild(section);
-    }
-    
-    recalcularRiesgosSiExisten();
-}
-
-/**
- * Calcula el riesgo - SIN RESTRICCIONES
- * @param {number} tabla - Número de tabla (1-3)
- */
 function calcularRiesgo(tabla) {
     const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
     const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
@@ -284,22 +345,6 @@ function calcularRiesgo(tabla) {
     }
 }
 
-/**
- * Recalcula riesgos al cargar si hay datos existentes
- */
-function recalcularRiesgosSiExisten() {
-    for (let tabla = 1; tabla <= 3; tabla++) {
-        const sevInput = document.querySelector(`.sev[data-tabla="${tabla}"]`);
-        const ocuInput = document.querySelector(`.ocu[data-tabla="${tabla}"]`);
-        if (sevInput && sevInput.value && ocuInput && ocuInput.value) {
-            calcularRiesgo(tabla);
-        }
-    }
-}
-
-/**
- * SOLO GUARDA los datos en localStorage (sin navegar)
- */
 function saveData() {
     document.querySelectorAll('input[data-key]').forEach(input => {
         if (input.dataset.key) {
@@ -321,20 +366,16 @@ function saveData() {
         }
     });
     
+    data.numeroPrevenciones = contadorTablas;
     localStorage.setItem('projectData', JSON.stringify(data));
     console.log('Datos guardados correctamente');
 }
 
-/**
- * SOLO NAVEGA a la siguiente página (sin guardar)
- */
 function continueToNext() {
+    saveData();
     window.location.href = 'resultados.html';
 }
 
-/**
- * Configura el selector de idioma
- */
 function setupLanguageSelector() {
     const langSelector = document.getElementById('languageSelector');
     if (!langSelector) return;
@@ -354,9 +395,6 @@ function setupLanguageSelector() {
     });
 }
 
-/**
- * Configura el tema oscuro/claro
- */
 function setupThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     const currentTheme = localStorage.getItem('theme') || 'light';
@@ -368,7 +406,6 @@ function setupThemeToggle() {
         themeToggle.addEventListener('click', function() {
             const current = document.documentElement.getAttribute('data-theme');
             const newTheme = current === 'dark' ? 'light' : 'dark';
-            
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeButton();
@@ -376,9 +413,6 @@ function setupThemeToggle() {
     }
 }
 
-/**
- * Actualiza el icono y tooltip del botón de tema
- */
 function updateThemeButton() {
     const themeToggle = document.getElementById('themeToggle');
     if (!themeToggle) return;
@@ -388,33 +422,20 @@ function updateThemeButton() {
     if (currentTheme === 'dark') {
         themeToggle.textContent = '☀️';
         themeToggle.title = 'Cambiar a modo claro';
-        if (typeof t === 'function') {
-            themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
-        }
+        if (typeof t === 'function') themeToggle.title = t('theme_light') || 'Cambiar a modo claro';
     } else {
         themeToggle.textContent = '🌙';
         themeToggle.title = 'Cambiar a modo oscuro';
-        if (typeof t === 'function') {
-            themeToggle.title = t('theme_dark') || 'Cambiar a modo oscuro';
-        }
+        if (typeof t === 'function') themeToggle.title = t('theme_dark') || 'Cambiar a modo oscuro';
     }
 }
 
-/**
- * Configura los botones de Guardar y Continuar
- */
 function setupButtons() {
-    if (guardarBtn) {
-        guardarBtn.addEventListener('click', saveData);
-    }
-    if (continuarBtn) {
-        continuarBtn.addEventListener('click', continueToNext);
-    }
+    if (guardarBtn) guardarBtn.addEventListener('click', saveData);
+    if (continuarBtn) continuarBtn.addEventListener('click', continueToNext);
+    if (agregarTablaBtn) agregarTablaBtn.addEventListener('click', agregarTabla);
 }
 
-/**
- * Inicializa la página
- */
 function initializePage() {
     setupLanguageSelector();
     setupThemeToggle();
@@ -422,25 +443,22 @@ function initializePage() {
     updateProjectName();
     generarContenido();
     
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
-    }
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
+    
+    setTimeout(() => {
+        configurarEventosInputs();
+    }, 100);
 }
 
-// ========== EJECUCIÓN AL CARGAR EL DOM ==========
 document.addEventListener('DOMContentLoaded', initializePage);
 
-// ========== EXPORTAR FUNCIONES PARA USO GLOBAL ==========
 window.updateProjectName = updateProjectName;
 window.generarContenido = generarContenido;
 window.generarMejorConcepto = generarMejorConcepto;
-window.generarTablasPrevencion = generarTablasPrevencion;
 window.calcularRiesgo = calcularRiesgo;
-window.recalcularRiesgosSiExisten = recalcularRiesgosSiExisten;
 window.saveData = saveData;
 window.continueToNext = continueToNext;
 window.obtenerConceptosExistentes = obtenerConceptosExistentes;
+window.agregarTabla = agregarTabla;
+window.eliminarTabla = eliminarTabla;

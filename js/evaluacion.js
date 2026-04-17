@@ -267,11 +267,11 @@ function saveData() {
 }
 
 /**
- * SOLO NAVEGA a la siguiente página (sin guardar)
- * MODIFICADO: Ahora va a opcionDiagramas.html
+ * GUARDA y NAVEGA a la siguiente página
  */
 function continueToNext() {
-    window.location.href = 'opcionDiagramas.html';
+    saveData();  // Primero guarda los datos
+    window.location.href = 'opcionDiagramas.html';  // Luego navega
 }
 
 /**
