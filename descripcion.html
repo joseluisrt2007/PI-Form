@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="risk_prevention">Prevenir - Actividades de Mejora</title>
+    <title data-i18n="criteria_weights">Criterios - Actividades de Mejora</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="lang.js"></script>
-    
-    <link rel="stylesheet" href="css/prevenir.css">
+
+    <link rel="stylesheet" href="css/descripcion.css">
 </head>
 <body>
     <header role="banner">
-        <div class="header-left"></div>
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
         
         <div class="header-center">
             <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
@@ -24,7 +25,9 @@
         
         <div class="header-right">
             <div class="header-controls">
-                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    🌙
+                </button>
                 <div class="language-selector">
                     <select id="languageSelector">
                         <option value="es">🇪🇸 Español</option>
@@ -36,26 +39,33 @@
     </header>
 
     <div class="container">
-        <h1 data-i18n="risk_prevention">Prevenir</h1>
+        <h1 data-i18n="description_data">Criterios y pesos (la suma debe ser 10)</h1>
 
-        <div id="mejorConceptoContainer"></div>
+        <!-- Nombre del proyecto -->
+        <div class="section">
+            <label for="projectName" data-i18n="project_name">Nombre del proyecto</label>
+            <input type="text" id="projectName" data-i18n-placeholder="enter_project_name" placeholder="Ingrese el nombre del proyecto">
+        </div>
 
-        <div id="tablasContainer"></div>
-
-        <!-- Botón para agregar más tablas -->
-        <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn-secondary" id="agregarTablaBtn" style="background: linear-gradient(135deg, #10b981, #059669);">
-                + Agregar Prevención
-            </button>
+        <!-- Descripción del proyecto -->
+        <div class="section">
+            <label for="projectDescription" data-i18n="project_description">Descripción del proyecto</label>
+            <textarea 
+                id="projectDescription" 
+                rows="4" 
+                data-i18n-placeholder="enter_project_description" 
+                placeholder="Describa el objetivo y detalles del proyecto..."
+            ></textarea>
         </div>
 
         <div class="buttons">
             <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
             <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
-            <button class="btn-secondary" onclick="window.location.href='evalConceptos.html'" data-i18n="back">Regreso</button>
+            <button class="btn-secondary" onclick="window.location.href='index.html'" data-i18n="back">Regreso</button>
         </div>
     </div>
 
-    <script src="js/prevenir.js"></script>
+    <script src="lang.js"></script>
+    <script src="js/descripcion.js"></script>
 </body>
 </html>

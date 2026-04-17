@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="completion_page">Proceso Completado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/bloqueo.css">
+</head>
+<body>
+    <!-- Header con controles -->
+    <header role="banner">
+        <div class="header-controls">
+            <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                🌙
+            </button>
+            <div class="language-selector">
+                <select id="languageSelector">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇺🇸 English</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <div class="container">
+        <!-- Icono -->
+        <div class="icon">🎯</div>
+        
+        <!-- Título principal -->
+        <h1 data-i18n="congratulations_message">¡Felicidades por llegar hasta aquí!</h1>
+        
+        <!-- Mensaje de instrucciones -->
+        <p class="message" data-i18n="wait_instructions">
+            Espera indicaciones de tu profesor para continuar.
+        </p>
+        
+        <!-- Botón de regreso -->
+        <button class="btn-return" onclick="window.history.back()" data-i18n="back">
+            Regresar
+        </button>
+    </div>
+
+    <!-- Sistema de traducción -->
+    <script src="lang.js"></script>
+    
+    <!-- Script específico -->
+    <script src="js/bloqueo.js"></script>
+</body>
+</html>

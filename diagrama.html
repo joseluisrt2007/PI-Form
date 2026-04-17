@@ -13,9 +13,7 @@
 </head>
 <body>
     <header role="banner">
-        <div class="header-left">
-            <!-- Espacio reservado para alineación -->
-        </div>
+        <div class="header-left"></div>
         
         <div class="header-center">
             <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
@@ -26,9 +24,7 @@
         
         <div class="header-right">
             <div class="header-controls">
-                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
-                    🌙
-                </button>
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
                 <div class="language-selector">
                     <select id="languageSelector">
                         <option value="es">🇪🇸 Español</option>
@@ -40,11 +36,35 @@
     </header>
 
     <div class="container">
-        <h1 data-i18n="diagram">Diagrama</h1>
+        <h1 data-i18n="diagram">Diagrama de funciones</h1>
 
         <div class="tabla-tareas">
-            <h2 data-i18n="tasks_responsibles">Tabla de tareas y responsables</h2>
-            <div id="tareasContainer"></div>
+            <h2 data-i18n="tasks_responsibles">Enlace de entradas y salidas a través de funciones</h2>
+            
+            <div class="table-responsive">
+                <table id="tareasTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 22%;" data-i18n="responsable_label">Entrada</th>
+                            <th style="width: 5%;"></th>
+                            <th style="width: 28%;" data-i18n="task_label">Función</th>
+                            <th style="width: 5%;"></th>
+                            <th style="width: 25%;" data-i18n="salida_label">Salida</th>
+                            <th style="width: 10%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tareasBody">
+                        <!-- Filas generadas dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn-secondary" id="agregarTareaBtn" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    + Agregar fila
+                </button>
+            </div>
         </div>
 
         <div class="buttons">
