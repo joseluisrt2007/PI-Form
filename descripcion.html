@@ -58,6 +58,47 @@
             ></textarea>
         </div>
 
+        <!-- Menú de selección de módulos -->
+        <div class="section">
+            <h2 data-i18n="modules_menu_title">Selecciona los módulos a realizar</h2>
+            <p class="modules-subtitle" data-i18n="modules_menu_subtitle">Elige qué partes del proceso quieres completar. Solo esas páginas, resultados y secciones del PDF se incluirán.</p>
+
+            <div class="modules-list">
+                <label class="module-card module-card-required">
+                    <input type="checkbox" id="mod-analisisInicial" checked disabled>
+                    <div class="module-card-text">
+                        <span class="module-card-title" data-i18n="module_initial_analysis">Análisis Inicial</span>
+                        <span class="module-card-desc" data-i18n="module_initial_analysis_desc">Necesidades, ideas y evaluación inicial</span>
+                    </div>
+                    <span class="module-badge" data-i18n="module_required_badge">Obligatorio</span>
+                </label>
+
+                <label class="module-card">
+                    <input type="checkbox" id="mod-diagrama">
+                    <div class="module-card-text">
+                        <span class="module-card-title" data-i18n="diagram_question">Diagrama de Actividades</span>
+                        <span class="module-card-desc" data-i18n="ask_diagram">¿Quieres realizar los diagramas de funciones?</span>
+                    </div>
+                </label>
+
+                <label class="module-card">
+                    <input type="checkbox" id="mod-exploracionConceptos">
+                    <div class="module-card-text">
+                        <span class="module-card-title" data-i18n="concept_question">Exploración y Evaluación de Conceptos</span>
+                        <span class="module-card-desc" data-i18n="ask_concept">¿Deseas hacer la exploración y evaluación de conceptos?</span>
+                    </div>
+                </label>
+
+                <label class="module-card">
+                    <input type="checkbox" id="mod-prevencion">
+                    <div class="module-card-text">
+                        <span class="module-card-title" data-i18n="prevention_question">Prevención de Riesgos</span>
+                        <span class="module-card-desc" data-i18n="ask_prevention">¿Deseas realizar el análisis de prevención de riesgos?</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
         <div class="buttons">
             <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
             <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
