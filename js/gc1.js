@@ -201,11 +201,18 @@ function saveData() {
 }
 
 /**
- * GUARDA y NAVEGA a la siguiente página
+ * GUARDA y NAVEGA a la siguiente página (calculada dinámicamente)
  */
 function continueToNext() {
     saveData();  // Primero guarda los datos
-    window.location.href = 'evalConceptos.html';  // Luego navega
+    window.location.href = getNextPage('gc1.html');  // Luego navega
+}
+
+/**
+ * Navega a la página anterior (calculada dinámicamente)
+ */
+function goToPrevious() {
+    window.location.href = getPreviousPage('gc1.html');
 }
 
 /**
@@ -285,6 +292,10 @@ function setupButtons() {
     }
     if (continuarBtn) {
         continuarBtn.addEventListener('click', continueToNext);
+    }
+    const anteriorBtn = document.getElementById('anteriorBtn');
+    if (anteriorBtn) {
+        anteriorBtn.addEventListener('click', goToPrevious);
     }
 }
 

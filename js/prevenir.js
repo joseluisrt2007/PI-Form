@@ -373,7 +373,11 @@ function saveData() {
 
 function continueToNext() {
     saveData();
-    window.location.href = 'resultados.html';
+    window.location.href = getNextPage('prevenir.html');
+}
+
+function goToPrevious() {
+    window.location.href = getPreviousPage('prevenir.html');
 }
 
 function setupLanguageSelector() {
@@ -434,6 +438,8 @@ function setupButtons() {
     if (guardarBtn) guardarBtn.addEventListener('click', saveData);
     if (continuarBtn) continuarBtn.addEventListener('click', continueToNext);
     if (agregarTablaBtn) agregarTablaBtn.addEventListener('click', agregarTabla);
+    const anteriorBtn = document.getElementById('anteriorBtn');
+    if (anteriorBtn) anteriorBtn.addEventListener('click', goToPrevious);
 }
 
 function initializePage() {

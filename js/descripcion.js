@@ -2,6 +2,40 @@
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const NUM_CRITERIOS = 5;
 
+// Claves de los módulos opcionales y el id del checkbox correspondiente en el HTML
+const MODULOS_OPCIONALES = {
+    diagrama: 'mod-diagrama',
+    exploracionConceptos: 'mod-exploracionConceptos',
+    prevencion: 'mod-prevencion'
+};
+
+/**
+ * Lee el estado actual de los checkboxes de módulos y devuelve el objeto
+ * modulosSeleccionados completo (incluye analisisInicial, siempre true).
+ */
+function leerModulosSeleccionadosDesdeUI() {
+    const modulos = { analisisInicial: true };
+    Object.keys(MODULOS_OPCIONALES).forEach(key => {
+        const checkbox = document.getElementById(MODULOS_OPCIONALES[key]);
+        modulos[key] = checkbox ? checkbox.checked : false;
+    });
+    return modulos;
+}
+
+/**
+ * Aplica a los checkboxes del HTML el estado guardado en data.modulosSeleccionados.
+ * Si no hay nada guardado todavía, deja los opcionales sin marcar.
+ */
+function aplicarModulosSeleccionadosAUI() {
+    const guardados = data.modulosSeleccionados || {};
+    Object.keys(MODULOS_OPCIONALES).forEach(key => {
+        const checkbox = document.getElementById(MODULOS_OPCIONALES[key]);
+        if (checkbox) {
+            checkbox.checked = guardados[key] === true;
+        }
+    });
+}
+
 // ========== FUNCIONES PRINCIPALES ==========
 
 /**
@@ -76,6 +110,9 @@ function saveData() {
     document.querySelectorAll('.concepto').forEach(el => {
         data[`concepto${el.dataset.id}`] = el.value.trim();
     });
+
+    // Guardar selección de módulos (análisis inicial siempre true)
+    data.modulosSeleccionados = leerModulosSeleccionadosDesdeUI();
 
     // Guardar en localStorage
     localStorage.setItem('projectData', JSON.stringify(data));
@@ -238,6 +275,8 @@ function loadSavedData() {
     document.querySelectorAll('.concepto').forEach(el => {
         el.value = data[`concepto${el.dataset.id}`] || '';
     });
+
+    aplicarModulosSeleccionadosAUI();
 }
 
 /**

@@ -69,11 +69,18 @@ function saveData() {
 }
 
 /**
- * GUARDA y NAVEGA a la siguiente página
+ * GUARDA y NAVEGA a la siguiente página (calculada dinámicamente)
  */
 function continueToNext() {
     saveData();  // Primero guarda los datos
-    window.location.href = 'ideas.html';  // Luego navega
+    window.location.href = getNextPage('necesidades.html');  // Luego navega
+}
+
+/**
+ * Navega a la página anterior (calculada dinámicamente)
+ */
+function goToPrevious() {
+    window.location.href = getPreviousPage('necesidades.html');
 }
 
 /**
@@ -160,6 +167,7 @@ function setupInputEvents() {
 function setupButtons() {
     const guardarBtn = document.getElementById('guardarBtn');
     const continuarBtn = document.getElementById('continuarBtn');
+    const anteriorBtn = document.getElementById('anteriorBtn');
     
     if (guardarBtn) {
         guardarBtn.addEventListener('click', saveData);
@@ -167,6 +175,10 @@ function setupButtons() {
     
     if (continuarBtn) {
         continuarBtn.addEventListener('click', continueToNext);
+    }
+
+    if (anteriorBtn) {
+        anteriorBtn.addEventListener('click', goToPrevious);
     }
 }
 

@@ -41,7 +41,7 @@ function saveData() {
 }
 
 function goToPrevious() {
-    window.location.href = 'necesidades.html';
+    window.location.href = getPreviousPage('ideas.html');
 }
 
 function continueToNext() {
@@ -49,7 +49,7 @@ function continueToNext() {
         data[`concepto${el.dataset.id}`] = el.value.trim();
     });
     localStorage.setItem('projectData', JSON.stringify(data));
-    window.location.href = 'evaluacion.html';
+    window.location.href = getNextPage('ideas.html');
 }
 
 function updateThemeButton() {

@@ -481,7 +481,11 @@ function saveData() {
 
 function continueToNext() {
     saveData();
-    window.location.href = 'opcionConceptos.html';
+    window.location.href = getNextPage('diagrama.html');
+}
+
+function goToPrevious() {
+    window.location.href = getPreviousPage('diagrama.html');
 }
 
 function setupLanguageSelector() {
@@ -534,6 +538,8 @@ function setupButtons() {
     if (guardarBtn) guardarBtn.addEventListener('click', saveData);
     if (continuarBtn) continuarBtn.addEventListener('click', continueToNext);
     if (agregarTareaBtn) agregarTareaBtn.addEventListener('click', agregarNuevaFila);
+    const anteriorBtn = document.getElementById('anteriorBtn');
+    if (anteriorBtn) anteriorBtn.addEventListener('click', goToPrevious);
 }
 
 function initializePage() {

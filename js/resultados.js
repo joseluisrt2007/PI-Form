@@ -59,133 +59,50 @@ function generarGruposDinamicos() {
 }
 
 // =============================================
-// FUNCIONES DE VERIFICACIÓN DE DATOS (CORREGIDAS)
+// FUNCIONES DE VERIFICACIÓN DE MÓDULOS
 // =============================================
+// Antes, estas funciones inferían si una sección debía imprimirse
+// revisando si había datos guardados. Ahora consultan directamente
+// la selección explícita de módulos hecha en descripcion.html
+// (data.modulosSeleccionados), que es una señal más confiable:
+// una sección puede estar vacía pero seguir "activa" (p. ej. el
+// usuario marcó un módulo y no llegó a llenarlo), y antes eso la
+// hacía desaparecer del informe sin que el usuario lo pidiera.
+
+function getModulos() {
+    return data.modulosSeleccionados || { analisisInicial: true };
+}
 
 function tieneConceptosIniciales() {
-    for (let conc = 1; conc <= NUM_CONCEPTOS_MAX; conc++) {
-        const concepto = data[`concepto${conc}`];
-        if (concepto && typeof concepto === 'string' && concepto.trim().length > 0) {
-            return true;
-        }
-    }
-    return false;
+    return getModulos().analisisInicial === true;
 }
 
 function tieneEvaluacionInicial() {
-    for (let conc = 1; conc <= NUM_CONCEPTOS_MAX; conc++) {
-        for (let i = 1; i <= NUM_CRITERIOS; i++) {
-            const calif = data[`calif${conc}_${i}`];
-            if (calif !== undefined && calif !== null && calif !== '') {
-                const num = parseFloat(calif);
-                if (!isNaN(num) && num > 0) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    return getModulos().analisisInicial === true;
 }
 
 function tieneExploracionOpciones() {
-    for (let i = 1; i <= (NUM_CONCEPTOS_MAX * NUM_OPCIONES_POR_CONCEPTO); i++) {
-        const posibilidad = data[`pos${i}`];
-        if (posibilidad && typeof posibilidad === 'string' && posibilidad.trim().length > 0) {
-            return true;
-        }
-    }
-    return false;
+    return getModulos().exploracionConceptos === true;
 }
 
 function tieneSeleccionesFormacion() {
-    const conceptosExistentes = obtenerConceptosExistentes();
-    for (const conc of conceptosExistentes) {
-        for (let col = 1; col <= 3; col++) {
-            const key = `pastel_grupo${(conc - 1) * 3 + col}`;
-            const seleccion = data[key];
-            if (seleccion && typeof seleccion === 'string' && seleccion.trim().length > 0) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return getModulos().exploracionConceptos === true;
 }
 
 function tieneEvaluacionConceptosFormados() {
-    for (let conc = 1; conc <= NUM_CONCEPTOS_FORMADOS; conc++) {
-        for (let i = 1; i <= NUM_CRITERIOS; i++) {
-            const key = `ca${(conc - 1) * NUM_CRITERIOS + i}`;
-            const calif = data[key];
-            if (calif !== undefined && calif !== null && calif !== '') {
-                const num = parseFloat(calif);
-                if (!isNaN(num) && num > 0) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    return getModulos().exploracionConceptos === true;
 }
 
 function tienePrevencion() {
-    for (let i = 1; i <= 3; i++) {
-        const falla = data[`fallaPotencial${i}`];
-        const efecto = data[`efecto${i}`];
-        const accionReal = data[`accionReal${i}`];
-        const responsable = data[`responsable${i}`];
-        const accionTom = data[`accionTom${i}`];
-        const sev = data[`sev${i}`];
-        const ocu = data[`ocu${i}`];
-        const riesgo = data[`riesgo${i}`];
-        const fechaCell = data[`fechaCell${i}`];
-        const fecha = data[`fecha${i}`];
-        
-        if (falla && typeof falla === 'string' && falla.trim().length > 0) return true;
-        if (efecto && typeof efecto === 'string' && efecto.trim().length > 0) return true;
-        if (accionReal && typeof accionReal === 'string' && accionReal.trim().length > 0) return true;
-        if (responsable && typeof responsable === 'string' && responsable.trim().length > 0) return true;
-        if (accionTom && typeof accionTom === 'string' && accionTom.trim().length > 0) return true;
-        
-        if (sev !== undefined && sev !== null && sev !== '') {
-            const numSev = parseFloat(sev);
-            if (!isNaN(numSev) && numSev > 0) return true;
-        }
-        if (ocu !== undefined && ocu !== null && ocu !== '') {
-            const numOcu = parseFloat(ocu);
-            if (!isNaN(numOcu) && numOcu > 0) return true;
-        }
-        if (riesgo !== undefined && riesgo !== null && riesgo !== '') {
-            const numRiesgo = parseFloat(riesgo);
-            if (!isNaN(numRiesgo) && numRiesgo > 0) return true;
-        }
-        
-        if (fechaCell && typeof fechaCell === 'string' && fechaCell.trim().length > 0) return true;
-        if (fecha && typeof fecha === 'string' && fecha.trim().length > 0) return true;
-    }
-    return false;
+    return getModulos().prevencion === true;
 }
 
 function tieneTareas() {
-    for (let i = 1; i <= 30; i++) {
-        const persona = data[`persona${i}`];
-        const tarea = data[`tarea${i}`];
-        const salida = data[`salida${i}`];
-        
-        if (persona && typeof persona === 'string' && persona.trim().length > 0) return true;
-        if (tarea && typeof tarea === 'string' && tarea.trim().length > 0) return true;
-        if (salida && typeof salida === 'string' && salida.trim().length > 0) return true;
-    }
-    return false;
+    return getModulos().diagrama === true;
 }
 
 function tieneMejorConcepto() {
-    for (let i = 4; i <= 6; i++) {
-        const puntuacion = parseFloat(data[`resultado${i}`]);
-        if (!isNaN(puntuacion) && puntuacion > 0) {
-            return true;
-        }
-    }
-    return false;
+    return getModulos().exploracionConceptos === true;
 }
 
 // =============================================
@@ -228,37 +145,38 @@ function t(key) {
             'unnamed_project': '(Sin nombre)',
             'complete_project_report': 'INFORME COMPLETO DE PROYECTO',
             'generated_on': 'Generado el:',
-            'project_information': '1. INFORMACIÓN DEL PROYECTO',
+            'project_information': 'INFORMACIÓN DEL PROYECTO',
             'project_name_label': 'Nombre del proyecto:',
             'description_label': 'Descripción:',
             'no_description': '(Sin descripción)',
-            'criteria_weights': '2. CRITERIOS Y PESOS',
+            'criteria_weights': 'CRITERIOS Y PESOS',
             'criteria': 'Criterio',
             'weight': 'Peso',
             'total_sum_weights': 'SUMA TOTAL DE PESOS:',
-            'ideas_concepts': '3. IDEAS / CONCEPTOS INICIALES',
+            'ideas_concepts': 'IDEAS / CONCEPTOS INICIALES',
             'idea': 'Idea',
-            'initial_evaluation': '4. EVALUACIÓN INICIAL DE IDEAS',
+            'initial_evaluation': 'EVALUACIÓN INICIAL DE IDEAS',
             'for': 'Para',
             'option': 'Opción',
             'options': 'Opción',
-            'explore_possibilities': '6. EXPLORACIÓN DE OPCIONES',
-            'concept_formation': '7. FORMACIÓN DE CONCEPTOS',
+            'explore_possibilities': 'EXPLORACIÓN DE OPCIONES',
+            'concept_formation': 'FORMACIÓN DE CONCEPTOS',
             'checkbox_selections': '(Selecciones realizadas con checkboxes)',
             'selection_summary': 'Resumen de selecciones por grupo:',
             'group': 'Grupo',
             'from': 'de',
-            'concepts_formed': '8. CONCEPTOS FORMADOS',
+            'concepts_formed': 'CONCEPTOS FORMADOS',
             'concepts_from_selections': '(Los 3 conceptos creados a partir de las selecciones)',
             'concept_formed': 'Concepto Formado',
             'no_selection': '(Sin selección)',
-            'evaluation_concepts_formed': '9. EVALUACIÓN DE CONCEPTOS FORMADOS',
+            'evaluation_concepts_formed': 'EVALUACIÓN DE CONCEPTOS FORMADOS',
             'final_score': 'Puntuación final',
-            'best_concept_selected': '10. MEJOR CONCEPTO SELECCIONADO',
+            'best_concept_selected': 'MEJOR CONCEPTO SELECCIONADO',
             'score_obtained': 'Puntuación obtenida',
             'composition_winner': 'COMPOSICIÓN DEL CONCEPTO GANADOR:',
             'idea_not_selected': '(Idea no seleccionada)',
-            'risk_prevention': '11. PREVENCIÓN DE RIESGOS',
+            'no_best_concept_yet': '(Aún no se ha calculado ninguna puntuación de conceptos)',
+            'risk_prevention': 'PREVENCIÓN DE RIESGOS',
             'prevention': 'PREVENCIÓN',
             'potential_failure': '• Falla potencial:',
             'effect': '• Efecto:',
@@ -270,7 +188,7 @@ function t(key) {
             'today_date': '• Fecha de hoy:',
             'action_taken': '• Acción tomada:',
             'action_date': '• Fecha de realización:',
-            'action_plan': '5. PLAN DE ACCIÓN',
+            'action_plan': 'PLAN DE ACCIÓN',
             'tasks_1_15': 'Tareas 1-15:',
             'tasks_16_30': 'Tareas 16-30:',
             'document_generated': 'Documento generado el',
@@ -281,37 +199,38 @@ function t(key) {
             'unnamed_project': '(Unnamed)',
             'complete_project_report': 'COMPLETE PROJECT REPORT',
             'generated_on': 'Generated on:',
-            'project_information': '1. PROJECT INFORMATION',
+            'project_information': 'PROJECT INFORMATION',
             'project_name_label': 'Project name:',
             'description_label': 'Description:',
             'no_description': '(No description)',
-            'criteria_weights': '2. CRITERIA AND WEIGHTS',
+            'criteria_weights': 'CRITERIA AND WEIGHTS',
             'criteria': 'Criteria',
             'weight': 'Weight',
             'total_sum_weights': 'TOTAL SUM OF WEIGHTS:',
-            'ideas_concepts': '3. INITIAL IDEAS / CONCEPTS',
+            'ideas_concepts': 'INITIAL IDEAS / CONCEPTS',
             'idea': 'Idea',
-            'initial_evaluation': '4. INITIAL EVALUATION OF IDEAS',
+            'initial_evaluation': 'INITIAL EVALUATION OF IDEAS',
             'for': 'For',
             'option': 'Option',
             'options': 'Option',
-            'explore_possibilities': '6. EXPLORATION OF OPTIONS',
-            'concept_formation': '7. CONCEPT FORMATION',
+            'explore_possibilities': 'EXPLORATION OF OPTIONS',
+            'concept_formation': 'CONCEPT FORMATION',
             'checkbox_selections': '(Selections made with checkboxes)',
             'selection_summary': 'Selection summary by group:',
             'group': 'Group',
             'from': 'from',
-            'concepts_formed': '8. FORMED CONCEPTS',
+            'concepts_formed': 'FORMED CONCEPTS',
             'concepts_from_selections': '(The 3 concepts created from the selections)',
             'concept_formed': 'Concept Formed',
             'no_selection': '(No selection)',
-            'evaluation_concepts_formed': '9. EVALUATION OF FORMED CONCEPTS',
+            'evaluation_concepts_formed': 'EVALUATION OF FORMED CONCEPTS',
             'final_score': 'Final score',
-            'best_concept_selected': '10. BEST CONCEPT SELECTED',
+            'best_concept_selected': 'BEST CONCEPT SELECTED',
             'score_obtained': 'Score obtained',
             'composition_winner': 'COMPOSITION OF THE WINNING CONCEPT:',
             'idea_not_selected': '(Idea not selected)',
-            'risk_prevention': '11. RISK PREVENTION',
+            'no_best_concept_yet': '(No concept score has been calculated yet)',
+            'risk_prevention': 'RISK PREVENTION',
             'prevention': 'PREVENTION',
             'potential_failure': '• Potential failure:',
             'effect': '• Effect:',
@@ -323,7 +242,7 @@ function t(key) {
             'today_date': '• Today\'s date:',
             'action_taken': '• Action taken:',
             'action_date': '• Date of execution:',
-            'action_plan': '5. ACTION PLAN',
+            'action_plan': 'ACTION PLAN',
             'tasks_1_15': 'Tasks 1-15:',
             'tasks_16_30': 'Tasks 16-30:',
             'document_generated': 'Document generated on',
@@ -431,9 +350,25 @@ function generarPDF() {
     const doc = new jsPDF();
     
     let y = 20;
+    let seccionActual = 0;
     const margen = 20;
     const anchoPagina = doc.internal.pageSize.width;
     const isSpanish = currentLang === 'es';
+
+    /**
+     * Imprime el título de una sección con numeración secuencial.
+     * El número solo avanza cuando una sección realmente se imprime,
+     * así que la numeración siempre queda consecutiva (1, 2, 3...)
+     * sin huecos, sin importar qué módulos estén activos.
+     */
+    function imprimirTituloSeccion(textoBase) {
+        seccionActual++;
+        doc.setFontSize(16);
+        doc.setTextColor(21, 101, 192);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${seccionActual}. ${textoBase}`, margen, y);
+        y += 15;
+    }
 
     // ==================== PORTADA (SIEMPRE) ====================
     doc.setFontSize(24);
@@ -451,15 +386,11 @@ function generarPDF() {
     doc.setTextColor(100, 100, 100);
     doc.text(`${t('generated_on')} ${hoy}`, anchoPagina / 2, 130, { align: "center" });
 
-    // ==================== 1. INFORMACIÓN DEL PROYECTO (SIEMPRE) ====================
+    // ==================== INFORMACIÓN DEL PROYECTO (SIEMPRE) ====================
     doc.addPage();
     y = margen;
 
-    doc.setFontSize(16);
-    doc.setTextColor(21, 101, 192);
-    doc.setFont("helvetica", "bold");
-    doc.text(t('project_information'), margen, y);
-    y += 15;
+    imprimirTituloSeccion(t('project_information'));
 
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -492,12 +423,8 @@ function generarPDF() {
     }
     y += 15;
 
-    // ==================== 2. CRITERIOS Y PESOS (SIEMPRE) ====================
-    doc.setFontSize(16);
-    doc.setTextColor(21, 101, 192);
-    doc.setFont("helvetica", "bold");
-    doc.text(t('criteria_weights'), margen, y);
-    y += 15;
+    // ==================== CRITERIOS Y PESOS (SIEMPRE) ====================
+    imprimirTituloSeccion(t('criteria_weights'));
 
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -521,15 +448,11 @@ function generarPDF() {
     doc.setFont("helvetica", "normal");
     y += 10;
 
-    // ==================== 3. IDEAS / CONCEPTOS INICIALES (SOLO SI HAY) ====================
+    // ==================== IDEAS / CONCEPTOS INICIALES (SOLO SI HAY) ====================
     if (tieneConceptosIniciales()) {
         if (y > 250) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('ideas_concepts'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('ideas_concepts'));
         
         const conceptosExistentes = obtenerConceptosExistentes();
         conceptosExistentes.forEach((conc, index) => {
@@ -541,15 +464,11 @@ function generarPDF() {
         y += 10;
     }
 
-    // ==================== 4. EVALUACIÓN INICIAL DE IDEAS (SOLO SI HAY) ====================
+    // ==================== EVALUACIÓN INICIAL DE IDEAS (SOLO SI HAY) ====================
     if (tieneEvaluacionInicial()) {
         if (y > 220) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('initial_evaluation'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('initial_evaluation'));
 
         const conceptosExistentes = obtenerConceptosExistentes();
         conceptosExistentes.forEach(conc => {
@@ -598,54 +517,51 @@ function generarPDF() {
         y += 10;
     }
 
-    // ==================== 5. PLAN DE ACCIÓN (SOLO SI HAY) ====================
-if (tieneTareas()) {
-    if (y > 230) { doc.addPage(); y = margen; }
-    
-    doc.setFontSize(16);
-    doc.setTextColor(21, 101, 192);
-    doc.setFont("helvetica", "bold");
-    doc.text(t('action_plan'), margen, y);
-    y += 15;
-
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
-    
-    let filaNum = 1;
-    
-    for (let i = 1; i <= 30; i++) {
-        const persona = data[`persona${i}`] || "";
-        const tarea = data[`tarea${i}`] || "";
-        const salida = data[`salida${i}`] || "";
+    // ==================== PLAN DE ACCIÓN (SOLO SI HAY) ====================
+    if (tieneTareas()) {
+        if (y > 230) { doc.addPage(); y = margen; }
         
-        if (persona.trim() || tarea.trim() || salida.trim()) {
-            if (y > 270) { doc.addPage(); y = margen; }
-            
-            // Alinear en columnas fijas
-            const numTexto = `${filaNum}.`;
-            doc.text(numTexto, margen, y);
-            doc.text(persona, margen + 25, y);
-            doc.text(tarea, margen + 85, y);
-            doc.text(salida, margen + 145, y);
-            
-            y += 8;
-            filaNum++;
-        }
-    }
-    
-    y += 10;
-}
+        imprimirTituloSeccion(t('action_plan'));
 
-    // ==================== 6. EXPLORACIÓN DE OPCIONES (SOLO SI HAY) ====================
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+
+        // Espacio entre columnas = 32 caracteres × ~2mm/carácter = 64 unidades
+        const espacioCol = 32 * 2; // 64 unidades
+        const col1 = margen;           // Número:   posición 20
+        const col2 = col1 + 10;        // Persona:  posición 30  (número ocupa ~10)
+        const col3 = col2 + espacioCol; // Tarea:    posición 94  (32 chars desde persona)
+        const col4 = col3 + espacioCol; // Salida:   posición 158 (32 chars desde tarea)
+
+        let filaNum = 1;
+
+        for (let i = 1; i <= 30; i++) {
+            const persona = data[`persona${i}`] || "";
+            const tarea   = data[`tarea${i}`]   || "";
+            const salida  = data[`salida${i}`]  || "";
+
+            if (persona.trim() || tarea.trim() || salida.trim()) {
+                if (y > 270) { doc.addPage(); y = margen; }
+
+                doc.text(`${filaNum}.`, col1, y);
+                doc.text(persona, col2, y);
+                doc.text(tarea,   col3, y);
+                doc.text(salida,  col4, y);
+
+                y += 8;
+                filaNum++;
+            }
+        }
+
+        y += 10;
+    }
+
+    // ==================== EXPLORACIÓN DE OPCIONES (SOLO SI HAY) ====================
     if (tieneExploracionOpciones()) {
         if (y > 200) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('explore_possibilities'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('explore_possibilities'));
 
         const conceptosExistentes = obtenerConceptosExistentes();
         conceptosExistentes.forEach(conc => {
@@ -676,15 +592,11 @@ if (tieneTareas()) {
         y += 10;
     }
 
-    // ==================== 7. FORMACIÓN DE CONCEPTOS (SOLO SI HAY) ====================
+    // ==================== FORMACIÓN DE CONCEPTOS (SOLO SI HAY) ====================
     if (tieneSeleccionesFormacion()) {
         if (y > 200) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('concept_formation'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('concept_formation'));
 
         doc.setFontSize(12);
         doc.setTextColor(80, 80, 80);
@@ -718,15 +630,11 @@ if (tieneTareas()) {
         y += 15;
     }
 
-    // ==================== 8. CONCEPTOS FORMADOS (SOLO SI HAY) ====================
+    // ==================== CONCEPTOS FORMADOS (SOLO SI HAY) ====================
     if (tieneSeleccionesFormacion()) {
         if (y > 220) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('concepts_formed'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('concepts_formed'));
 
         doc.setFontSize(12);
         doc.setTextColor(80, 80, 80);
@@ -769,15 +677,11 @@ if (tieneTareas()) {
         y += 15;
     }
 
-    // ==================== 9. EVALUACIÓN DE CONCEPTOS FORMADOS (SOLO SI HAY) ====================
+    // ==================== EVALUACIÓN DE CONCEPTOS FORMADOS (SOLO SI HAY) ====================
     if (tieneEvaluacionConceptosFormados()) {
         if (y > 220) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('evaluation_concepts_formed'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('evaluation_concepts_formed'));
 
         for (let conc = 1; conc <= NUM_CONCEPTOS_FORMADOS; conc++) {
             let tieneDatos = false;
@@ -813,15 +717,11 @@ if (tieneTareas()) {
         y += 15;
     }
 
-    // ==================== 10. MEJOR CONCEPTO SELECCIONADO (SOLO SI HAY) ====================
+    // ==================== MEJOR CONCEPTO SELECCIONADO (SOLO SI HAY) ====================
     if (tieneMejorConcepto()) {
         if (y > 230) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('best_concept_selected'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('best_concept_selected'));
 
         let mejorIndice = -1;
         let mejorPuntuacion = -1;
@@ -861,19 +761,21 @@ if (tieneTareas()) {
                 doc.text(texto, margen + 10, y);
                 y += 10;
             });
+        } else {
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont("helvetica", "normal");
+            doc.text(t('no_best_concept_yet'), margen, y);
+            y += 12;
         }
         y += 20;
     }
 
-    // ==================== 11. PREVENCIÓN DE RIESGOS (SOLO SI HAY) ====================
+    // ==================== PREVENCIÓN DE RIESGOS (SOLO SI HAY) ====================
     if (tienePrevencion()) {
         if (y > 220) { doc.addPage(); y = margen; }
         
-        doc.setFontSize(16);
-        doc.setTextColor(21, 101, 192);
-        doc.setFont("helvetica", "bold");
-        doc.text(t('risk_prevention'), margen, y);
-        y += 15;
+        imprimirTituloSeccion(t('risk_prevention'));
 
         for (let i = 1; i <= 3; i++) {
             let tieneDatos = false;
