@@ -19,8 +19,10 @@ const translations = {
         'modules_menu_title': 'Selecciona los módulos a realizar',
         'modules_menu_subtitle': 'Elige qué partes del proceso quieres completar. Solo esas páginas, resultados y secciones del PDF se incluirán.',
         'module_initial_analysis': 'Análisis Inicial',
-        'module_initial_analysis_desc': 'Necesidades, ideas y evaluación inicial',
+        'module_initial_analysis_desc': 'Criterios y pesos (necesidades del proyecto)',
         'module_required_badge': 'Obligatorio',
+        'module_definition_ideas': 'Definición y Análisis de Ideas',
+        'module_definition_ideas_desc': 'Ideas/conceptos iniciales y su evaluación',
 
         // NUEVAS TRADUCCIONES PARA OPCION DIAGRAMAS
         'diagram_choice': 'Diagramas - Actividades de Mejora',
@@ -186,8 +188,10 @@ const translations = {
         'modules_menu_title': 'Select the modules to complete',
         'modules_menu_subtitle': 'Choose which parts of the process you want to complete. Only those pages, results, and PDF sections will be included.',
         'module_initial_analysis': 'Initial Analysis',
-        'module_initial_analysis_desc': 'Needs, ideas, and initial evaluation',
+        'module_initial_analysis_desc': 'Criteria and weights (project needs)',
         'module_required_badge': 'Required',
+        'module_definition_ideas': 'Definition and Analysis of Ideas',
+        'module_definition_ideas_desc': 'Initial ideas/concepts and their evaluation',
 
         // NEW TRANSLATIONS FOR OPTION DIAGRAMS
         'diagram_choice': 'Diagrams - Improvement Activities',
