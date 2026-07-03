@@ -70,15 +70,15 @@ function generarGruposDinamicos() {
 // hacía desaparecer del informe sin que el usuario lo pidiera.
 
 function getModulos() {
-    return data.modulosSeleccionados || { analisisInicial: true };
+    return data.modulosSeleccionados || { analisisInicial: true, definicionIdeas: false };
 }
 
 function tieneConceptosIniciales() {
-    return getModulos().analisisInicial === true;
+    return getModulos().definicionIdeas === true;
 }
 
 function tieneEvaluacionInicial() {
-    return getModulos().analisisInicial === true;
+    return getModulos().definicionIdeas === true;
 }
 
 function tieneExploracionOpciones() {

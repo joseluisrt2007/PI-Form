@@ -4,6 +4,7 @@ const NUM_CRITERIOS = 5;
 
 // Claves de los módulos opcionales y el id del checkbox correspondiente en el HTML
 const MODULOS_OPCIONALES = {
+    definicionIdeas: 'mod-definicionIdeas',
     diagrama: 'mod-diagrama',
     exploracionConceptos: 'mod-exploracionConceptos',
     prevencion: 'mod-prevencion'

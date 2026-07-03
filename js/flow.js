@@ -6,7 +6,7 @@
 // usar destinos fijos escritos en cada página.
 //
 // Se apoya en data.modulosSeleccionados:
-//   { analisisInicial: true, diagrama: bool, exploracionConceptos: bool, prevencion: bool }
+//   { analisisInicial: true, definicionIdeas: bool, diagrama: bool, exploracionConceptos: bool, prevencion: bool }
 //
 // Este archivo debe cargarse en cada página del flujo activo,
 // ANTES del script propio de esa página.
@@ -18,16 +18,16 @@
  * descripcion, todo Análisis Inicial, y resultados).
  */
 const FLOW_STEPS = [
-    { page: 'descripcion.html', modulo: 'siempre' },
-    { page: 'necesidades.html', modulo: 'siempre' },
-    { page: 'ideas.html', modulo: 'siempre' },
-    { page: 'evaluacion.html', modulo: 'siempre' },
-    { page: 'diagrama.html', modulo: 'diagrama' },
-    { page: 'morfologia.html', modulo: 'exploracionConceptos' },
-    { page: 'gc1.html', modulo: 'exploracionConceptos' },
-    { page: 'evalConceptos.html', modulo: 'exploracionConceptos' },
-    { page: 'prevenir.html', modulo: 'prevencion' },
-    { page: 'resultados.html', modulo: 'siempre' }
+    { page: 'descripcion.html',    modulo: 'siempre' },
+    { page: 'necesidades.html',    modulo: 'siempre' },
+    { page: 'ideas.html',          modulo: 'definicionIdeas' },
+    { page: 'evaluacion.html',     modulo: 'definicionIdeas' },
+    { page: 'diagrama.html',       modulo: 'diagrama' },
+    { page: 'morfologia.html',     modulo: 'exploracionConceptos' },
+    { page: 'gc1.html',            modulo: 'exploracionConceptos' },
+    { page: 'evalConceptos.html',  modulo: 'exploracionConceptos' },
+    { page: 'prevenir.html',       modulo: 'prevencion' },
+    { page: 'resultados.html',     modulo: 'siempre' }
 ];
 
 /**
@@ -43,7 +43,7 @@ function getModulosSeleccionados() {
     } catch (e) {
         console.warn('flow.js: no se pudo leer projectData de localStorage', e);
     }
-    return data.modulosSeleccionados || { analisisInicial: true };
+    return data.modulosSeleccionados || { analisisInicial: true, definicionIdeas: false };
 }
 
 /**
