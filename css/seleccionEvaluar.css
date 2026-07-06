@@ -1,0 +1,461 @@
+/* =============================================
+   VARIABLES Y RESET  (idénticos al resto del proyecto)
+   ============================================= */
+:root {
+    --primary: #1e3a5f;
+    --primary-dark: #14283f;
+    --primary-light: #2c5282;
+    --background-start: #f8fafc;
+    --background-end: #eef2f6;
+    --text-dark: #1e293b;
+    --text-light: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 12px 28px -8px rgba(30, 58, 95, 0.28);
+    --card-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    --border-light: #e2e8f0;
+    --error: #dc2626;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --card-bg: #ffffff;
+    --header-bg: #1e3a5f;
+    --info: #2c5282;
+    --success: #0d9668;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    background: var(--background-start);
+    min-height: 100vh;
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* =============================================
+   HEADER  (idéntico al resto del proyecto)
+   ============================================= */
+header {
+    background-color: var(--header-bg);
+    color: var(--text-light);
+    padding: 1.25rem 2rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.header-left  { flex: 1; text-align: left; }
+.header-center {
+    flex: 2; text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+.header-right { flex: 1; text-align: right; }
+
+.app-title {
+    font-size: 1.5rem; font-weight: 600;
+    margin-bottom: 0.25rem; letter-spacing: -0.01em;
+}
+.project-name-container {
+    font-size: 1.125rem; font-weight: 400;
+    opacity: 0.95; color: rgba(255,255,255,0.85);
+}
+
+.header-controls {
+    display: flex; align-items: center;
+    gap: 15px; justify-content: flex-end;
+}
+
+.theme-toggle {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: white; width: 42px; height: 42px;
+    border-radius: 50%; cursor: pointer; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+    padding: 0;
+}
+.theme-toggle:hover {
+    background: rgba(255,255,255,0.16);
+    border-color: rgba(255,255,255,0.45);
+    transform: rotate(12deg);
+}
+.theme-toggle:active { transform: scale(0.94); }
+
+.language-selector select {
+    padding: 8px 12px; border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.25);
+    background-color: rgba(255,255,255,0.08);
+    color: var(--text-light); font-size: 0.9rem;
+    font-weight: 500; cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    min-width: 120px;
+}
+.language-selector select:hover {
+    border-color: rgba(255,255,255,0.45);
+    background-color: rgba(255,255,255,0.12);
+}
+.language-selector select:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.7);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.18);
+}
+
+/* =============================================
+   CONTAINER PRINCIPAL
+   ============================================= */
+.container {
+    max-width: 760px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+.page-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    color: var(--primary);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem;
+}
+
+.page-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    opacity: 0.7;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+/* =============================================
+   GRUPOS DE MÓDULO  (encabezado de sección)
+   ============================================= */
+.grupo-modulo {
+    margin-bottom: 2rem;
+}
+
+.grupo-modulo-titulo {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    opacity: 0.7;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* =============================================
+   TARJETA DE ELEMENTO  (checkbox + nombre + lápiz)
+   ============================================= */
+.elemento-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    margin-bottom: 0.65rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.elemento-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--card-shadow);
+}
+
+.elemento-card.seleccionado {
+    border-color: var(--primary);
+    background: rgba(30, 58, 95, 0.03);
+}
+
+.elemento-card input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Nombre del elemento: en modo lectura es texto, en edición es input */
+.elemento-nombre-texto {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--text-dark);
+    font-weight: 400;
+    line-height: 1.4;
+    user-select: none;
+}
+
+.elemento-nombre-input {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--text-dark);
+    font-weight: 400;
+    border: none;
+    border-bottom: 1.5px solid var(--primary);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.1rem 0;
+    outline: none;
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+.elemento-nombre-input:focus {
+    border-bottom-color: var(--primary-dark);
+}
+
+/* Botón lápiz */
+.btn-editar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.35rem;
+    border-radius: 6px;
+    color: var(--text-dark);
+    opacity: 0.4;
+    font-size: 1rem;
+    transition: opacity 0.2s, background 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-editar:hover {
+    opacity: 0.85;
+    background: rgba(30, 58, 95, 0.08);
+}
+
+.btn-editar.editando {
+    opacity: 1;
+    color: var(--primary);
+    background: rgba(30, 58, 95, 0.1);
+}
+
+/* =============================================
+   MENSAJE SIN ELEMENTOS
+   ============================================= */
+.sin-elementos-msg {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-dark);
+    opacity: 0.6;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+/* =============================================
+   BOTONES  (idénticos al resto del proyecto)
+   ============================================= */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: var(--text-light);
+    padding: 0.95rem 2rem;
+    border: none; border-radius: 10px;
+    font-size: 1.05rem; font-weight: 600;
+    cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    min-width: 160px; text-align: center;
+}
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text-dark);
+    padding: 0.95rem 2rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 1.05rem; font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    transition: border-color 0.2s, background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    min-width: 160px; text-align: center;
+}
+.btn-secondary:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+.btn-secondary:active { transform: translateY(0); }
+
+/* =============================================
+   MODO OSCURO
+   ============================================= */
+[data-theme="dark"] {
+    --primary: #3b6ea5;
+    --primary-dark: #2c5282;
+    --primary-light: #5485bb;
+    --background-start: #0f172a;
+    --text-dark: #e8edf4;
+    --text-light: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 28px -8px rgba(0,0,0,0.5);
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    --border-light: #2d3a4d;
+    --surface: #1a2332;
+    --border: #2d3a4d;
+    --card-bg: #1a2332;
+    --header-bg: #1a2332;
+}
+
+[data-theme="dark"] body { background: var(--background-start); color: var(--text-dark); }
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .project-name-container { color: #94a3b8; }
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] h1 { color: var(--text-light); }
+
+[data-theme="dark"] .page-label { color: var(--primary-light); }
+
+[data-theme="dark"] .grupo-modulo-titulo {
+    color: var(--primary-light);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] .elemento-card {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .elemento-card:hover {
+    border-color: var(--primary-light);
+}
+
+[data-theme="dark"] .elemento-card.seleccionado {
+    border-color: var(--primary-light);
+    background: rgba(59, 110, 165, 0.08);
+}
+
+[data-theme="dark"] .elemento-nombre-texto { color: var(--text-dark); }
+
+[data-theme="dark"] .elemento-nombre-input {
+    color: var(--text-dark);
+    border-bottom-color: var(--primary-light);
+}
+
+[data-theme="dark"] .btn-editar { color: var(--text-dark); }
+
+[data-theme="dark"] .btn-editar:hover { background: rgba(84,133,187,0.12); }
+[data-theme="dark"] .btn-editar.editando {
+    color: var(--primary-light);
+    background: rgba(84,133,187,0.18);
+}
+
+[data-theme="dark"] .sin-elementos-msg {
+    border-color: var(--border);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84,133,187,0.35);
+    background: rgba(59,110,165,0.12);
+    color: #7fa8d4;
+}
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59,110,165,0.22);
+    border-color: rgba(84,133,187,0.6);
+}
+
+[data-theme="dark"] .language-selector select {
+    background-color: rgba(255,255,255,0.05);
+    color: #e2e8f0;
+    border-color: rgba(255,255,255,0.18);
+}
+
+[data-theme="dark"] .btn-primary { background: var(--primary); }
+[data-theme="dark"] .btn-primary:hover { background: var(--primary-dark); }
+
+[data-theme="dark"] .btn-secondary {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-dark);
+}
+[data-theme="dark"] .btn-secondary:hover {
+    background-color: #212c3d;
+    border-color: #3d4a5e;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem; padding: 1rem;
+        font-size: 1.3rem; text-align: center;
+    }
+    .header-left, .header-center, .header-right {
+        width: 100%; text-align: center;
+    }
+    .header-left  { order: 1; }
+    .header-center { order: 3; margin-top: 0.5rem; }
+    .header-right { order: 2; }
+    .app-title { font-size: 1.3rem; }
+    .project-name-container { font-size: 1rem; }
+    .container { margin: 2rem 1rem; padding: 2rem; }
+    h1 { font-size: 1.7rem; }
+    .buttons {
+        flex-direction: column;
+        align-items: center; gap: 1rem;
+    }
+    .btn-primary, .btn-secondary {
+        width: 100%; max-width: 280px; min-width: auto;
+    }
+    .header-controls {
+        flex-direction: row; gap: 15px; justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-title { font-size: 1.2rem; }
+    .project-name-container { font-size: 0.95rem; }
+    .btn-primary, .btn-secondary {
+        padding: 0.875rem 1.5rem; font-size: 1rem;
+    }
+}
