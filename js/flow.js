@@ -13,21 +13,24 @@
 
 /**
  * Definición canónica de los pasos del flujo, en orden.
- * Cada paso indica a qué módulo pertenece. "siempre" significa
- * que el paso no depende de ningún módulo opcional (incluye
- * descripcion, todo Análisis Inicial, y resultados).
+ * 'modulo' puede ser:
+ *   - 'siempre'              → siempre activo
+ *   - string                 → activo si modulosSeleccionados[string] === true
+ *   - function(modulos)      → activo si la función devuelve true (para condiciones compuestas)
  */
 const FLOW_STEPS = [
-    { page: 'descripcion.html',    modulo: 'siempre' },
-    { page: 'necesidades.html',    modulo: 'siempre' },
-    { page: 'ideas.html',          modulo: 'definicionIdeas' },
-    { page: 'evaluacion.html',     modulo: 'definicionIdeas' },
-    { page: 'diagrama.html',       modulo: 'diagrama' },
-    { page: 'morfologia.html',     modulo: 'exploracionConceptos' },
-    { page: 'gc1.html',            modulo: 'exploracionConceptos' },
-    { page: 'evalConceptos.html',  modulo: 'exploracionConceptos' },
-    { page: 'prevenir.html',       modulo: 'prevencion' },
-    { page: 'resultados.html',     modulo: 'siempre' }
+    { page: 'descripcion.html',       modulo: 'siempre' },
+    { page: 'necesidades.html',       modulo: 'siempre' },
+    { page: 'ideas.html',             modulo: 'definicionIdeas' },
+    { page: 'diagrama.html',          modulo: 'diagrama' },
+    // La página de selección aparece si hay al menos un módulo que aporta elementos evaluables
+    { page: 'seleccionEvaluar.html',  modulo: m => m.definicionIdeas === true || m.diagrama === true },
+    { page: 'evaluacion.html',        modulo: m => m.definicionIdeas === true || m.diagrama === true },
+    { page: 'morfologia.html',        modulo: 'exploracionConceptos' },
+    { page: 'gc1.html',               modulo: 'exploracionConceptos' },
+    { page: 'evalConceptos.html',     modulo: 'exploracionConceptos' },
+    { page: 'prevenir.html',          modulo: 'prevencion' },
+    { page: 'resultados.html',        modulo: 'siempre' }
 ];
 
 /**
@@ -48,9 +51,14 @@ function getModulosSeleccionados() {
 
 /**
  * Indica si un paso del flujo debe incluirse según los módulos activos.
+ * Soporta tres formas de 'modulo':
+ *   - 'siempre'         → siempre activo
+ *   - string            → activo si modulosSeleccionados[string] === true
+ *   - function(modulos) → activo si la función devuelve true
  */
 function pasoActivo(step, modulosSeleccionados) {
     if (step.modulo === 'siempre') return true;
+    if (typeof step.modulo === 'function') return step.modulo(modulosSeleccionados);
     return modulosSeleccionados[step.modulo] === true;
 }
 

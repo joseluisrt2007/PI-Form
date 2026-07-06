@@ -453,11 +453,10 @@ function generarPDF() {
         if (y > 250) { doc.addPage(); y = margen; }
         
         imprimirTituloSeccion(t('ideas_concepts'));
-        
-        const conceptosExistentes = obtenerConceptosExistentes();
-        conceptosExistentes.forEach((conc, index) => {
-            const concepto = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
-            doc.text(`${index + 1}. ${concepto}`, margen, y);
+
+        const elementosEval = data.elementosAEvaluar || [];
+        elementosEval.forEach((elem, index) => {
+            doc.text(`${index + 1}. [${elem.tipo}] ${elem.nombre}`, margen, y);
             y += 10;
             if (y > 280) { doc.addPage(); y = margen; }
         });
@@ -467,17 +466,19 @@ function generarPDF() {
     // ==================== EVALUACIÓN INICIAL DE IDEAS (SOLO SI HAY) ====================
     if (tieneEvaluacionInicial()) {
         if (y > 220) { doc.addPage(); y = margen; }
-        
+
         imprimirTituloSeccion(t('initial_evaluation'));
 
-        const conceptosExistentes = obtenerConceptosExistentes();
-        conceptosExistentes.forEach(conc => {
+        const elementosEval = data.elementosAEvaluar || [];
+        elementosEval.forEach(elem => {
             if (y > 240) { doc.addPage(); y = margen; }
 
+            const claveRes = `eval_resultado_${elem.tipo}_${elem.idx}`;
             let tieneDatos = false;
             for (let i = 1; i <= NUM_CRITERIOS; i++) {
-                if (data[`calif${conc}_${i}`] && data[`calif${conc}_${i}`] !== '') {
-                    const num = parseFloat(data[`calif${conc}_${i}`]);
+                const clave = `eval_${elem.tipo}_${elem.idx}_crit${i}`;
+                if (data[clave] && data[clave] !== '') {
+                    const num = parseFloat(data[clave]);
                     if (!isNaN(num) && num > 0) { tieneDatos = true; break; }
                 }
             }
@@ -486,8 +487,7 @@ function generarPDF() {
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            const conceptoNombre = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
-            doc.text(`${t('idea')} ${conc}: ${conceptoNombre}`, margen, y);
+            doc.text(`${elem.nombre}`, margen, y);
             y += 12;
 
             doc.setFontSize(12);
@@ -496,7 +496,8 @@ function generarPDF() {
 
             let total = 0;
             for (let i = 1; i <= NUM_CRITERIOS; i++) {
-                const califVal = data[`calif${conc}_${i}`];
+                const clave = `eval_${elem.tipo}_${elem.idx}_crit${i}`;
+                const califVal = data[clave];
                 if (califVal && califVal !== '') {
                     const calif = parseFloat(califVal) || 0;
                     const peso = parseFloat(data[`peso${i}`]) || 0;
@@ -511,8 +512,7 @@ function generarPDF() {
             doc.setFont("helvetica", "bold");
             doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
             doc.setFont("helvetica", "normal");
-            y += 12;
-            y += 10;
+            y += 22;
         });
         y += 10;
     }
