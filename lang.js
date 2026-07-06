@@ -24,6 +24,14 @@ const translations = {
         'module_definition_ideas': 'Definición y Análisis de Ideas',
         'module_definition_ideas_desc': 'Ideas/conceptos iniciales y su evaluación',
 
+        // NUEVAS TRADUCCIONES PARA SELECCIÓN DE ELEMENTOS A EVALUAR (seleccionEvaluar.html)
+        'select_elements_title': 'Selección de Elementos a Evaluar',
+        'select_elements_label': 'SELECCIÓN',
+        'select_elements_subtitle': 'Elige los elementos que deseas incluir en la evaluación · Edita el nombre con el ícono de lápiz',
+        'select_elements_none': 'No hay elementos disponibles. Activa el módulo "Definición de Ideas" o "Diagrama de Actividades" en la página de descripción.',
+        'select_group_ideas': 'Ideas / Conceptos',
+        'select_group_tasks': 'Funciones del Diagrama de Actividades',
+
         // NUEVAS TRADUCCIONES PARA OPCION DIAGRAMAS
         'diagram_choice': 'Diagramas - Actividades de Mejora',
         'diagram_question': 'Diagrama de Actividades',
@@ -192,6 +200,14 @@ const translations = {
         'module_required_badge': 'Required',
         'module_definition_ideas': 'Definition and Analysis of Ideas',
         'module_definition_ideas_desc': 'Initial ideas/concepts and their evaluation',
+
+        // NEW TRANSLATIONS FOR ELEMENT SELECTION (seleccionEvaluar.html)
+        'select_elements_title': 'Selection of Elements to Evaluate',
+        'select_elements_label': 'SELECTION',
+        'select_elements_subtitle': 'Choose the elements you want to include in the evaluation · Edit the name with the pencil icon',
+        'select_elements_none': 'No elements available. Enable the "Definition of Ideas" or "Activity Diagram" module on the description page.',
+        'select_group_ideas': 'Ideas / Concepts',
+        'select_group_tasks': 'Activity Diagram Functions',
 
         // NEW TRANSLATIONS FOR OPTION DIAGRAMS
         'diagram_choice': 'Diagrams - Improvement Activities',

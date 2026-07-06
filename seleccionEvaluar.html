@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="select_elements_title">Selección de Elementos - Actividades de Mejora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/seleccionEvaluar.css">
+</head>
+<body>
+    <header role="banner">
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+
+        <div class="header-center">
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <div class="project-name-container" id="projectNameDisplay">
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    🌙
+                </button>
+                <div class="language-selector">
+                    <select id="languageSelector">
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-label" data-i18n="select_elements_label">SELECCIÓN</div>
+        <h1 data-i18n="select_elements_title">Selección de Elementos a Evaluar</h1>
+        <p class="page-subtitle" data-i18n="select_elements_subtitle">
+            Elige los elementos que deseas incluir en la evaluación · Edita el nombre con el ícono de lápiz
+        </p>
+
+        <!-- Contenedor dinámico: se genera desde JS según módulos activos -->
+        <div id="elementosContainer"></div>
+
+        <div id="sinElementosMsg" class="sin-elementos-msg" style="display:none;">
+            <span data-i18n="select_elements_none">No hay elementos disponibles. Activa el módulo "Definición de Ideas" o "Diagrama de Actividades" en la página de descripción.</span>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
+            <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
+            <button class="btn-secondary" id="anteriorBtn" data-i18n="back">Regreso</button>
+        </div>
+    </div>
+
+    <script src="lang.js"></script>
+    <script src="js/flow.js"></script>
+    <script src="js/seleccionEvaluar.js"></script>
+</body>
+</html>
