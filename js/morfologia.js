@@ -26,45 +26,43 @@ function updateProjectName() {
 }
 
 /**
- * Cuenta cuántos conceptos tienen contenido
- * @returns {number} Número de conceptos con contenido
+ * Devuelve todos los elementos que el usuario marcó en seleccionEvaluar
+ * (ideas y/o tareas). Si no hay ninguno marcado, usa como fallback
+ * todos los conceptos de ideas.html con contenido.
  */
-function contarConceptos() {
-    let contador = 0;
-    for (let conc = 1; conc <= 5; conc++) {
-        const concepto = data[`concepto${conc}`] || '';
-        if (concepto.trim() !== '') {
-            contador++;
-        }
+function obtenerConceptosActivos() {
+    const seleccionados = data.elementosAEvaluar || [];
+    if (seleccionados.length > 0) {
+        return seleccionados.map(e => ({ idx: e.idx, nombre: e.nombre, tipo: e.tipo }));
     }
-    return contador;
+    // Fallback: todos los conceptos de ideas.html
+    const resultado = [];
+    for (let conc = 1; conc <= 5; conc++) {
+        const nombre = (data[`concepto${conc}`] || '').trim();
+        if (nombre) resultado.push({ idx: conc, nombre, tipo: 'concepto' });
+    }
+    return resultado;
 }
 
-/**
- * Genera las tablas de morfología (solo para conceptos con contenido)
- */
+function contarConceptos() {
+    return obtenerConceptosActivos().length;
+}
+
 function generarTablas() {
     if (!tablasContainer) return;
-    
     tablasContainer.innerHTML = '';
-    
-    const numeroDeConceptos = contarConceptos();
-    
-    if (numeroDeConceptos === 0) {
+
+    const conceptosActivos = obtenerConceptosActivos();
+
+    if (conceptosActivos.length === 0) {
         const message = document.createElement('div');
         message.className = 'no-conceptos-message';
         message.textContent = 'No hay conceptos definidos. Regresa a la página anterior para ingresar conceptos.';
         tablasContainer.appendChild(message);
         return;
     }
-    
-    for (let conc = 1; conc <= 5; conc++) {
-        const conceptoNombre = data[`concepto${conc}`] || '';
-        
-        if (conceptoNombre.trim() === '') {
-            continue;
-        }
-        
+
+    conceptosActivos.forEach(({ idx, nombre: conceptoNombre, tipo }) => {
         const section = document.createElement('div');
         section.className = 'concepto-section';
         section.innerHTML = `
@@ -78,23 +76,23 @@ function generarTablas() {
                 </thead>
                 <tbody>
                     ${[1, 2, 3].map(i => {
-                        const posIdx = (conc - 1) * 3 + i;
-                        const savedValue = data[`pos${posIdx}`] || '';
-                        
-                        const optionText = (typeof t === 'function') 
-                            ? `${t('options') || 'Opción'} ${i}` 
+                        // Clave única que incluye tipo e idx para evitar colisiones
+                        // entre conceptos y tareas con el mismo índice numérico
+                        const posKey = `pos_${tipo}_${idx}_${i}`;
+                        const savedValue = data[posKey] || '';
+                        const optionText = (typeof t === 'function')
+                            ? `${t('options') || 'Opción'} ${i}`
                             : `Opción ${i}`;
-                        
-                        const placeholderText = (typeof t === 'function') 
-                            ? `${t('enter_possibility') || 'Ingresa posibilidad'} ${i}` 
+                        const placeholderText = (typeof t === 'function')
+                            ? `${t('enter_possibility') || 'Ingresa posibilidad'} ${i}`
                             : `Ingresa posibilidad ${i}`;
-                        
                         return `
                             <tr>
                                 <td>${optionText}</td>
                                 <td>
-                                    <input type="text" class="posibilidad" data-idx="${posIdx}" 
-                                           value="${savedValue}" 
+                                    <input type="text" class="posibilidad"
+                                           data-pos-key="${posKey}"
+                                           value="${savedValue}"
                                            placeholder="${placeholderText}">
                                 </td>
                             </tr>
@@ -104,17 +102,11 @@ function generarTablas() {
             </table>
         `;
         tablasContainer.appendChild(section);
-    }
-    
+    });
+
     applyDynamicTranslations();
-    
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
-    }
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
 }
 
 /**
@@ -142,12 +134,11 @@ function applyDynamicTranslations() {
  */
 function saveData() {
     document.querySelectorAll('.posibilidad').forEach(input => {
-        const idx = input.dataset.idx;
-        if (idx) {
-            data[`pos${idx}`] = input.value.trim();
+        const posKey = input.dataset.posKey;
+        if (posKey) {
+            data[posKey] = input.value.trim();
         }
     });
-    
     localStorage.setItem('projectData', JSON.stringify(data));
     console.log('Datos guardados correctamente');
 }

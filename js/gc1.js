@@ -26,45 +26,47 @@ function updateProjectName() {
 }
 
 /**
- * Cuenta cuántos conceptos tienen contenido
- * @returns {number} Número de conceptos con contenido
+ * Devuelve TODOS los elementos seleccionados en seleccionEvaluar
+ * (ideas Y tareas). Si no hay selección, usa los conceptos de ideas.html.
  */
-function contarConceptos() {
-    let contador = 0;
-    for (let conc = 1; conc <= 5; conc++) {
-        const concepto = data[`concepto${conc}`] || '';
-        if (concepto.trim() !== '') {
-            contador++;
-        }
+function obtenerConceptosActivos() {
+    const seleccionados = data.elementosAEvaluar || [];
+    if (seleccionados.length > 0) {
+        return seleccionados.map(e => ({ idx: e.idx, nombre: e.nombre, tipo: e.tipo }));
     }
-    return contador;
+    // Fallback: todos los conceptos de ideas.html con contenido
+    const resultado = [];
+    for (let conc = 1; conc <= 5; conc++) {
+        const nombre = (data[`concepto${conc}`] || '').trim();
+        if (nombre) resultado.push({ idx: conc, nombre, tipo: 'concepto' });
+    }
+    return resultado;
+}
+
+function contarConceptos() {
+    return obtenerConceptosActivos().length;
 }
 
 /**
- * Genera las tablas de formación de conceptos (solo para conceptos con contenido)
+ * Genera las tablas de formación de conceptos (solo para conceptos activos)
  */
 function generarTablas() {
     if (!tablasContainer) return;
-    
     tablasContainer.innerHTML = '';
-    
-    const numeroDeConceptos = contarConceptos();
-    
-    if (numeroDeConceptos === 0) {
+
+    const conceptosActivos = obtenerConceptosActivos();
+
+    if (conceptosActivos.length === 0) {
         const message = document.createElement('div');
         message.className = 'no-conceptos-message';
         message.textContent = 'No hay conceptos definidos. Regresa a la página anterior para ingresar conceptos.';
         tablasContainer.appendChild(message);
         return;
     }
-    
-    for (let conc = 1; conc <= 5; conc++) {
-        const conceptoNombre = data[`concepto${conc}`] || '';
-        
-        if (conceptoNombre.trim() === '') {
-            continue;
-        }
-        
+
+    conceptosActivos.forEach(({ idx, nombre: conceptoNombre, tipo }) => {
+        // elemId: identificador único del elemento (ej: "concepto_1", "tarea_2")
+        const elemId = `${tipo}_${idx}`;
         const section = document.createElement('div');
         section.className = 'concepto-section';
         section.innerHTML = `
@@ -81,22 +83,25 @@ function generarTablas() {
                 </thead>
                 <tbody>
                     ${[1, 2, 3].map(row => {
-                        const posIdx = (conc - 1) * 3 + row;
-                        const posibilidad = data[`pos${posIdx}`] || `Opción ${posIdx}`;
+                        const posKey = `pos_${tipo}_${idx}_${row}`;
+                        const posibilidad = data[posKey] || `Opción ${row}`;
                         return `
                             <tr>
                                 <td>${row}</td>
                                 <td>
-                                    <input type="checkbox" class="chk" data-conc="${conc}" 
-                                           data-col="1" data-pos="${posIdx}">
+                                    <input type="checkbox" class="chk"
+                                           data-elem="${elemId}" data-col="1"
+                                           data-pos-key="${posKey}">
                                 </td>
                                 <td>
-                                    <input type="checkbox" class="chk" data-conc="${conc}" 
-                                           data-col="2" data-pos="${posIdx}">
+                                    <input type="checkbox" class="chk"
+                                           data-elem="${elemId}" data-col="2"
+                                           data-pos-key="${posKey}">
                                 </td>
                                 <td>
-                                    <input type="checkbox" class="chk" data-conc="${conc}" 
-                                           data-col="3" data-pos="${posIdx}">
+                                    <input type="checkbox" class="chk"
+                                           data-elem="${elemId}" data-col="3"
+                                           data-pos-key="${posKey}">
                                 </td>
                                 <td class="posibilidad">${posibilidad}</td>
                             </tr>
@@ -106,18 +111,13 @@ function generarTablas() {
             </table>
         `;
         tablasContainer.appendChild(section);
-    }
-    
+    });
+
     applyDynamicTranslations();
     configurarCheckboxes();
-    
-    // SIN RESTRICCIONES: Asegurar que los botones estén habilitados
-    if (guardarBtn) {
-        guardarBtn.disabled = false;
-    }
-    if (continuarBtn) {
-        continuarBtn.disabled = false;
-    }
+
+    if (guardarBtn) guardarBtn.disabled = false;
+    if (continuarBtn) continuarBtn.disabled = false;
 }
 
 /**
@@ -154,41 +154,39 @@ function applyDynamicTranslations() {
  */
 function configurarCheckboxes() {
     document.querySelectorAll('.chk').forEach(chk => {
-        const conc = chk.dataset.conc;
-        const col = chk.dataset.col;
-        const pos = chk.dataset.pos;
+        const elem    = chk.dataset.elem;
+        const col     = chk.dataset.col;
+        const posKey  = chk.dataset.posKey;
 
-        const groupKey = `pastel_grupo${(parseInt(conc) - 1) * 3 + parseInt(col)}`;
-        if (data[groupKey] === data[`pos${pos}`]) {
+        const groupKey = `pastel_grupo_${elem}_col${col}`;
+
+        // Solo marcar si hay un valor guardado en groupKey Y coincide
+        // con el valor de esta posibilidad. Evita marcar cuando ambos
+        // son undefined (que es === true pero no significa selección real).
+        const valorGuardado = data[groupKey];
+        const valorPos = data[posKey];
+        if (valorGuardado !== undefined && valorGuardado !== '' && valorGuardado === valorPos) {
             chk.checked = true;
         }
 
-        chk.addEventListener('change', function() {
-            handleCheckboxChange(this, conc, col, pos, groupKey);
+        chk.addEventListener('change', function () {
+            handleCheckboxChange(this, elem, col, posKey, groupKey);
         });
     });
 }
 
-/**
- * Maneja el cambio de estado de un checkbox - SIN RESTRICCIONES
- */
-function handleCheckboxChange(checkbox, conc, col, pos, groupKey) {
+function handleCheckboxChange(checkbox, elem, col, posKey, groupKey) {
     if (checkbox.checked) {
-        document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`).forEach(other => {
+        document.querySelectorAll(`.chk[data-elem="${elem}"][data-col="${col}"]`).forEach(other => {
             if (other !== checkbox) other.checked = false;
         });
-        
-        data[groupKey] = data[`pos${pos}`] || '';
+        data[groupKey] = data[posKey] || '';
     } else {
         const anyChecked = Array.from(
-            document.querySelectorAll(`.chk[data-conc="${conc}"][data-col="${col}"]`)
+            document.querySelectorAll(`.chk[data-elem="${elem}"][data-col="${col}"]`)
         ).some(c => c.checked);
-        
-        if (!anyChecked) {
-            delete data[groupKey];
-        }
+        if (!anyChecked) delete data[groupKey];
     }
-    
     localStorage.setItem('projectData', JSON.stringify(data));
 }
 

@@ -1,39 +1,38 @@
-// ========== VARIABLES GLOBALES ==========
+// ========== EVALUACIÓN DE FUNCIONES DEL DIAGRAMA ==========
+// Lee las tareas seleccionadas en seleccionEvaluar.html
+// (data.elementosAEvaluar filtrando tipo === 'tarea')
+// y genera una tabla de evaluación por cada una.
+
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 const tablasContainer = document.getElementById('tablasContainer');
 const guardarBtn = document.getElementById('guardarBtn');
 const continuarBtn = document.getElementById('continuarBtn');
 
-// ========== FUNCIONES DE UTILIDAD ==========
+// ========== UTILIDADES ==========
 
 function updateProjectName() {
-    const projectText = document.getElementById('projectNameText');
-    if (!projectText) return;
-    if (data.projectName && data.projectName.trim()) {
-        projectText.textContent = data.projectName;
-    } else {
-        projectText.textContent = (typeof t === 'function' ? t('unnamed_project') : null) || '(Sin nombre)';
-    }
+    const el = document.getElementById('projectNameText');
+    if (!el) return;
+    el.textContent = (data.projectName || '').trim()
+        || (typeof t === 'function' ? t('unnamed_project') : null)
+        || '(Sin nombre)';
 }
 
 function updateThemeButton() {
-    const themeToggle = document.getElementById('themeToggle');
-    if (!themeToggle) return;
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    if (currentTheme === 'dark') {
-        themeToggle.textContent = '☀️';
-        themeToggle.title = (typeof t === 'function' ? t('theme_light') : null) || 'Cambiar a modo claro';
-    } else {
-        themeToggle.textContent = '🌙';
-        themeToggle.title = (typeof t === 'function' ? t('theme_dark') : null) || 'Cambiar a modo oscuro';
-    }
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀️' : '🌙';
+    btn.title = dark
+        ? ((typeof t === 'function' ? t('theme_light') : null) || 'Cambiar a modo claro')
+        : ((typeof t === 'function' ? t('theme_dark') : null) || 'Cambiar a modo oscuro');
 }
 
 function setupLanguageSelector() {
-    const langSelector = document.getElementById('languageSelector');
-    if (!langSelector) return;
-    langSelector.value = localStorage.getItem('preferredLanguage') || 'es';
-    langSelector.addEventListener('change', function () {
+    const sel = document.getElementById('languageSelector');
+    if (!sel) return;
+    sel.value = localStorage.getItem('preferredLanguage') || 'es';
+    sel.addEventListener('change', function () {
         if (typeof setLanguage === 'function') {
             setLanguage(this.value);
             updateProjectName();
@@ -44,56 +43,40 @@ function setupLanguageSelector() {
 }
 
 function setupThemeToggle() {
-    const themeToggle = document.getElementById('themeToggle');
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', currentTheme);
+    const btn = document.getElementById('themeToggle');
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
     updateThemeButton();
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function () {
-            const current = document.documentElement.getAttribute('data-theme');
-            const newTheme = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+    if (btn) {
+        btn.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
             updateThemeButton();
         });
     }
 }
 
-// ========== LÓGICA DE ELEMENTOS A EVALUAR ==========
+// ========== ELEMENTOS A EVALUAR ==========
 
 /**
- * Devuelve todas las ideas definidas en ideas.html.
- * La evaluación inicial incluye automáticamente todas
- * las ideas con contenido, sin filtro de checkboxes.
+ * Devuelve solo las tareas que el usuario seleccionó
+ * en seleccionEvaluar.html.
  */
 function obtenerElementos() {
-    const elementos = [];
-    for (let i = 1; i <= 5; i++) {
-        const nombre = (data[`concepto${i}`] || '').trim();
-        if (nombre) {
-            elementos.push({ tipo: 'concepto', idx: i, nombre });
-        }
-    }
-    return elementos;
+    return (data.elementosAEvaluar || []).filter(e => e.tipo === 'tarea');
 }
 
-/**
- * Clave única para calificaciones.
- * Ej: "eval_concepto_2_crit3"  /  "eval_tarea_1_crit5"
- */
 function claveCalif(tipo, idx, crit) {
     return `eval_${tipo}_${idx}_crit${crit}`;
 }
 
-/**
- * Clave única para el resultado calculado.
- * Ej: "eval_resultado_concepto_2"  /  "eval_resultado_tarea_1"
- */
 function claveResultado(tipo, idx) {
     return `eval_resultado_${tipo}_${idx}`;
 }
 
-// ========== GENERACIÓN DE TABLAS ==========
+// ========== TABLAS ==========
 
 function generarTablas() {
     if (!tablasContainer) return;
@@ -102,18 +85,16 @@ function generarTablas() {
     const elementos = obtenerElementos();
 
     if (elementos.length === 0) {
-        const message = document.createElement('div');
-        message.className = 'no-conceptos-message';
-        message.textContent = 'No hay elementos seleccionados para evaluar. ' +
-            'Regresa a la página anterior y selecciona al menos uno.';
-        tablasContainer.appendChild(message);
+        const msg = document.createElement('div');
+        msg.className = 'no-conceptos-message';
+        msg.textContent = 'No hay funciones seleccionadas para evaluar. '
+            + 'Regresa y selecciona al menos una.';
+        tablasContainer.appendChild(msg);
         return;
     }
 
-    elementos.forEach(elem => {
-        const { tipo, idx, nombre } = elem;
+    elementos.forEach(({ tipo, idx, nombre }) => {
         const resId = `res_${tipo}_${idx}`;
-
         const section = document.createElement('div');
         section.className = 'concepto-section';
         section.innerHTML = `
@@ -128,27 +109,21 @@ function generarTablas() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${[1, 2, 3, 4, 5].map(i => `
+                    ${[1,2,3,4,5].map(i => `
                         <tr>
                             <td>${i}</td>
                             <td>${data[`criterio${i}`] || `Criterio ${i}`}</td>
                             <td>
-                                <input type="number"
-                                       class="calif"
-                                       data-tipo="${tipo}"
-                                       data-idx="${idx}"
-                                       data-crit="${i}"
-                                       min="0" max="10" step="0.1"
-                                       value="${data[claveCalif(tipo, idx, i)] || ''}">
+                                <input type="number" class="calif"
+                                    data-tipo="${tipo}" data-idx="${idx}" data-crit="${i}"
+                                    min="0" max="10" step="0.1"
+                                    value="${data[claveCalif(tipo, idx, i)] || ''}">
                             </td>
                             <td>${i === 1 ? `<span class="resultado" id="${resId}">-</span>` : ''}</td>
-                        </tr>
-                    `).join('')}
+                        </tr>`).join('')}
                 </tbody>
             </table>
-            <button class="btn-calc"
-                    data-tipo="${tipo}"
-                    data-idx="${idx}"
+            <button class="btn-calc" data-tipo="${tipo}" data-idx="${idx}"
                     data-i18n="calculate">Calcular</button>
         `;
         tablasContainer.appendChild(section);
@@ -157,14 +132,11 @@ function generarTablas() {
     applyDynamicTranslations();
     recalcularTodo();
 
-    if (guardarBtn) guardarBtn.disabled = false;
-    if (continuarBtn) continuarBtn.disabled = false;
-
     document.querySelectorAll('.calif').forEach(input => {
         input.addEventListener('input', function () {
             const { tipo, idx } = this.dataset;
-            const resEl = document.getElementById(`res_${tipo}_${idx}`);
-            if (resEl) resEl.textContent = '-';
+            const el = document.getElementById(`res_${tipo}_${idx}`);
+            if (el) el.textContent = '-';
             delete data[claveResultado(tipo, idx)];
         });
     });
@@ -200,16 +172,16 @@ function calcular(tipo, idx) {
         data[claveCalif(tipo, idx, i)] = input.value;
     }
     const resultado = total.toFixed(2);
-    const resEl = document.getElementById(`res_${tipo}_${idx}`);
-    if (resEl) resEl.textContent = resultado;
+    const el = document.getElementById(`res_${tipo}_${idx}`);
+    if (el) el.textContent = resultado;
     data[claveResultado(tipo, idx)] = resultado;
 }
 
 function recalcularTodo() {
     obtenerElementos().forEach(({ tipo, idx }) => {
-        const resGuardado = data[claveResultado(tipo, idx)];
-        const resEl = document.getElementById(`res_${tipo}_${idx}`);
-        if (resEl) resEl.textContent = resGuardado || '-';
+        const guardado = data[claveResultado(tipo, idx)];
+        const el = document.getElementById(`res_${tipo}_${idx}`);
+        if (el) el.textContent = guardado || '-';
     });
 }
 
@@ -227,11 +199,11 @@ function saveData() {
 
 function continueToNext() {
     saveData();
-    window.location.href = getNextPage('evaluacion.html');
+    window.location.href = getNextPage('evaluacionDiagrama.html');
 }
 
 function goToPrevious() {
-    window.location.href = getPreviousPage('evaluacion.html');
+    window.location.href = getPreviousPage('evaluacionDiagrama.html');
 }
 
 // ========== BOTONES ==========
@@ -257,13 +229,5 @@ function initializePage() {
 
 document.addEventListener('DOMContentLoaded', initializePage);
 
-// ========== EXPORTAR PARA USO GLOBAL ==========
-window.updateProjectName = updateProjectName;
-window.generarTablas = generarTablas;
-window.calcular = calcular;
-window.recalcularTodo = recalcularTodo;
 window.saveData = saveData;
 window.continueToNext = continueToNext;
-window.claveCalif = claveCalif;
-window.claveResultado = claveResultado;
-window.obtenerElementos = obtenerElementos;

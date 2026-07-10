@@ -20,22 +20,21 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
 
-// Definición escalable de fuentes de elementos.
-// Para añadir una nueva fuente en el futuro, basta con
-// agregar una entrada aquí sin tocar nada más.
+// Muestra ideas (si definicionIdeas activo) Y tareas (si diagrama activo).
+// Lo que el usuario marque aquí pasa al proceso de exploración:
+// morfología, gc1 y evalConceptos.
+// Las tareas NO pasan por evaluacion.html — solo las ideas hacen ese recorrido.
 const FUENTES = [
     {
         tipo: 'concepto',
         moduloRequerido: 'definicionIdeas',
-        labelKey: 'select_group_ideas',        // clave en lang.js
+        labelKey: 'select_group_ideas',
         labelFallback: 'Ideas / Conceptos',
         obtenerElementos: () => {
             const elementos = [];
             for (let i = 1; i <= 5; i++) {
                 const nombre = (data[`concepto${i}`] || '').trim();
-                if (nombre) {
-                    elementos.push({ tipo: 'concepto', idx: i, nombre });
-                }
+                if (nombre) elementos.push({ tipo: 'concepto', idx: i, nombre });
             }
             return elementos;
         }
@@ -50,9 +49,7 @@ const FUENTES = [
             const numTareas = parseInt(data.numeroTareas) || 0;
             for (let i = 1; i <= numTareas; i++) {
                 const nombre = (data[`tarea${i}`] || '').trim();
-                if (nombre) {
-                    elementos.push({ tipo: 'tarea', idx: i, nombre });
-                }
+                if (nombre) elementos.push({ tipo: 'tarea', idx: i, nombre });
             }
             return elementos;
         }
@@ -147,9 +144,9 @@ function crearTarjeta(entry) {
         card.classList.toggle('seleccionado', checkbox.checked);
     });
 
-    // Clic en la tarjeta (pero NO en el lápiz ni en el input) activa el checkbox
+    // Clic en la tarjeta (pero NO en el checkbox, el lápiz ni el input) activa el checkbox
     card.addEventListener('click', (e) => {
-        if (e.target === btnEditar || e.target === inputNombre) return;
+        if (e.target === checkbox || e.target === btnEditar || e.target === inputNombre) return;
         checkbox.checked = !checkbox.checked;
         entry.checked = checkbox.checked;
         card.classList.toggle('seleccionado', checkbox.checked);

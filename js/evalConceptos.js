@@ -26,69 +26,63 @@ function updateProjectName() {
 }
 
 /**
- * Obtiene los números de concepto que tienen contenido
- * @returns {Array} Array con los números de concepto que existen
+ * Devuelve los índices de concepto para evaluación de conceptos formados.
+ * Fallback a todos los conceptos de ideas.html si no hay
+ * conceptos marcados en seleccionEvaluar.
  */
 function obtenerConceptosExistentes() {
-    const conceptos = [];
+    const seleccionados = data.elementosAEvaluar || [];
+    if (seleccionados.length > 0) return seleccionados;
+
+    // Fallback: todos los conceptos de ideas.html con contenido
+    const resultado = [];
     for (let conc = 1; conc <= 5; conc++) {
-        const concepto = data[`concepto${conc}`] || '';
-        if (concepto.trim() !== '') {
-            conceptos.push(conc);
-        }
+        const nombre = (data[`concepto${conc}`] || '').trim();
+        if (nombre) resultado.push({ tipo: 'concepto', idx: conc, nombre });
     }
-    return conceptos;
+    return resultado;
 }
 
 /**
  * Genera la sección con la lista de ideas
  */
 function generarSeccionIdeas() {
-    const conceptosExistentes = obtenerConceptosExistentes();
-    
-    if (conceptosExistentes.length === 0) {
-        return '';
-    }
-    
+    const elementos = obtenerConceptosExistentes();
+    if (elementos.length === 0) return '';
+
     let html = `
         <div class="ideas-section">
             <div class="section-title" data-i18n="ideas_concepts">Ideas</div>
             <div class="ideas-list">
                 <ul>
     `;
-    
-    conceptosExistentes.forEach(conc => {
-        const idea = data[`concepto${conc}`] || `Idea ${conc}`;
-        html += `<li>${idea}</li>`;
+    elementos.forEach(elem => {
+        html += `<li>${elem.nombre || elem}</li>`;
     });
-    
     html += `
                 </ul>
             </div>
         </div>
     `;
-    
     return html;
 }
 
 /**
- * Obtiene las opciones seleccionadas para un concepto formado específico
- * @param {number} col - Número de la columna (1-3)
- * @returns {Array} Array de opciones seleccionadas
+ * Obtiene las opciones seleccionadas en gc1 para una columna dada.
+ * Usa la nueva clave: pastel_grupo_${tipo}_${idx}_col${col}
  */
 function obtenerOpcionesSeleccionadas(col) {
-    const conceptosExistentes = obtenerConceptosExistentes();
+    const elementos = obtenerConceptosExistentes();
     const opcionesSeleccionadas = [];
-    
-    for (const conc of conceptosExistentes) {
-        const grupoKey = `pastel_grupo${(conc - 1) * 3 + col}`;
+
+    for (const elem of elementos) {
+        const elemId = `${elem.tipo}_${elem.idx}`;
+        const grupoKey = `pastel_grupo_${elemId}_col${col}`;
         const opcionSeleccionada = data[grupoKey] || '';
-        
         if (opcionSeleccionada.trim() !== '') {
             opcionesSeleccionadas.push(opcionSeleccionada);
         }
     }
-    
     return opcionesSeleccionadas;
 }
 

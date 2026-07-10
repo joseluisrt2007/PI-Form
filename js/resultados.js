@@ -20,10 +20,17 @@ const NUM_OPCIONES_POR_CONCEPTO = 3;
 // =============================================
 
 function obtenerConceptosExistentes() {
+    // Solo los conceptos que el usuario seleccionó en seleccionEvaluar
+    const elementosAEvaluar = data.elementosAEvaluar || [];
+    const seleccionados = elementosAEvaluar.filter(e => e.tipo === 'concepto');
+    if (seleccionados.length > 0) {
+        return seleccionados.map(e => e.idx);
+    }
+    // Fallback para el PDF: si no hay selección (flujo sin seleccionEvaluar)
+    // usa todos los conceptos con contenido
     const conceptos = [];
     for (let conc = 1; conc <= NUM_CONCEPTOS_MAX; conc++) {
-        const concepto = data[`concepto${conc}`] || '';
-        if (concepto.trim() !== '') {
+        if ((data[`concepto${conc}`] || '').trim() !== '') {
             conceptos.push(conc);
         }
     }
@@ -31,30 +38,22 @@ function obtenerConceptosExistentes() {
 }
 
 function generarGruposDinamicos() {
-    const conceptosExistentes = obtenerConceptosExistentes();
+    const elementos = obtenerConceptosExistentes(); // ahora devuelve [{tipo, idx, nombre}]
     const grupos = { col1: [], col2: [], col3: [] };
-    
-    conceptosExistentes.forEach(conc => {
-        const baseGrupo = (conc - 1) * NUM_OPCIONES_POR_CONCEPTO;
-        const nombreConcepto = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
-        
-        grupos.col1.push({
-            numero: baseGrupo + 1,
-            nombreConcepto: nombreConcepto,
-            seleccion: data[`pastel_grupo${baseGrupo + 1}`] || null
-        });
-        grupos.col2.push({
-            numero: baseGrupo + 2,
-            nombreConcepto: nombreConcepto,
-            seleccion: data[`pastel_grupo${baseGrupo + 2}`] || null
-        });
-        grupos.col3.push({
-            numero: baseGrupo + 3,
-            nombreConcepto: nombreConcepto,
-            seleccion: data[`pastel_grupo${baseGrupo + 3}`] || null
+
+    elementos.forEach(elem => {
+        const elemId = `${elem.tipo}_${elem.idx}`;
+        const nombreElem = elem.nombre || data[`concepto${elem.idx}`] || `${elem.tipo} ${elem.idx}`;
+
+        [1, 2, 3].forEach(col => {
+            const groupKey = `pastel_grupo_${elemId}_col${col}`;
+            grupos[`col${col}`].push({
+                nombreConcepto: nombreElem,
+                seleccion: data[groupKey] || null
+            });
         });
     });
-    
+
     return grupos;
 }
 
@@ -98,6 +97,10 @@ function tienePrevencion() {
 }
 
 function tieneTareas() {
+    return getModulos().diagrama === true;
+}
+
+function tieneEvaluacionDiagrama() {
     return getModulos().diagrama === true;
 }
 
@@ -156,6 +159,7 @@ function t(key) {
             'ideas_concepts': 'IDEAS / CONCEPTOS INICIALES',
             'idea': 'Idea',
             'initial_evaluation': 'EVALUACIÓN INICIAL DE IDEAS',
+            'diagram_evaluation_section': 'EVALUACIÓN DE FUNCIONES DEL DIAGRAMA',
             'for': 'Para',
             'option': 'Opción',
             'options': 'Opción',
@@ -210,6 +214,7 @@ function t(key) {
             'ideas_concepts': 'INITIAL IDEAS / CONCEPTS',
             'idea': 'Idea',
             'initial_evaluation': 'INITIAL EVALUATION OF IDEAS',
+            'diagram_evaluation_section': 'ACTIVITY DIAGRAM FUNCTION EVALUATION',
             'for': 'For',
             'option': 'Option',
             'options': 'Option',
@@ -470,10 +475,11 @@ function generarPDF() {
         imprimirTituloSeccion(t('initial_evaluation'));
 
         const elementosEval = data.elementosAEvaluar || [];
-        elementosEval.forEach(elem => {
+        const soloConceptos = elementosEval.filter(e => e.tipo === 'concepto');
+
+        soloConceptos.forEach(elem => {
             if (y > 240) { doc.addPage(); y = margen; }
 
-            const claveRes = `eval_resultado_${elem.tipo}_${elem.idx}`;
             let tieneDatos = false;
             for (let i = 1; i <= NUM_CRITERIOS; i++) {
                 const clave = `eval_${elem.tipo}_${elem.idx}_crit${i}`;
@@ -515,6 +521,62 @@ function generarPDF() {
             y += 22;
         });
         y += 10;
+    }
+
+    // ==================== EVALUACIÓN DE FUNCIONES DEL DIAGRAMA (SOLO SI HAY) ====================
+    if (tieneEvaluacionDiagrama()) {
+        const elementosEval = data.elementosAEvaluar || [];
+        const soloTareas = elementosEval.filter(e => e.tipo === 'tarea');
+
+        if (soloTareas.length > 0) {
+            if (y > 220) { doc.addPage(); y = margen; }
+            imprimirTituloSeccion(t('diagram_evaluation_section'));
+
+            soloTareas.forEach(elem => {
+                if (y > 240) { doc.addPage(); y = margen; }
+
+                let tieneDatos = false;
+                for (let i = 1; i <= NUM_CRITERIOS; i++) {
+                    const clave = `eval_${elem.tipo}_${elem.idx}_crit${i}`;
+                    if (data[clave] && data[clave] !== '') {
+                        const num = parseFloat(data[clave]);
+                        if (!isNaN(num) && num > 0) { tieneDatos = true; break; }
+                    }
+                }
+                if (!tieneDatos) return;
+
+                doc.setFontSize(14);
+                doc.setTextColor(13, 71, 161);
+                doc.setFont("helvetica", "bold");
+                doc.text(`${elem.nombre}`, margen, y);
+                y += 12;
+
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "normal");
+
+                let total = 0;
+                for (let i = 1; i <= NUM_CRITERIOS; i++) {
+                    const clave = `eval_${elem.tipo}_${elem.idx}_crit${i}`;
+                    const califVal = data[clave];
+                    if (califVal && califVal !== '') {
+                        const calif = parseFloat(califVal) || 0;
+                        const peso = parseFloat(data[`peso${i}`]) || 0;
+                        const ponderado = calif * peso;
+                        total += ponderado;
+                        const criterio = data[`criterio${i}`] || `${t('criteria')} ${i}`;
+                        doc.text(`  ${criterio}: ${calif.toFixed(1)} × ${peso.toFixed(1)} = ${ponderado.toFixed(2)}`, margen + 10, y);
+                        y += 8;
+                        if (y > 280) { doc.addPage(); y = margen; }
+                    }
+                }
+                doc.setFont("helvetica", "bold");
+                doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
+                doc.setFont("helvetica", "normal");
+                y += 22;
+            });
+            y += 10;
+        }
     }
 
     // ==================== PLAN DE ACCIÓN (SOLO SI HAY) ====================
@@ -564,14 +626,14 @@ function generarPDF() {
         imprimirTituloSeccion(t('explore_possibilities'));
 
         const conceptosExistentes = obtenerConceptosExistentes();
-        conceptosExistentes.forEach(conc => {
+        conceptosExistentes.forEach(elem => {
             if (y > 250) { doc.addPage(); y = margen; }
-            
+
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            const conceptoNombre = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
-            doc.text(`${t('for')} ${conceptoNombre}`, margen, y);
+            const nombreElem = elem.nombre || data[`concepto${elem.idx}`] || `${t('idea')} ${elem.idx}`;
+            doc.text(`${t('for')} ${nombreElem}`, margen, y);
             y += 12;
 
             doc.setFontSize(12);
@@ -579,8 +641,8 @@ function generarPDF() {
             doc.setFont("helvetica", "normal");
 
             for (let row = 1; row <= NUM_OPCIONES_POR_CONCEPTO; row++) {
-                const posIdx = (conc - 1) * NUM_OPCIONES_POR_CONCEPTO + row;
-                const posibilidad = data[`pos${posIdx}`] || "";
+                const posKey = `pos_${elem.tipo}_${elem.idx}_${row}`;
+                const posibilidad = data[posKey] || "";
                 if (posibilidad && posibilidad.trim()) {
                     doc.text(`  ${t('options')} ${row}: ${posibilidad}`, margen + 10, y);
                     y += 8;

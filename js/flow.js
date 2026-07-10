@@ -21,11 +21,20 @@
 const FLOW_STEPS = [
     { page: 'descripcion.html',       modulo: 'siempre' },
     { page: 'necesidades.html',       modulo: 'siempre' },
+    // ideas → evaluación automática de TODAS las ideas (en base a criterios/pesos)
     { page: 'ideas.html',             modulo: 'definicionIdeas' },
+    { page: 'evaluacion.html',        modulo: 'definicionIdeas' },
+    // diagrama (las tareas NO pasan por evaluacion.html)
     { page: 'diagrama.html',          modulo: 'diagrama' },
-    // La página de selección aparece si hay al menos un módulo que aporta elementos evaluables
-    { page: 'seleccionEvaluar.html',  modulo: m => m.definicionIdeas === true || m.diagrama === true },
-    { page: 'evaluacion.html',        modulo: m => m.definicionIdeas === true || m.diagrama === true },
+    // seleccionEvaluar: el usuario elige cuáles ideas y/o tareas pasan
+    // a morfología/gc1/evalConceptos. Solo aparece si hay exploración
+    // activa Y al menos un módulo que aporte elementos (ideas o diagrama).
+    {
+        page: 'seleccionEvaluar.html',
+        modulo: m => m.exploracionConceptos === true &&
+                     (m.definicionIdeas === true || m.diagrama === true)
+    },
+    // morfología/gc1/evalConceptos operan solo sobre lo marcado en seleccionEvaluar
     { page: 'morfologia.html',        modulo: 'exploracionConceptos' },
     { page: 'gc1.html',               modulo: 'exploracionConceptos' },
     { page: 'evalConceptos.html',     modulo: 'exploracionConceptos' },
