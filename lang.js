@@ -32,6 +32,9 @@ const translations = {
         'select_group_ideas': 'Ideas / Conceptos',
         'select_group_tasks': 'Funciones del Diagrama de Actividades',
 
+        // EVALUACIÓN DE FUNCIONES DEL DIAGRAMA
+        'diagram_evaluation': 'Evaluación de Funciones',
+
         // NUEVAS TRADUCCIONES PARA OPCION DIAGRAMAS
         'diagram_choice': 'Diagramas - Actividades de Mejora',
         'diagram_question': 'Diagrama de Actividades',
@@ -208,6 +211,9 @@ const translations = {
         'select_elements_none': 'No elements available. Enable the "Definition of Ideas" or "Activity Diagram" module on the description page.',
         'select_group_ideas': 'Ideas / Concepts',
         'select_group_tasks': 'Activity Diagram Functions',
+
+        // DIAGRAM FUNCTION EVALUATION
+        'diagram_evaluation': 'Function Evaluation',
 
         // NEW TRANSLATIONS FOR OPTION DIAGRAMS
         'diagram_choice': 'Diagrams - Improvement Activities',
