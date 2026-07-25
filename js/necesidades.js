@@ -68,6 +68,119 @@ function saveData() {
     console.log('Datos guardados correctamente');
 }
 
+// ========== EXPORTAR / IMPORTAR NECESIDADES (.txt) ==========
+
+/**
+ * Genera un nombre de archivo seguro a partir del nombre del proyecto.
+ */
+function getNecesidadesFilename() {
+    const base = (data.projectName || 'necesidades').trim();
+    const safeBase = base.replace(/[^a-z0-9_\-]+/gi, '_').replace(/^_+|_+$/g, '') || 'necesidades';
+    return `${safeBase}_necesidades_prioridades.txt`;
+}
+
+/**
+ * Construye el contenido de texto plano a partir de los criterios y pesos
+ * actualmente escritos en el formulario.
+ * Formato: una línea de cabecera + una línea por fila con
+ * "id\tcriterio\tpeso"
+ */
+function construirContenidoTXT() {
+    const lineas = ['NECESIDADES_PRIORIDADES_V1'];
+
+    for (let i = 1; i <= NUM_CRITERIOS; i++) {
+        const criterioEl = document.querySelector(`.criterio[data-id="${i}"]`);
+        const pesoEl = document.querySelector(`.peso[data-id="${i}"]`);
+        const criterio = criterioEl ? criterioEl.value.trim() : '';
+        const peso = pesoEl ? pesoEl.value.trim() : '';
+        lineas.push(`${i}\t${criterio}\t${peso}`);
+    }
+
+    return lineas.join('\n');
+}
+
+/**
+ * Descarga los datos de esta página como archivo .txt
+ */
+function guardarNecesidadesTXT() {
+    saveData(); // Asegura que localStorage quede sincronizado también
+
+    const contenido = construirContenidoTXT();
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = getNecesidadesFilename();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Aplica el contenido de un archivo .txt cargado a los campos del formulario.
+ * Acepta el formato generado por guardarNecesidadesTXT (tabulador) y,
+ * como alternativa tolerante, separación por ";" o ",".
+ */
+function aplicarContenidoTXT(texto) {
+    const lineas = texto
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0 && !l.startsWith('NECESIDADES_PRIORIDADES'));
+
+    lineas.forEach(linea => {
+        let campos = linea.split('\t');
+        if (campos.length < 3) {
+            campos = linea.split(/[;,]/);
+        }
+        if (campos.length < 3) return;
+
+        const id = parseInt(campos[0], 10);
+        if (!id || id < 1 || id > NUM_CRITERIOS) return;
+
+        const criterio = (campos[1] || '').trim();
+        const peso = (campos[2] || '').trim();
+
+        const criterioEl = document.querySelector(`.criterio[data-id="${id}"]`);
+        const pesoEl = document.querySelector(`.peso[data-id="${id}"]`);
+        if (criterioEl) criterioEl.value = criterio;
+        if (pesoEl) pesoEl.value = peso;
+    });
+
+    saveData();
+    validateAndEnable();
+}
+
+/**
+ * Maneja la selección de archivo del input de carga y aplica su contenido.
+ */
+function cargarNecesidadesTXT(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            aplicarContenidoTXT(e.target.result);
+        } catch (err) {
+            console.error('Error al procesar el archivo de necesidades:', err);
+            const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+                'No se pudo leer el archivo. Verifica que sea un archivo .txt válido generado por esta aplicación.';
+            alert(msg);
+        }
+    };
+    reader.onerror = function () {
+        const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+            'No se pudo leer el archivo.';
+        alert(msg);
+    };
+    reader.readAsText(file, 'utf-8');
+
+    // Permite volver a seleccionar el mismo archivo más adelante
+    event.target.value = '';
+}
+
 /**
  * GUARDA y NAVEGA a la siguiente página (calculada dinámicamente)
  */
@@ -180,6 +293,20 @@ function setupButtons() {
     if (anteriorBtn) {
         anteriorBtn.addEventListener('click', goToPrevious);
     }
+
+    // Botones de Cargar/Guardar Necesidades en archivo .txt
+    const guardarNecesidadesBtn = document.getElementById('guardarNecesidadesBtn');
+    const cargarNecesidadesBtn = document.getElementById('cargarNecesidadesBtn');
+    const cargarNecesidadesInput = document.getElementById('cargarNecesidadesInput');
+
+    if (guardarNecesidadesBtn) {
+        guardarNecesidadesBtn.addEventListener('click', guardarNecesidadesTXT);
+    }
+
+    if (cargarNecesidadesBtn && cargarNecesidadesInput) {
+        cargarNecesidadesBtn.addEventListener('click', () => cargarNecesidadesInput.click());
+        cargarNecesidadesInput.addEventListener('change', cargarNecesidadesTXT);
+    }
 }
 
 /**
@@ -223,3 +350,7 @@ window.validateAndEnable = validateAndEnable;
 window.saveData = saveData;
 window.continueToNext = continueToNext;
 window.NUM_CRITERIOS = NUM_CRITERIOS;
+window.guardarNecesidadesTXT = guardarNecesidadesTXT;
+window.cargarNecesidadesTXT = cargarNecesidadesTXT;
+window.construirContenidoTXT = construirContenidoTXT;
+window.aplicarContenidoTXT = aplicarContenidoTXT;
