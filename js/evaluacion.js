@@ -234,6 +234,98 @@ function goToPrevious() {
     window.location.href = getPreviousPage('evaluacion.html');
 }
 
+// ========== EXPORTAR / IMPORTAR EVALUACIÓN (.txt) ==========
+
+function getEvaluacionFilename() {
+    const base = (data.projectName || 'evaluacion').trim();
+    const safeBase = base.replace(/[^a-z0-9_\-]+/gi, '_').replace(/^_+|_+$/g, '') || 'evaluacion';
+    return `${safeBase}_evaluacion_ideas.txt`;
+}
+
+/**
+ * Construye el contenido de texto plano con las calificaciones actuales.
+ * Formato: cabecera + una línea por calificación: "tipo\tidx\tcriterio\tvalor"
+ */
+function construirContenidoTXT() {
+    const lineas = ['EVALUACION_IDEAS_V1'];
+    document.querySelectorAll('.calif').forEach(input => {
+        const { tipo, idx, crit } = input.dataset;
+        lineas.push(`${tipo}\t${idx}\t${crit}\t${input.value}`);
+    });
+    return lineas.join('\n');
+}
+
+function guardarEvaluacionTXT() {
+    saveData();
+
+    const contenido = construirContenidoTXT();
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = getEvaluacionFilename();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Aplica el contenido de un archivo .txt a las calificaciones ya presentes
+ * en la tabla (los elementos a evaluar siguen viniendo de ideas.html;
+ * este archivo solo repone las calificaciones, no crea elementos nuevos).
+ */
+function aplicarContenidoTXT(texto) {
+    const lineas = texto
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0 && !l.startsWith('EVALUACION_IDEAS'));
+
+    lineas.forEach(linea => {
+        let campos = linea.split('\t');
+        if (campos.length < 4) {
+            campos = linea.split(/[;,]/).map(c => c.trim());
+        }
+        if (campos.length < 4) return;
+
+        const [tipo, idx, crit, valor] = campos;
+        const input = document.querySelector(
+            `input.calif[data-tipo="${tipo}"][data-idx="${idx}"][data-crit="${crit}"]`
+        );
+        if (input) input.value = valor;
+    });
+
+    // Recalcula el resultado de cada elemento con las calificaciones aplicadas
+    obtenerElementos().forEach(({ tipo, idx }) => calcular(tipo, idx));
+    saveData();
+}
+
+function cargarEvaluacionTXT(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            aplicarContenidoTXT(e.target.result);
+        } catch (err) {
+            console.error('Error al procesar el archivo de evaluación:', err);
+            const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+                'No se pudo leer el archivo. Verifica que sea un archivo .txt válido generado por esta aplicación.';
+            alert(msg);
+        }
+    };
+    reader.onerror = function () {
+        const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+            'No se pudo leer el archivo.';
+        alert(msg);
+    };
+    reader.readAsText(file, 'utf-8');
+
+    event.target.value = '';
+}
+
 // ========== BOTONES ==========
 
 function setupButtons() {
@@ -241,6 +333,20 @@ function setupButtons() {
     if (continuarBtn) continuarBtn.addEventListener('click', continueToNext);
     const anteriorBtn = document.getElementById('anteriorBtn');
     if (anteriorBtn) anteriorBtn.addEventListener('click', goToPrevious);
+
+    // Botones de Cargar/Guardar Evaluación en archivo .txt
+    const guardarEvaluacionBtn = document.getElementById('guardarEvaluacionBtn');
+    const cargarEvaluacionBtn = document.getElementById('cargarEvaluacionBtn');
+    const cargarEvaluacionInput = document.getElementById('cargarEvaluacionInput');
+
+    if (guardarEvaluacionBtn) {
+        guardarEvaluacionBtn.addEventListener('click', guardarEvaluacionTXT);
+    }
+
+    if (cargarEvaluacionBtn && cargarEvaluacionInput) {
+        cargarEvaluacionBtn.addEventListener('click', () => cargarEvaluacionInput.click());
+        cargarEvaluacionInput.addEventListener('change', cargarEvaluacionTXT);
+    }
 }
 
 // ========== INICIALIZACIÓN ==========
@@ -267,3 +373,7 @@ window.continueToNext = continueToNext;
 window.claveCalif = claveCalif;
 window.claveResultado = claveResultado;
 window.obtenerElementos = obtenerElementos;
+window.guardarEvaluacionTXT = guardarEvaluacionTXT;
+window.cargarEvaluacionTXT = cargarEvaluacionTXT;
+window.construirContenidoTXT = construirContenidoTXT;
+window.aplicarContenidoTXT = aplicarContenidoTXT;

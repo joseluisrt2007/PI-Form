@@ -110,6 +110,90 @@ function setupInputEvents() {
     });
 }
 
+// ========== EXPORTAR / IMPORTAR IDEAS (.txt) ==========
+
+function getIdeasFilename() {
+    const base = (data.projectName || 'ideas').trim();
+    const safeBase = base.replace(/[^a-z0-9_\-]+/gi, '_').replace(/^_+|_+$/g, '') || 'ideas';
+    return `${safeBase}_ideas_conceptos.txt`;
+}
+
+function construirContenidoTXT() {
+    const lineas = ['IDEAS_CONCEPTOS_V1'];
+    for (let i = 1; i <= NUM_CRITERIOS; i++) {
+        const el = document.querySelector(`.concepto[data-id="${i}"]`);
+        const valor = el ? el.value.trim() : '';
+        lineas.push(`${i}\t${valor}`);
+    }
+    return lineas.join('\n');
+}
+
+function guardarIdeasTXT() {
+    saveData();
+
+    const contenido = construirContenidoTXT();
+    const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = getIdeasFilename();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function aplicarContenidoTXT(texto) {
+    const lineas = texto
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0 && !l.startsWith('IDEAS_CONCEPTOS'));
+
+    lineas.forEach(linea => {
+        let campos = linea.split('\t');
+        if (campos.length < 2) {
+            campos = linea.split(/[;,]/);
+        }
+        if (campos.length < 2) return;
+
+        const id = parseInt(campos[0], 10);
+        if (!id || id < 1 || id > NUM_CRITERIOS) return;
+
+        const valor = campos.slice(1).join('\t').trim();
+        const el = document.querySelector(`.concepto[data-id="${id}"]`);
+        if (el) el.value = valor;
+    });
+
+    saveData();
+    validateAndEnable();
+}
+
+function cargarIdeasTXT(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            aplicarContenidoTXT(e.target.result);
+        } catch (err) {
+            console.error('Error al procesar el archivo de ideas:', err);
+            const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+                'No se pudo leer el archivo. Verifica que sea un archivo .txt válido generado por esta aplicación.';
+            alert(msg);
+        }
+    };
+    reader.onerror = function () {
+        const msg = (typeof t === 'function' ? t('error_loading_file') : null) ||
+            'No se pudo leer el archivo.';
+        alert(msg);
+    };
+    reader.readAsText(file, 'utf-8');
+
+    event.target.value = '';
+}
+
 function setupButtons() {
     const guardarBtn = document.getElementById('guardarBtn');
     const continuarBtn = document.getElementById('continuarBtn');
@@ -125,6 +209,20 @@ function setupButtons() {
     
     if (anteriorBtn) {
         anteriorBtn.addEventListener('click', goToPrevious);
+    }
+
+    // Botones de Cargar/Guardar Ideas en archivo .txt
+    const guardarIdeasBtn = document.getElementById('guardarIdeasBtn');
+    const cargarIdeasBtn = document.getElementById('cargarIdeasBtn');
+    const cargarIdeasInput = document.getElementById('cargarIdeasInput');
+
+    if (guardarIdeasBtn) {
+        guardarIdeasBtn.addEventListener('click', guardarIdeasTXT);
+    }
+
+    if (cargarIdeasBtn && cargarIdeasInput) {
+        cargarIdeasBtn.addEventListener('click', () => cargarIdeasInput.click());
+        cargarIdeasInput.addEventListener('change', cargarIdeasTXT);
     }
 }
 
