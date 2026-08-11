@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="css/evaluacion.css">
+    <link rel="stylesheet" href="css/asistente.css">
 </head>
 <body>
     <header role="banner">
@@ -41,6 +42,13 @@
     <div class="container">
         <h1 data-i18n="concept_evaluation">Evaluación</h1>
 
+        <!-- Cargar / Guardar Evaluación en archivo .txt -->
+        <div class="file-actions">
+            <button type="button" class="btn-secondary btn-file-action" id="cargarEvaluacionBtn" data-i18n="load_evaluacion">📂 Cargar Evaluación</button>
+            <input type="file" id="cargarEvaluacionInput" accept=".txt,text/plain" style="display:none">
+            <button type="button" class="btn-secondary btn-file-action" id="guardarEvaluacionBtn" data-i18n="save_evaluacion">💾 Guardar Evaluación</button>
+        </div>
+
         <div id="tablasContainer"></div>
 
         <div class="buttons">
@@ -55,5 +63,9 @@
     
     <script src="js/flow.js"></script>
     <script src="js/evaluacion.js"></script>
+
+    <!-- Asistente IA (opcional): requiere /api/assistant desplegado -->
+    <script>window.ASISTENTE_PAGINA = 'evaluacion';</script>
+    <script src="js/asistente.js"></script>
 </body>
 </html>

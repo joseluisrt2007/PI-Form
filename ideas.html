@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/ideas.css">
+    <link rel="stylesheet" href="css/asistente.css">
 </head>
 <body>
     <header role="banner">
@@ -41,6 +42,13 @@
     <div class="container">
         <h1 data-i18n="ideas_concepts">Criterios y pesos (la suma debe ser 10)</h1>
 
+        <!-- Cargar / Guardar Ideas en archivo .txt -->
+        <div class="file-actions">
+            <button type="button" class="btn-secondary btn-file-action" id="cargarIdeasBtn" data-i18n="load_ideas">📂 Cargar Ideas</button>
+            <input type="file" id="cargarIdeasInput" accept=".txt,text/plain" style="display:none">
+            <button type="button" class="btn-secondary btn-file-action" id="guardarIdeasBtn" data-i18n="save_ideas">💾 Guardar Ideas</button>
+        </div>
+
         <!-- Ideas/Conceptos -->
         <div class="section">
             <h2 data-i18n="ideas_concepts">Ideas / Conceptos</h2>
@@ -68,5 +76,9 @@
     <script src="lang.js"></script>
     <script src="js/flow.js"></script>
     <script src="js/ideas.js"></script>
+
+    <!-- Asistente IA (opcional): requiere /api/assistant desplegado -->
+    <script>window.ASISTENTE_PAGINA = 'ideas';</script>
+    <script src="js/asistente.js"></script>
 </body>
 </html>
