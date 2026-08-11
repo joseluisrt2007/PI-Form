@@ -155,6 +155,19 @@ h1 {
     letter-spacing: -0.01em;
 }
 
+.file-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-file-action {
+    min-width: 200px;
+}
+
 .section {
     margin-bottom: 3rem;
 }
@@ -353,6 +366,17 @@ td input:focus {
         width: 100%;
         max-width: 280px;
         min-width: auto;
+    }
+
+    .file-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-file-action {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
     }
 }
 

@@ -1,0 +1,206 @@
+/* ============================================================
+   Widget flotante del Asistente IA
+   Reutiliza las variables de tema (--primary, --card-bg, --border,
+   --text-dark, etc.) ya definidas en el :root de cada página.
+   ============================================================ */
+
+.asistente-toggle {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 1.6rem;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.asistente-toggle:hover {
+    background: var(--primary-dark);
+    transform: scale(1.06);
+}
+
+.asistente-panel {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 5.5rem;
+    width: 360px;
+    max-width: calc(100vw - 2rem);
+    height: 520px;
+    max-height: calc(100vh - 8rem);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.asistente-panel.oculto {
+    display: none;
+}
+
+.asistente-header {
+    background: var(--primary);
+    color: var(--text-light);
+    padding: 0.9rem 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.asistente-cerrar {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.85;
+    padding: 0.2rem 0.4rem;
+}
+
+.asistente-cerrar:hover {
+    opacity: 1;
+}
+
+.asistente-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.asistente-msg {
+    max-width: 85%;
+    padding: 0.6rem 0.85rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.asistente-msg-assistant {
+    align-self: flex-start;
+    background: var(--background-end);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 2px;
+}
+
+.asistente-msg-user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: var(--text-light);
+    border-bottom-right-radius: 2px;
+}
+
+.asistente-pensando {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.asistente-archivo-listo {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--background-end);
+}
+
+.asistente-archivo-listo.oculto {
+    display: none;
+}
+
+.asistente-archivo-listo p {
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    margin-bottom: 0.6rem;
+}
+
+.asistente-archivo-botones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.asistente-archivo-botones .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+}
+
+.asistente-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.asistente-form textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    background: var(--surface);
+    max-height: 90px;
+}
+
+.asistente-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.asistente-enviar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.asistente-enviar:hover {
+    background: var(--primary-dark);
+}
+
+.asistente-enviar:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+    .asistente-panel {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        bottom: 5rem;
+    }
+
+    .asistente-toggle {
+        right: 1rem;
+        bottom: 1rem;
+    }
+}
