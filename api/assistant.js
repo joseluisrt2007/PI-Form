@@ -28,7 +28,7 @@
 
 // Modelo recomendado en el nivel gratuito (buen balance calidad/límite de uso).
 // Puedes cambiarlo por otro modelo gratuito listado en https://ai.google.dev/gemini-api/docs/models
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-flash-latest';
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 const MAX_OUTPUT_TOKENS = 1024;
 
