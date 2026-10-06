@@ -1,0 +1,442 @@
+/**
+ * base.css - Estilos compartidos por TODAS las paginas de la aplicacion.
+ *
+ * Que paginas lo cargan: las 12 (index, descripcion, necesidades, ideas, evaluacion,
+ * diagrama, seleccionEvaluar, morfologia, gc1, evalConceptos, prevenir, resultados),
+ * siempre con <link rel="stylesheet" href="css/base.css">.
+ *
+ * Orden de carga: base.css va PRIMERO; despues css/pages/<pagina>.css y, en necesidades,
+ * ideas y evaluacion, css/components/asistente.css. Los archivos posteriores pueden
+ * sobrescribir cualquier regla de este archivo (varias paginas lo hacen: por ejemplo
+ * evaluacion.css y evalConceptos.css redefinen .btn-calc).
+ *
+ * Contenido: (1) variables CSS de la paleta (tema claro en :root y tema oscuro en
+ * [data-theme="dark"]), (2) reset y cuerpo, (3) cabecera comun (header y sus tres zonas),
+ * (4) botones y filas de acciones comunes, (5) adaptacion a moviles (max-width: 768px)
+ * y (6) ajustes del modo oscuro.
+ *
+ * Dependencias: base.css no depende de otros css ni de fuentes propias. Al reves, todos
+ * los css de pagina y asistente.css usan las variables --xxx declaradas aqui mediante
+ * var(--xxx); una variable que no exista aqui deja invalida la propiedad que la use.
+ *
+ * MECANISMO DE TEMA: js/core/theme.js (PFM.theme.init, llamado desde PFM.page.init) pone
+ * el atributo data-theme="light" o "dark" en el elemento <html> al cargar la pagina
+ * (lee localStorage['theme'], por defecto "light") y lo alterna al pulsar el boton
+ * #themeToggle. Cuando vale "dark" se aplica el bloque [data-theme="dark"] de este
+ * archivo, que redefine las mismas variables con valores oscuros; el resto de reglas
+ * cambia solo porque usa las variables.
+ *
+ * PARA CAMBIAR LA PALETA hay que editar AMBOS bloques: :root (claro) y
+ * [data-theme="dark"] (oscuro). Si solo cambias uno, el otro tema queda con los colores
+ * antiguos. Ademas, algunas CSS de pagina (gc1.css, evaluacion.css, index.css...) tienen
+ * reglas [data-theme="dark"] propias con colores fijos; revisalas si algo no cambia.
+ */
+
+/* ===== Variables de tema CLARO (valores por defecto) ===== */
+
+:root {
+        /* CONFIGURABLE: color principal de marca (azul marino). Lo usan los titulos h1, el fondo
+           de .btn-primary, acentos y bordes de foco en las paginas. Cambiarlo cambia la identidad
+           de color de toda la app (en oscuro se redefine abajo). */
+        --primary: #1e3a5f;
+        /* Variante oscura del principal: fondo de .btn-primary y botones del asistente al pasar el raton (:hover). */
+        --primary-dark: #14283f;
+        /* Variante aclarada del principal: borde en :hover de tarjetas/campos y color de titulos y cabeceras de tabla en modo oscuro (en las CSS de pagina). */
+        --primary-light: #2c5282;
+        /* Fondo de pagina: lo usa el body (regla body de este archivo) y se reutiliza en las CSS de pagina. */
+        --background-start: #f8fafc;
+        /* Fondo de contraste suave: burbujas y zona de archivo del asistente IA (asistente.css) y bloques de resultados.css. */
+        --background-end: #eef2f6;
+        /* Color de texto general: cuerpo, etiquetas, parrafos y celdas. */
+        --text-dark: #1e293b;
+        /* Texto sobre fondos oscuros o de color: cabecera, botones primarios y boton flotante del asistente. */
+        --text-light: #ffffff;
+        /* Sombra sutil de elementos planos: cabecera (header) y botones en reposo. */
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+        /* Sombra pronunciada al elevarse un elemento: botones primarios en :hover y el boton y panel del asistente IA. */
+        --shadow-lg: 0 12px 28px -8px rgba(30, 58, 95, 0.28);
+        /* Fondo de superficies: botones .btn-secondary, campos de texto, pie de index y campo de escritura del asistente. */
+        --surface: #ffffff;
+        /* Color de borde estandar de campos, tablas, tarjetas y del panel del asistente. */
+        --border: #e2e8f0;
+        /* Sombra de las tarjetas de contenido (.container, .section y similares) en las paginas internas. */
+        --card-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+        /* Borde para separadores finos (lineas bajo titulos y filas) en necesidades, ideas y seleccionEvaluar. Hoy coincide con --border. */
+        --border-light: #e2e8f0;
+        /* Color de error: texto de validacion (necesidades) y borde de campos invalidos (evaluacion, evalConceptos). */
+        --error: #dc2626;
+        /* Fondo de tarjetas y contenedores de contenido (.container) y del panel del asistente. */
+        --card-bg: #ffffff;
+        /* Fondo de la cabecera superior (regla header). Por defecto igual que --primary; en index.css el header usa --primary directamente. */
+        --header-bg: #1e3a5f;
+        /* Color informativo: textos de ayuda y contadores de caracteres en necesidades.css. */
+        --info: #2c5282;
+        /* Color de exito (verde): columna/valores de resultado en tablas de evaluacion y evalConceptos. */
+        --success: #0d9668;
+        /* Fondo de las secciones grandes (.section, .concepto-section) en evaluacion, morfologia, gc1, prevenir, evalConceptos y diagrama. */
+        --section-bg: #ffffff;
+        /* Fondo de las celdas de cabecera de tabla (th) en evaluacion, morfologia, gc1, prevenir y evalConceptos. */
+        --table-header: #eef2f7;
+        /* Franja de color (borde izquierdo) de las tarjetas de prevenir, evalConceptos y resultados. */
+        --accent-border: #2c5282;
+        /* Fondo de listas y paneles internos de prevenir, evalConceptos y resultados. */
+        --list-bg: #f8fafc;
+        /* Color del texto de los <select> y campos tematizados (gc1, prevenir, diagrama, evalConceptos, resultados). */
+        --select-text: #1e293b;
+        /* Fondo de esos <select> y campos de formulario. */
+        --select-bg: #ffffff;
+        /* Borde de esos <select> y campos de formulario. */
+        --select-border: #e2e8f0;
+}
+
+/* ===== Base: reset, cuerpo y contenedor
+CONFIGURABLE: font-family es la tipografia de toda la app. 'Inter' no se carga en los
+<link> (solo Roboto 400/500/700 desde Google Fonts), asi que normalmente se ve Roboto o
+Arial. min-height: 100vh hace que el fondo cubra al menos toda la ventana. ===== */
+
+body {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    background: var(--background-start);
+    min-height: 100vh;
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Cabecera comun (titulo, idioma, tema)
+Zonas laterales del <header>: flex: 1 cada una; la central (.header-center) usa flex: 2,
+de modo que el titulo queda centrado. Su contenido (selector de idioma, boton de tema)
+esta en cada HTML y los estilos de esos controles en css/pages/<pagina>.css. ===== */
+
+.header-left {
+    flex: 1;
+    text-align: left;
+}
+
+.header-right {
+    flex: 1;
+    text-align: right;
+}
+
+/* ===== Botones
+.btn-calc: boton "Calcular" generado por JS (js/pages/evaluacion.js, evalConceptos.js y
+prevenir.js). Aqui solo forma y cursor; el color y la transicion los define la CSS de cada
+pagina. CONFIGURABLE: border-radius 10px = redondeo del boton. ===== */
+
+.btn-calc {
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Efecto de elevacion al pasar el raton: sube 2px (la transicion se declara en cada CSS de pagina). */
+.btn-calc:hover {
+    transform: translateY(-2px);
+}
+
+/* Al pulsar vuelve a su sitio (efecto de presionado). */
+.btn-calc:active {
+    transform: translateY(0);
+}
+
+/* ===== Reset universal
+box-sizing: border-box (el padding entra en el ancho) y se anulan margenes y rellenos
+del navegador. CUIDADO: nada tiene margen por defecto; todo espaciado debe declararse
+explicitamente en cada regla. ===== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Cabecera superior
+<header> de cada pagina: flex en fila con tres zonas (.header-left, .header-center,
+.header-right); space-between las reparte y align-items: center las alinea en vertical;
+position: relative permite situar hijos absolutos. Fondo --header-bg.
+CONFIGURABLE: padding 1.25rem 2rem (alto y margenes laterales de la barra) y font-size
+1.5rem (tamano base del texto de la cabecera). ===== */
+
+header {
+    background-color: var(--header-bg);
+    color: var(--text-light);
+    padding: 1.25rem 2rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    position: relative;
+}
+
+/* Nombre del proyecto bajo el titulo (#projectNameDisplay, en todas las paginas salvo
+   index). Su texto (#projectNameText) lo rellena js/core/page.js.
+   CONFIGURABLE: font-size 1.125rem y color blanco al 85%. */
+.project-name-container {
+    font-size: 1.125rem;
+    font-weight: 400;
+    opacity: 0.95;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Zona central: flex: 2 (doble ancho que las laterales); column apila titulo y nombre de proyecto, centrados en ambos ejes. */
+.header-center {
+    flex: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Titulo de la aplicacion (data-i18n="app_title"). CONFIGURABLE: font-size 1.5rem y font-weight 600; el letter-spacing negativo lo compacta ligeramente. */
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Fila inferior de botones (div.buttons: Guardar / Continuar / Regreso) en las paginas del flujo.
+   CONFIGURABLE: gap 1.25rem = separacion entre botones; margin-top 3rem = espacio sobre la
+   fila. flex-wrap permite pasar a otra linea si no caben. Algunas CSS de pagina
+   (p. ej. descripcion.css) la redeclaran. */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+/* Fila de acciones de archivo (Cargar / Guardar .txt) en ideas, evaluacion y necesidades; sus botones son .btn-file-action (definidos en cada CSS de pagina). Extremos opuestos (space-between). */
+.file-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ===== Adaptacion a pantallas pequenas
+CONFIGURABLE: 768px es el breakpoint de tablet vertical / movil grande; por debajo se
+centran las zonas de la cabecera, se limita el ancho de los botones y se apilan en columna
+las filas .file-actions y .buttons. Muchas CSS de pagina usan el mismo valor; si lo
+cambias aqui, cambialo tambien alli. ===== */
+
+@media (max-width: 768px) {
+    .header-left,
+    .header-center,
+    .header-right {
+        text-align: center;
+    }
+    .btn-calc {
+        max-width: 300px;
+    }
+    .file-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn-file-action {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* ===== Modo oscuro
+Se activa cuando <html> tiene data-theme="dark" (lo pone js/core/theme.js al cargar si
+localStorage['theme'] es 'dark', o al pulsar #themeToggle). Redefine las MISMAS variables
+que :root (su significado esta documentado arriba, variable por variable). Para cambiar
+la paleta edita este bloque Y :root. Las sombras pasan a negro porque una sombra azulada
+no se aprecia sobre fondo oscuro. CUIDADO: mantener las mismas claves en ambos bloques;
+si falta una, el modo oscuro hereda el valor claro. ===== */
+
+[data-theme="dark"] {
+    /* Azul principal aclarado para contraste sobre fondo oscuro. */
+    --primary: #3b6ea5;
+    --primary-dark: #2c5282;
+    --primary-light: #5485bb;
+    /* Fondo de pagina oscuro (body). */
+    --background-start: #0f172a;
+    --background-end: #1a2332;
+    --text-dark: #e8edf4;
+    --text-light: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 28px -8px rgba(0, 0, 0, 0.5);
+    --surface: #1a2332;
+    --border: #2d3a4d;
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --border-light: #2d3a4d;
+    --error: #f87171;
+    --card-bg: #1a2332;
+    /* La cabecera pasa a gris azulado oscuro en vez del azul de marca (index.css usa --surface en oscuro). */
+    --header-bg: #1a2332;
+    --info: #7fa8d4;
+    --section-bg: #1a2332;
+    /* Cabecera de tabla oscura. */
+    --table-header: #212c3d;
+    --success: #15a877;
+    --select-text: #e8edf4;
+    /* Fondo de selects y campos en oscuro (algo mas claro que --surface). */
+    --select-bg: #212c3d;
+    --select-border: #2d3a4d;
+    --accent-border: #5485bb;
+    --list-bg: #161f30;
+}
+
+/* Linea inferior de los titulos .concepto-title (creados por JS en evaluacion.js, morfologia.js y evalConceptos.js) con el borde del tema oscuro. */
+[data-theme="dark"] .concepto-title {
+    border-bottom-color: var(--border);
+}
+
+/* ===== Componentes compartidos: encabezado y botones ===== */
+/* Antes estas reglas se repetían en cada css/pages/<pagina>.css. Aquí están solo las declaraciones que
+   coinciden en todas las páginas (o en la mayoría). Si una página necesita otro valor, lo sobrescribe en su
+   propio archivo (que se carga después). CUIDADO: cambiar un valor de esta sección afecta a todas las páginas
+   que no lo sobrescriban; revisa también los css/pages/*.css. */
+
+/* Selector de idioma (#languageSelector, en el header de todas las páginas; lo conecta js/core/page.js). Fondo y borde translúcidos sobre la cabecera azul. CONFIGURABLE: min-width (ancho mínimo; algunas páginas lo sobrescriben) y font-size. */
+.language-selector select {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 120px;
+    color: var(--text-light);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Botón principal (#guardarBtn, #continuarBtn, #startBtn y #downloadAgainBtn). CONFIGURABLE: padding y font-size definen su tamaño; index.css y resultados.css lo sobrescriben para botones grandes. Colores: --primary y --text-light de este archivo. */
+.btn-primary {
+    background: var(--primary);
+    color: var(--text-light);
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    font-size: 1.05rem;
+    padding: 0.95rem 2rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+/* Hover del botón principal: se oscurece y sube 2px (translateY). CONFIGURABLE: el desplazamiento y la sombra. */
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Botón redondo de tema claro/oscuro (#themeToggle; lo cablea js/core/theme.js). CONFIGURABLE: width/height 42px y font-size 1.2rem (tamaño del emoji). */
+.theme-toggle {
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover del botón de tema: gira 12 grados. */
+.theme-toggle:hover {
+    transform: rotate(12deg);
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Botón secundario (#anteriorBtn "Regreso", #returnMainMenuBtn, #agregarTareaBtn y #agregarTablaBtn). Mismas medidas que .btn-primary pero con fondo de superficie y borde. CONFIGURABLE: padding, font-size y colores (--surface, --border). */
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text-dark);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.95rem 2rem;
+    font-size: 1.05rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+/* Hover del botón secundario: borde y fondo resaltados y sube 2px. */
+.btn-secondary:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+/* Botones de Guardar/Cargar archivo .txt (necesidades, ideas, evaluación): algo más anchos que los normales. CONFIGURABLE: min-width. */
+.btn-file-action {
+    min-width: 200px;
+}
+
+/* Botón "Calcular" de cada tarjeta de evaluación (lo generan evaluacion.js y evalConceptos.js). */
+.btn-calc {
+    display: block;
+    background: var(--primary);
+    color: var(--text-light);
+    padding: 0.95rem 2.5rem;
+    border: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+/* Hover del botón Calcular. */
+.btn-calc:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Tema oscuro (js/core/theme.js pone data-theme="dark" en <html>): colores del botón secundario. */
+[data-theme="dark"] .btn-secondary {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-dark);
+}
+
+/* Tema oscuro: hover del botón secundario. */
+[data-theme="dark"] .btn-secondary:hover {
+    background-color: #212c3d;
+    border-color: #3d4a5e;
+}
+
+/* Tema oscuro: color del texto del selector de idioma. */
+[data-theme="dark"] .language-selector select {
+    color: #e2e8f0;
+}
+
+/* Tema oscuro: fondo del botón Calcular. */
+[data-theme="dark"] .btn-calc {
+    background: var(--primary);
+}
+
+/* Tema oscuro: hover del botón Calcular. */
+[data-theme="dark"] .btn-calc:hover {
+    background: var(--primary-dark);
+}
+
+@media (max-width: 768px) {
+    /* Móvil/tablet (hasta 768px): los botones de archivo ocupan todo el ancho. CONFIGURABLE: el breakpoint 768px. */
+    .btn-file-action {
+        width: 100%;
+    }
+    /* Móvil/tablet (hasta 768px): el botón Calcular ocupa todo el ancho y se compacta. */
+    .btn-calc {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.875rem 2rem;
+    }
+}

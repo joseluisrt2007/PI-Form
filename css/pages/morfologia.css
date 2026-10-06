@@ -1,0 +1,508 @@
+/**
+ * morfologia.css - Estilos propios de morfologia.html (explorar posibilidades por idea o funcion).
+ *
+ * Quien lo carga: solo morfologia.html, con css/base.css primero y este archivo despues
+ * (no carga asistente.css). Va DESPUES de base.css y redefine .container, h1, .btn-primary,
+ * .btn-secondary y .theme-toggle.
+ *
+ * Contenido: (1) cabecera y selector de idioma, (2) contenedor y titulo, (3) tarjetas
+ * .concepto-section con tabla de 2 columnas, (4) inputs, (5) botones, (6) adaptacion movil
+ * (768px y 480px), (7) controles del header, (8) modo oscuro y su responsive.
+ *
+ * Lo genera JS: js/pages/morfologia.js (en #tablasContainer) crea una .concepto-section por
+ * elemento con .concepto-title y una <table> de 3 filas (POSIBILIDADES_POR_ELEMENTO): la
+ * celda 1 dice "Opcion N" y la celda 2 contiene input.posibilidad (type text). Si no hay
+ * elementos, JS crea div.no-conceptos-message, que NO tiene reglas en este archivo. JS no
+ * anade clases de estado ni estilos en linea.
+ */
+
+/* CONFIGURABLE: fondo de las tarjetas .concepto-section en claro (oscuro: al final del
+   archivo). Variable local de esta pagina, no esta en base.css. */
+:root {
+    --section-bg: #f8fafc;
+}
+
+/* ===== Cabecera y selector de idioma ===== */
+/* Titulo de la app en el header. */
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* Selector de idioma sobre el header oscuro (blancos translucidos). CONFIGURABLE:
+   min-width 120px. */
+.language-selector select {
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.language-selector select:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+
+/* ===== Contenedor y titulo ===== */
+/* CONFIGURABLE: max-width 1200px, margin 3rem y padding 2.5rem de la tarjeta central. */
+.container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ===== Tarjeta de cada elemento y tabla de posibilidades ===== */
+/* Una tarjeta por idea o funcion elegida (creada por morfologia.js). Hover: borde #cbd5e1 y
+   sombra, con transicion de 0.2s; el hover oscuro esta mas abajo. */
+.concepto-section {
+    margin-bottom: 3rem;
+    padding: 2.25rem;
+    background: var(--section-bg);
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.concepto-section:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--card-shadow);
+}
+
+/* Nombre del elemento (texto insertado desde JS). */
+.concepto-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* Tabla de 2 columnas (Opcion N / texto). border-spacing vertical 0.75rem separa las filas
+   como tarjetas; por eso border-collapse: separate y las esquinas redondeadas van en la
+   primera y ultima celda de cada fila. Afecta a toda <table> de la pagina. */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+/* Encabezados: "#" y "Explorar posibilidades" (data-i18n possibilities). */
+th {
+    background-color: var(--table-header);
+    color: var(--primary);
+    padding: 1.1rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* Celdas sin padding: la segunda contiene el input a todo el ancho. */
+td {
+    padding: 0;
+    background: var(--surface);
+    transition: background-color 0.2s ease;
+}
+
+/* Primera columna: etiqueta "Opcion N". CONFIGURABLE: width 140px (100px en 480px). */
+td:first-child {
+    padding: 1.1rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary);
+    width: 140px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+/* Ultima columna: la celda del input; esquinas derechas redondeadas. */
+td:last-child {
+    padding: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Campo de texto de cada posibilidad (input.posibilidad, guardado en pos_<tipo>_<idx>_<fila>).
+   CONFIGURABLE: padding y font-size (1.0625rem). Estas reglas afectan a todo input text. */
+input[type="text"] {
+    width: 100%;
+    padding: 1.05rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 1.0625rem;
+    background: var(--surface);
+    color: var(--text-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+input[type="text"]:hover {
+    border-color: #cbd5e1;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+    background: var(--surface);
+}
+
+/* Texto de ayuda (placeholder "Escribe una posibilidad N"): gris #94a3b8 (oscuro: #64748b). */
+input[type="text"]::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+/* ===== Botones Guardar / Continuar / Regreso ===== */
+/* Fila inferior (clase .buttons de base.css; aqui solo el margen). */
+/* ========== BOTONES MODIFICADOS ========== */
+.buttons {
+    margin-top: 4rem;
+}
+
+/* Sobrescribe .btn-primary de base.css. CONFIGURABLE: padding, min-width 160px y el
+   desplazamiento de hover (translateY(-2px), transicion 0.15s). */
+.btn-primary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.3), var(--shadow-sm);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Eliminado el estilo :disabled */
+
+/* Boton secundario (Regreso); mismas dimensiones que el primario. */
+.btn-secondary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ===== Adaptacion movil ===== */
+/* 768px: punto de corte comun de la app. Header en columna (orden: izquierda, controles,
+   centro), tarjetas y tabla mas compactas, botones a ancho completo (max 280px). */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        width: 100%;
+        text-align: center;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-center {
+        order: 3;
+        margin-top: 0.5rem;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .project-name-container {
+        font-size: 1rem;
+    }
+
+    .language-selector select {
+        min-width: 100px;
+    }
+
+    .container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .concepto-section {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .concepto-title {
+        font-size: 1.2rem;
+    }
+
+    table {
+        font-size: 0.95rem;
+    }
+
+    th, td:first-child {
+        padding: 1rem 0.75rem;
+    }
+
+    input[type="text"] {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .buttons {
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        min-width: auto;
+        font-size: 1.05rem;
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* 480px: telefonos pequenos; la columna "Opcion N" se estrecha a 100px. */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .project-name-container {
+        font-size: 0.95rem;
+    }
+    
+    .language-selector select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 90px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .concepto-title {
+        font-size: 1.1rem;
+    }
+
+    td:first-child {
+        width: 100px;
+        font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+        font-size: 0.95rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===== Controles del header (tema e idioma) ===== */
+/* Contenedor de #themeToggle y del selector de idioma (derecha del header). */
+/* ========== CONTROLES DEL HEADER ========== */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.theme-toggle:active {
+    transform: scale(0.94);
+}
+
+/* ===== Modo oscuro ===== */
+/* theme.js pone data-theme="dark" en <html>. Estas reglas redefinen colores fijos que no
+   salen de variables de base.css (#212c3d celdas e inputs, #3d4a5e bordes en hover). */
+/* CONFIGURABLE: fondo de las tarjetas en oscuro. */
+/* ========== VARIABLES PARA MODO OSCURO ========== */
+[data-theme="dark"] {
+    --section-bg: #161f30;
+}
+
+/* ========== ESTILOS MODO OSCURO ========== */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .concepto-section {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .concepto-section:hover {
+    border-color: #3d4a5e;
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .concepto-title {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] table th {
+    background-color: var(--table-header);
+    color: var(--primary-light);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] td {
+    background: #212c3d;
+}
+
+[data-theme="dark"] td:first-child {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] input[type="text"] {
+    background: #212c3d;
+    border-color: var(--border);
+    color: var(--text-dark);
+    box-shadow: none;
+}
+
+[data-theme="dark"] input[type="text"]:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] input[type="text"]:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+    background: #212c3d;
+}
+
+[data-theme="dark"] input[type="text"]::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84, 133, 187, 0.35);
+    background: rgba(59, 110, 165, 0.12);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59, 110, 165, 0.22);
+    border-color: rgba(84, 133, 187, 0.6);
+}
+
+[data-theme="dark"] .language-selector select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+/* ===== Adaptacion movil de los controles del header (768px y 480px) ===== */
+/* El boton de tema se reduce a 38px y luego a 36px; los controles se centran en movil. */
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .header-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .theme-toggle {
+        order: 1;
+    }
+    
+    .language-selector {
+        order: 2;
+    }
+    
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+}

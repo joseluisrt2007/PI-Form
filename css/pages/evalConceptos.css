@@ -1,0 +1,821 @@
+/**
+ * evalConceptos.css - Estilos de evalConceptos.html (evaluacion de los conceptos formados:
+ * el usuario califica cada criterio de 0 a 10 para cada concepto y pulsa "Calcular").
+ *
+ * Quien lo carga: solo evalConceptos.html, con <link rel="stylesheet"
+ * href="css/pages/evalConceptos.css"> DESPUES de css/base.css (puede sobrescribir sus reglas,
+ * por ejemplo .btn-calc, y usa sus variables: --primary, --border, --surface, --card-bg,
+ * --section-bg, --table-header, --list-bg, --accent-border, --success, --error).
+ *
+ * Contenido: (1) cabecera, selector de idioma y boton de tema, (2) contenedor central,
+ * (3) .concepto-section con la lista de opciones elegidas, (4) tabla criterio/calificacion/
+ * resultado, (5) inputs numericos, (6) botones y .resultado, (7) responsive (768px y 480px),
+ * (8) tema oscuro y (9) seccion inicial de ideas (.ideas-section), con su propio dark y responsive.
+ *
+ * Estructura generada por js/pages/evalConceptos.js dentro de #tablasContainer: una
+ * .ideas-section y, por cada concepto formado (3), una .concepto-section con .concepto-title,
+ * .opciones-list, una <table> (columnas: # | criterio | input.calif | resultado) y button.btn-calc.
+ * El span.resultado (id res<n>) solo existe en la primera fila de cada tabla.
+ *
+ * CUIDADO: los selectores td:first-child, td:nth-child(2), td:nth-child(3) y td:last-child
+ * dependen del orden de las 4 columnas; table, th y td son reglas globales de esta pagina.
+ */
+
+/* ===== RESET Y ESTILOS BASE ===== */
+
+/* Interlineado base de la pagina (base.css no lo fija). */
+body {
+    line-height: 1.5;
+}
+
+/* ===== HEADER ===== */
+
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== CONTROLES DEL HEADER ===== */
+/* Zona derecha de la cabecera (#themeToggle y selector de idioma). CONFIGURABLE: gap = separacion entre controles. */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Selector de idioma */
+/* Select de idioma: appearance none oculta la flecha nativa y se dibuja con un SVG embebido
+   (stroke %231e3a5f = #1e3a5f, igual que --primary; si cambias --primary actualiza este color).
+   padding-right 40px deja espacio a la flecha. */
+.language-selector select {
+    border: 1.5px solid var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e3a5f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.language-selector select:hover {
+    border-color: #94a3b8;
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+    background-color: var(--select-bg);
+}
+
+.language-selector select option {
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+.language-selector select option:checked {
+    background-color: rgba(30, 58, 95, 0.08);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.theme-toggle:active {
+    transform: scale(0.94);
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+/* Tarjeta central de la pagina. CONFIGURABLE: max-width = ancho maximo (1200px), margin y padding = espacios. */
+.container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ===== SECCIONES DE CONCEPTOS ===== */
+/* Tarjeta de cada concepto formado (la crea evalConceptos.js). Hover: solo borde y sombra (0.2s).
+   CONFIGURABLE: margin-bottom/padding = separacion y aire entre conceptos. */
+.concepto-section {
+    margin-bottom: 2.5rem;
+    padding: 2.25rem;
+    background: var(--section-bg);
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.concepto-section:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--card-shadow);
+}
+
+.concepto-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Margen extra entre tarjetas consecutivas; se suma al margin-bottom de arriba (el ultimo hijo lo anula solo en su margin-bottom). */
+.concepto-section + .concepto-section {
+    margin-top: 2rem;
+}
+
+.concepto-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* ===== LISTA DE OPCIONES ===== */
+/* Recuadro con las opciones elegidas en gc1 para este concepto (<strong> titulo + <ul> con un <li> por opcion).
+   Borde izquierdo de 4px de color --accent-border (CONFIGURABLE). */
+.opciones-list {
+    margin-bottom: 2rem;
+    padding: 1.6rem;
+    background: var(--list-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-border);
+    box-shadow: none;
+}
+
+.opciones-list strong {
+    display: block;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    color: var(--primary);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.opciones-list ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.opciones-list li {
+    margin-bottom: 0.875rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+    padding-left: 1rem;
+    position: relative;
+}
+
+/* Vineta personalizada: el list-style esta desactivado en el ul y la bolita se dibuja con ::before
+   posicionada de forma absoluta (left y top negativos, valores ajustados a ojo). */
+.opciones-list li:before {
+    content: "•";
+    color: var(--primary);
+    font-size: 1.4rem;
+    position: absolute;
+    left: -0.5rem;
+    top: -0.1rem;
+}
+
+/* ===== TABLAS ===== */
+/* Tabla de criterios de cada concepto. border-spacing vertical de 0.75rem separa las filas como "tarjetas";
+   el border-radius de las esquinas funciona gracias a border-collapse separate. Los td no llevan borde inferior. */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+th {
+    background-color: var(--table-header);
+    color: var(--primary);
+    padding: 1.1rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--border);
+}
+
+th:first-child {
+    border-top-left-radius: 10px;
+    text-align: center;
+}
+
+th:last-child {
+    border-top-right-radius: 10px;
+    text-align: center;
+}
+
+/* Las celdas no tienen padding propio; lo ponen td:first-child y td:nth-child(2) (texto) y las celdas con input lo dejan en 0 para que el input llene la celda. */
+td {
+    padding: 0;
+    background: var(--surface);
+    transition: background-color 0.2s ease;
+}
+
+td:first-child,
+td:nth-child(2) {
+    padding: 1.1rem 1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+/* Columna 1: numero de criterio (1..5). Ancho 60px (CONFIGURABLE). */
+td:first-child {
+    text-align: center;
+    width: 60px;
+    font-weight: 600;
+    color: var(--primary);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+td:nth-child(2) {
+    border-left: 1px solid var(--border);
+}
+
+/* Columna 3: contiene input.calif. Ancho 200px (CONFIGURABLE) = ancho de la caja de calificacion. */
+td:nth-child(3) {
+    text-align: center;
+    width: 200px;
+    border-left: 1px solid var(--border);
+}
+
+/* Columna 4: resultado del concepto (span.resultado de la primera fila, vacio en las demas). Ancho 140px;
+   verde por --success y fondo verdoso rgba(13,150,104,0.04), el mismo verde que --success claro (#0d9668). */
+td:last-child {
+    text-align: center;
+    font-weight: 700;
+    color: var(--success);
+    font-size: 1.3rem;
+    width: 140px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left: 1px solid var(--border);
+    background: rgba(13, 150, 104, 0.04);
+}
+
+/* Efecto hover en filas */
+/* Resalta la fila al pasar el raton (casi imperceptible, alpha 0.015). */
+tr:hover td {
+    background-color: rgba(30, 58, 95, 0.015);
+}
+
+/* ===== INPUTS NUMÉRICOS ===== */
+/* Casilla de calificacion (input.calif, rango 0-10 y paso 0.1 definidos en el HTML que genera evalConceptos.js, no aqui).
+   :invalid pinta el borde con --error cuando el navegador considera el valor fuera de rango. */
+input[type="number"] {
+    width: 100%;
+    padding: 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+    background: var(--surface);
+    color: var(--text-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+input[type="number"]:hover {
+    border-color: #cbd5e1;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+}
+
+input[type="number"]:invalid {
+    border-color: var(--error);
+}
+
+/* ===== BOTONES MODIFICADOS ===== */
+/* Fila de botones Regreso / Continuar (base.css define el resto); gap = separacion entre ellos (CONFIGURABLE). */
+.buttons {
+    display: flex;
+    gap: 1.25rem;
+}
+
+/* Botón primario (Guardar y Continuar) */
+.btn-primary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.3), var(--shadow-sm);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Botón de regreso */
+.btn-secondary {
+    letter-spacing: 0.01em;
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Botón de cálculo */
+/* Boton "Calcular" de cada concepto (button.btn-calc con data-conc); redefine el de base.css, centrado con margin auto.
+   Se pulsa una vez por concepto; evalConceptos.js escribe el valor calculado en el span.resultado. */
+.btn-calc {
+    margin: 0 auto;
+}
+
+/* ===== RESULTADO ===== */
+/* Insignia con el resultado numerico (span.resultado, id res1..res3). evalConceptos.js solo cambia su textContent
+   (valor calculado, "-" si no hay): no anade clases ni estilos inline. min-width 100px (CONFIGURABLE) evita saltos de ancho. */
+.resultado {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    background: rgba(13, 150, 104, 0.06);
+    border-radius: 10px;
+    border: 1.5px solid rgba(13, 150, 104, 0.3);
+    min-width: 100px;
+    text-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resultado:hover {
+    border-color: rgba(13, 150, 104, 0.5);
+    box-shadow: 0 4px 12px rgba(13, 150, 104, 0.15);
+}
+
+/* ===== DISEÑO RESPONSIVE ===== */
+/* Tablet/movil (768px, mismo corte que base.css): cabecera en columna con order (izquierda 1, derecha 2, centro 3),
+   menos margenes y letra, y botones a ancho completo (max 280px). CONFIGURABLE: 768px = punto de corte. */
+@media (max-width: 768px) {
+    /* Header responsive */
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1rem;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        width: 100%;
+        text-align: center;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-center {
+        order: 3;
+        margin-top: 0.5rem;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .project-name-container {
+        font-size: 1rem;
+    }
+
+    /* Controles responsive */
+    .header-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .theme-toggle {
+        order: 1;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .language-selector {
+        order: 2;
+    }
+
+    .language-selector select {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+
+    /* Contenedor principal */
+    .container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+        border-radius: 14px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Secciones */
+    .concepto-section {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+    }
+
+    .concepto-title {
+        font-size: 1.2rem;
+    }
+
+    /* Listas */
+    .opciones-list {
+        padding: 1.25rem;
+    }
+
+    .opciones-list li {
+        font-size: 1rem;
+    }
+
+    /* Tablas */
+    table {
+        font-size: 0.95rem;
+    }
+
+    th, td:first-child, td:nth-child(2) {
+        padding: 1rem 0.75rem;
+    }
+
+    td:last-child {
+        font-size: 1.15rem;
+    }
+
+    /* Inputs */
+    input[type="number"] {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    /* Botones */
+    .buttons {
+        margin-top: 2.5rem;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        min-width: auto;
+        font-size: 1.05rem;
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* Movil pequeno (480px): la tabla pasa a display block con overflow-x auto (scroll horizontal) y white-space nowrap,
+   lo que evita que el texto largo de los criterios rompa el layout. CONFIGURABLE: 480px = punto de corte. */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .project-name-container {
+        font-size: 0.95rem;
+    }
+    
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+    
+    .language-selector select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 90px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .concepto-title {
+        font-size: 1.1rem;
+    }
+
+    .opciones-list li {
+        font-size: 0.95rem;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    td:last-child {
+        font-size: 1.05rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===== TEMA OSCURO ===== */
+
+/* Estilos específicos para tema oscuro */
+/* Tema oscuro: js/core/theme.js pone data-theme="dark" en <html> y base.css redefine las variables.
+   Aqui se ajustan los colores fijos que no vienen de variables (#94a3b8, #3d4a5e, #212c3d, #e8edf4, #7fa8d4 y los
+   rgba azules y verdes de 21,168,119 = --success oscuro). CONFIGURABLE si cambias la paleta oscura. */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .language-selector select {
+    border-color: var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237fa8d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] .language-selector select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+    background-color: #212c3d;
+}
+
+[data-theme="dark"] .language-selector select option {
+    background-color: #212c3d;
+    color: #e8edf4;
+}
+
+[data-theme="dark"] .language-selector select option:checked {
+    background-color: rgba(84, 133, 187, 0.18);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .concepto-section {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .concepto-section:hover {
+    border-color: #3d4a5e;
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .concepto-title {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .opciones-list {
+    background: var(--list-bg);
+    border-left-color: var(--accent-border);
+}
+
+[data-theme="dark"] .opciones-list strong {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .opciones-list li {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .opciones-list li:before {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] table th {
+    background-color: var(--table-header);
+    color: var(--primary-light);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] td {
+    background: var(--surface);
+}
+
+[data-theme="dark"] td:first-child {
+    color: var(--primary-light);
+    background-color: var(--table-header);
+}
+
+[data-theme="dark"] td:nth-child(2),
+[data-theme="dark"] td:nth-child(3) {
+    border-left-color: var(--border);
+}
+
+[data-theme="dark"] td:last-child {
+    color: var(--success);
+    border-left-color: var(--border);
+    background: rgba(21, 168, 119, 0.08);
+}
+
+[data-theme="dark"] tr:hover td {
+    background-color: rgba(84, 133, 187, 0.05);
+}
+
+[data-theme="dark"] input[type="number"] {
+    background: #212c3d;
+    border-color: var(--border);
+    color: var(--text-dark);
+    box-shadow: none;
+}
+
+[data-theme="dark"] input[type="number"]:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] input[type="number"]:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84, 133, 187, 0.35);
+    background: rgba(59, 110, 165, 0.12);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59, 110, 165, 0.22);
+    border-color: rgba(84, 133, 187, 0.6);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+[data-theme="dark"] .resultado {
+    background: rgba(21, 168, 119, 0.1);
+    border-color: rgba(21, 168, 119, 0.4);
+}
+
+[data-theme="dark"] .resultado:hover {
+    box-shadow: 0 4px 12px rgba(21, 168, 119, 0.18);
+}
+
+/* ===== ESTILOS PARA LA SECCIÓN DE IDEAS ===== */
+/* Recuadro inicial con la lista de ideas/elementos evaluados (lo crea seccionIdeas en evalConceptos.js).
+   Su fondo #f8fafc es fijo (no usa variable); en oscuro pasa a #161f30 en el bloque de abajo. */
+.ideas-section {
+    margin-bottom: 3rem;
+    padding: 2.25rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    box-shadow: none;
+}
+
+/* Titulo de la .ideas-section (distinto de .concepto-title, mismo aspecto). */
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--border);
+}
+
+.ideas-list ul {
+    margin: 0;
+    padding-left: 0;
+    list-style-type: none;
+}
+
+/* Cada idea como tarjeta con borde izquierdo de 3px --accent-border; en hover el borde pasa a --primary (0.2s). */
+.ideas-list li {
+    margin-bottom: 1rem;
+    padding: 1.15rem;
+    background: var(--surface);
+    border-radius: 10px;
+    border-left: 3px solid var(--accent-border);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--text-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ideas-list li:hover {
+    border-color: var(--primary);
+    box-shadow: var(--card-shadow);
+}
+
+/* ===== TEMA OSCURO PARA SECCIÓN DE IDEAS ===== */
+/* Tema oscuro de la seccion de ideas: fondos fijos #161f30 (recuadro) y #212c3d (cada idea). */
+[data-theme="dark"] .ideas-section {
+    background: #161f30;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .ideas-list li {
+    background: #212c3d;
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .ideas-list li:hover {
+    border-color: var(--primary-light);
+}
+
+/* ===== RESPONSIVE PARA SECCIÓN DE IDEAS ===== */
+/* Reduccion de padding y letra de la seccion de ideas en movil (768px). */
+@media (max-width: 768px) {
+    .ideas-section {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+    }
+    
+    .ideas-list li {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Ajuste adicional de la seccion de ideas en movil pequeno (480px). */
+@media (max-width: 480px) {
+    .ideas-section {
+        padding: 1.25rem;
+    }
+    
+    .ideas-list li {
+        font-size: 0.95rem;
+        padding: 0.75rem;
+    }
+}

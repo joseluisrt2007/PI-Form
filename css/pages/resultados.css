@@ -1,0 +1,435 @@
+/**
+ * resultados.css - Estilos de resultados.html (ultima pagina del flujo: informe PDF generado
+ * y descargado, nombre del archivo, boton para descargarlo de nuevo y volver al menu).
+ *
+ * Quien lo carga: solo resultados.html, con <link rel="stylesheet" href="css/pages/resultados.css">
+ * DESPUES de css/base.css (puede sobrescribir sus reglas y usa sus variables: --primary,
+ * --border, --card-bg, --list-bg, --accent-border, --background-end, etc.).
+ *
+ * Contenido: (1) cuerpo en columna y cabecera con sus controles, (2) <main> que centra la
+ * tarjeta, (3) .container, h1, .success-message (#pdfDownloadInfo) y .pdf-info (nombre del
+ * archivo + #downloadAgainBtn), (4) botones, (5) responsive (768px y 480px) y
+ * (6) tema oscuro.
+ *
+ * Sin estados dinamicos: js/pages/resultados.js solo cambia textos (textContent / innerHTML) de
+ * los ids de la pagina; no anade clases ni estilos inline. Los estilos del PDF no estan aqui
+ * (se dibujan con jsPDF en js/pdf/).
+ */
+
+/* ===== VARIABLES CSS ===== */
+
+/* La seccion "VARIABLES CSS" de arriba esta vacia: esta pagina no declara variables propias y usa solo las de base.css. */
+/* ===== RESET Y ESTILOS BASE ===== */
+
+/* El body es una columna flex para que <main> (flex 1) ocupe el alto sobrante y la página llene la pantalla. */
+body {
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== CONTROLES DEL HEADER ===== */
+/* Zona derecha de la cabecera (#themeToggle y selector de idioma). CONFIGURABLE: gap. */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Selector de idioma */
+/* Select de idioma: appearance none oculta la flecha nativa y se dibuja con un SVG embebido
+   (stroke %231e3a5f = #1e3a5f, igual que --primary; si cambias --primary actualiza este color). */
+.language-selector select {
+    border: 1.5px solid var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e3a5f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.language-selector select:hover {
+    border-color: #94a3b8;
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+    background-color: var(--select-bg);
+}
+
+.language-selector select option {
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+.language-selector select option:checked {
+    background-color: rgba(30, 58, 95, 0.08);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.theme-toggle:active {
+    transform: scale(0.94);
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+/* Zona central: flex 1 + align-items center centran la tarjeta verticalmente entre la cabecera y el final de la página. */
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Tarjeta unica de la pagina. CONFIGURABLE: max-width 1000px = ancho maximo; padding 3rem. text-align center centra todos sus textos. */
+.container {
+    max-width: 1000px;
+    width: 100%;
+    padding: 3rem;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+/* ===== TÍTULO ===== */
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ===== MENSAJE DE ÉXITO ===== */
+/* Mensaje "informe generado y descargado" (#pdfDownloadInfo; resultados.js lo rellena con innerHTML porque lleva un br). */
+.success-message {
+    font-size: 1.3rem;
+    margin: 3rem 0;
+    color: var(--primary);
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* ===== INFORMACIÓN DEL PDF ===== */
+/* Recuadro con el nombre del archivo (#filenameLabel y #filenameDisplay) y el boton #downloadAgainBtn.
+   Borde izquierdo de 4px con --accent-border (CONFIGURABLE). */
+.pdf-info {
+    font-size: 1.0625rem;
+    margin: 2.5rem 0;
+    padding: 1.6rem;
+    background: var(--list-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-border);
+    box-shadow: none;
+}
+
+.pdf-info strong {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.pdf-info button {
+    margin-top: 1.5rem;
+}
+
+/* ===== BOTONES ===== */
+/* Zona del boton unico #returnMainMenuBtn (volver al menu principal). margin-top = separacion con el recuadro. */
+.buttons {
+    margin-top: 3.5rem;
+}
+
+/* Botón primario */
+/* Redefine el boton principal de base.css (aqui solo se usa para #downloadAgainBtn). CONFIGURABLE: padding 1rem 3rem y font-size 1.15rem. */
+.btn-primary {
+    padding: 1rem 3rem;
+    font-size: 1.15rem;
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.3), var(--shadow-sm);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Botón secundario - MODIFICADO para que sea igual a gc1.css */
+/* Boton secundario (#returnMainMenuBtn); mismo aspecto que en gc1.css. */
+.btn-secondary {
+    padding: 1rem 3rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+}
+
+.btn-secondary:hover {
+    /* Solo transformación sin cambio de color, igual que en gc1.css */
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ===== DISEÑO RESPONSIVE ===== */
+/* Tablet/movil (768px, mismo corte que base.css): cabecera en columna (order: izquierda 1, derecha 2, centro 3),
+   menos padding y botones a ancho completo (max 350px). CONFIGURABLE: 768px. */
+@media (max-width: 768px) {
+    /* Header responsive */
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1rem;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        width: 100%;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-center {
+        order: 3;
+        margin-top: 0.5rem;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .project-name-container {
+        font-size: 1rem;
+    }
+
+    /* Controles responsive */
+    .header-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .theme-toggle {
+        order: 1;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .language-selector {
+        order: 2;
+    }
+
+    .language-selector select {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+
+    /* Contenido principal */
+    main {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 2rem;
+        border-radius: 14px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Mensajes */
+    .success-message {
+        font-size: 1.15rem;
+        margin: 2rem 0;
+    }
+
+    .pdf-info {
+        font-size: 1rem;
+        padding: 1.25rem;
+        margin: 2rem 0;
+    }
+
+    /* Botones */
+    .buttons {
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 350px;
+        font-size: 1.05rem;
+        padding: 1rem 2rem;
+    }
+}
+
+/* Movil pequeno (480px): solo reduce tamanos de letra y paddings. CONFIGURABLE: 480px = punto de corte. */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .project-name-container {
+        font-size: 0.95rem;
+    }
+    
+    .language-selector select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 90px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .success-message {
+        font-size: 1.05rem;
+    }
+
+    .pdf-info {
+        padding: 1rem;
+    }
+
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+}
+
+/* ===== TEMA OSCURO ===== */
+
+/* Estilos específicos para tema oscuro */
+/* Tema oscuro: js/core/theme.js pone data-theme="dark" en <html> y base.css redefine sus variables.
+   Aqui se ajustan los colores fijos que no vienen de variables (#94a3b8, #3d4a5e, #212c3d, #e8edf4, #7fa8d4,
+   #1a2332 y los rgba azules). CONFIGURABLE si cambias la paleta oscura. */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .language-selector select {
+    border-color: var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237fa8d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] .language-selector select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+    background-color: #212c3d;
+}
+
+[data-theme="dark"] .language-selector select option {
+    background-color: #212c3d;
+    color: #e8edf4;
+}
+
+[data-theme="dark"] .language-selector select option:checked {
+    background-color: rgba(84, 133, 187, 0.18);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .success-message {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .pdf-info {
+    background: var(--list-bg);
+    border-left-color: var(--accent-border);
+}
+
+[data-theme="dark"] .pdf-info strong {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    /* Solo transformación sin cambio de color, igual que en gc1.css */
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84, 133, 187, 0.35);
+    background: rgba(59, 110, 165, 0.12);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59, 110, 165, 0.22);
+    border-color: rgba(84, 133, 187, 0.6);
+}
+

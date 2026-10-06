@@ -1,0 +1,801 @@
+/**
+ * prevenir.css - Estilos de prevenir.html (prevencion de riesgos estilo AMEF: por cada falla
+ * potencial se captura efecto, severidad y ocurrencia, y se calcula Riesgo = severidad x ocurrencia).
+ *
+ * Quien lo carga: solo prevenir.html, con <link rel="stylesheet" href="css/pages/prevenir.css">
+ * DESPUES de css/base.css (puede sobrescribir sus reglas y usa sus variables: --primary,
+ * --border, --surface, --card-bg, --section-bg, --table-header, --list-bg, --accent-border).
+ *
+ * Contenido: (1) variables locales de riesgo, (2) cabecera y controles, (3) contenedor,
+ * (4) recuadro del mejor concepto y su lista de opciones, (5) tarjetas .tabla-prevencion con
+ * tablas de formulario, inputs y celda de riesgo, (6) botones,
+ * (7) responsive (768px y 480px), (8) tema oscuro y (9) boton de eliminar tabla.
+ *
+ * Estructura generada por js/pages/prevenir.js: #mejorConceptoContainer (.mejor-concepto y
+ * .opciones-list) y, en #tablasContainer, una div.tabla-prevencion[data-tabla-id=n] por prevencion
+ * con .tabla-title, dos <table> (th = etiqueta, td = input), button.btn-calc, div.riesgo-cell con
+ * span#riesgo<n> y .tabla-buttons (con .btn-eliminar-tabla solo si n > 1).
+ *
+ * JS ya no escribe estilos en linea: los contenedores .calc-wrap (boton Calcular) y
+ * .riesgo-wrap, la etiqueta .riesgo-label y el valor span.riesgo se estilan aqui.
+ * Las reglas table, th, td y tr son globales (sin clase) en esta pagina.
+ */
+
+/* Variables locales (no existen en base.css), usadas por .riesgo-cell. --risk-color: rojo del riesgo;
+   El valor oscuro esta al final, en [data-theme="dark"]. */
+:root {
+    --risk-color: #c0392b;
+}
+
+/* ===== RESET Y ESTILOS BASE ===== */
+
+body {
+    line-height: 1.5;
+}
+
+/* ===== HEADER ===== */
+
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== CONTROLES DEL HEADER ===== */
+/* Zona derecha de la cabecera (#themeToggle y selector de idioma). CONFIGURABLE: gap. */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Selector de idioma */
+/* Select de idioma: appearance none oculta la flecha nativa y se dibuja con un SVG embebido
+   (stroke %231e3a5f = #1e3a5f, igual que --primary; si cambias --primary actualiza este color). */
+.language-selector select {
+    border: 1.5px solid var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e3a5f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.language-selector select:hover {
+    border-color: #94a3b8;
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+    background-color: var(--select-bg);
+}
+
+.language-selector select option {
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    padding: 12px;
+    font-size: 0.9rem;
+}
+
+.language-selector select option:checked {
+    background-color: rgba(30, 58, 95, 0.08);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.theme-toggle:active {
+    transform: scale(0.94);
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+/* Tarjeta central. CONFIGURABLE: max-width (1200px), margin y padding. */
+.container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ===== MEJOR CONCEPTO ===== */
+/* Recuadro con el nombre del mejor concepto (mayor resultado de evalConceptos), escrito por
+   generarMejorConcepto en #mejorConceptoContainer. Fondo y borde son el azul de --primary con poca opacidad. */
+.mejor-concepto {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2.5rem;
+    padding: 1.4rem;
+    background: rgba(30, 58, 95, 0.04);
+    border-radius: 12px;
+    border: 1.5px solid rgba(30, 58, 95, 0.15);
+}
+
+/* ===== LISTA DE OPCIONES ===== */
+/* Lista de opciones que componen el mejor concepto (solo se genera si hay mejor concepto con opciones).
+   CONFIGURABLE: max-width 900px = ancho del recuadro; borde izquierdo de 4px con --accent-border. */
+.opciones-list {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    padding: 1.75rem;
+    background: var(--list-bg);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-border);
+    box-shadow: none;
+}
+
+.opciones-list strong {
+    display: block;
+    margin-bottom: 1.25rem;
+    font-size: 1.15rem;
+    color: var(--primary);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.opciones-list ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    list-style-type: none;
+}
+
+.opciones-list li {
+    margin-bottom: 1rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+    padding-left: 1rem;
+    position: relative;
+}
+
+/* Vineta personalizada: list-style desactivado y bolita dibujada con ::before absoluta (left y top negativos ajustados a ojo). */
+.opciones-list li:before {
+    content: "•";
+    color: var(--primary);
+    font-size: 1.4rem;
+    position: absolute;
+    left: -0.5rem;
+    top: -0.1rem;
+}
+
+/* ===== TABLAS DE PREVENCIÓN ===== */
+/* Tarjeta de cada prevencion (div.tabla-prevencion[data-tabla-id=n], creada y renumerada por prevenir.js).
+   CONFIGURABLE: margin-bottom/padding = separacion y aire. Hover: solo borde y sombra (0.2s). */
+.tabla-prevencion {
+    margin-bottom: 3rem;
+    padding: 2.25rem;
+    background: var(--section-bg);
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tabla-prevencion:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--card-shadow);
+}
+
+.tabla-prevencion:last-child {
+    margin-bottom: 0;
+}
+
+/* Titulo "Prevencion n" de cada tarjeta; prevenir.js reescribe su texto al renumerar tablas. */
+.tabla-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* ===== TABLAS ===== */
+/* Tablas de formulario (2 por prevencion: falla/efecto/severidad/ocurrencia y acciones). border-spacing vertical de
+   1rem separa las filas; border-collapse separate permite los radios de esquina th (izquierda) y td (derecha). */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+}
+
+/* Encabezados de tabla */
+/* Etiqueta de cada fila del formulario. width 30% (CONFIGURABLE; 35% en 768px y 40% en 480px) reparte el ancho entre etiqueta e input. */
+th {
+    background-color: var(--table-header);
+    color: var(--primary);
+    padding: 1.1rem 1.4rem;
+    text-align: left;
+    font-weight: 600;
+    width: 30%;
+    vertical-align: middle;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-right: 1px solid var(--border);
+    transition: background-color 0.2s ease;
+}
+
+/* Celdas de tabla */
+/* Celda con el input: sin padding; el input se encarga del espacio (ver regla siguiente). */
+td {
+    padding: 0;
+    background: var(--surface);
+    vertical-align: middle;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Inputs dentro de celdas */
+/* Inputs de texto, fecha y numero (severidad y ocurrencia usan type number 1-10; el rango lo fija el HTML del JS).
+   Ocupan todo el ancho de la celda; padding 1.05rem 1.4rem (CONFIGURABLE) define la altura de la fila. */
+td input[type="text"],
+td input[type="date"],
+td input[type="number"] {
+    width: 100%;
+    padding: 1.05rem 1.4rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 1.0625rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--surface);
+    color: var(--text-dark);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+td input[type="text"]:hover,
+td input[type="date"]:hover,
+td input[type="number"]:hover {
+    border-color: #cbd5e1;
+}
+
+td input[type="text"]:focus,
+td input[type="date"]:focus,
+td input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+    background: var(--surface);
+}
+
+td input[type="text"]::placeholder,
+td input[type="number"]::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+/* Input de fecha */
+/* Input de fecha (filas "fecha de hoy" y "fecha de accion"); la fuente declarada primero es Inter, con Roboto de respaldo (Roboto es la que carga la pagina). */
+input[type="date"] {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    cursor: pointer;
+}
+
+/* Celda de riesgo */
+/* Caja con el riesgo calculado (div.riesgo-cell dentro de cada tarjeta, con el span#riesgo<n>).
+   El font-size de aqui afecta a la etiqueta "Riesgo:" (el valor span.riesgo tiene su propio tamano).
+   Color rojo por --risk-color; min-height 70px. */
+.calc-wrap {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.riesgo-wrap {
+    margin-top: 1rem;
+}
+
+.riesgo-label {
+    font-weight: 600;
+}
+
+/* Valor calculado del riesgo (span.riesgo#riesgo<n>). */
+.riesgo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
+}
+
+.riesgo-cell {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--risk-color);
+    padding: 1.1rem 1.4rem;
+    background: rgba(192, 57, 43, 0.06);
+    border-radius: 10px;
+    border: 1.5px solid rgba(192, 57, 43, 0.25);
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efectos hover en filas */
+/* Transicion de 0.2s del color de fondo para el resaltado de fila en :hover. */
+tr {
+    transition: background-color 0.2s ease;
+}
+
+/* Resalta la etiqueta de la fila bajo el raton (color fijo #e4e9f0; en oscuro se redefine abajo) y oscurece el borde de su input. */
+tr:hover th {
+    background-color: #e4e9f0;
+}
+
+tr:hover td input {
+    border-color: #94a3b8;
+}
+
+/* ===== BOTONES MODIFICADOS ===== */
+/* Botón de cálculo */
+/* Boton "Calculo de riesgo" de cada tarjeta (button.btn-calc; prevenir.js lo detecta por delegacion de eventos).
+   Tambien se recalcula automaticamente al editar .sev o .ocu. Redefine el de base.css: centrado con margin auto. */
+.btn-calc {
+    margin: 2rem auto 0;
+}
+
+/* Botones de acción */
+/* Fila de botones Regreso / Continuar (base.css define el resto); margin-top = separacion con la ultima tarjeta. */
+.buttons {
+    display: flex;
+    margin-top: 4rem;
+}
+
+/* Botón primario (Guardar y Continuar) */
+.btn-primary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.3), var(--shadow-sm);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Botón secundario (Regreso) */
+.btn-secondary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* ===== DISEÑO RESPONSIVE ===== */
+/* Tablet/movil (768px, mismo corte que base.css): cabecera en columna (order: izquierda 1, derecha 2, centro 3),
+   menos margenes y letra, th pasa de 30% a 35%, botones a ancho completo (max 280px). CONFIGURABLE: 768px. */
+@media (max-width: 768px) {
+    /* Header responsive */
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1rem;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        width: 100%;
+        text-align: center;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-center {
+        order: 3;
+        margin-top: 0.5rem;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .project-name-container {
+        font-size: 1rem;
+    }
+
+    /* Controles responsive */
+    .header-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .theme-toggle {
+        order: 1;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .language-selector {
+        order: 2;
+    }
+
+    .language-selector select {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+
+    /* Contenedor principal */
+    .container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+        border-radius: 14px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Mejor concepto */
+    .mejor-concepto {
+        font-size: 1.35rem;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Listas */
+    .opciones-list {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .opciones-list li {
+        font-size: 1rem;
+    }
+
+    /* Tablas */
+    .tabla-prevencion {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .tabla-title {
+        font-size: 1.2rem;
+    }
+
+    th, td input {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    th {
+        width: 35%;
+        font-size: 0.95rem;
+    }
+
+    .riesgo-cell {
+        font-size: 1.35rem;
+        padding: 1rem;
+        min-height: 60px;
+    }
+
+    /* Botones */
+    .buttons {
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        min-width: auto;
+        font-size: 1.05rem;
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* Movil pequeno (480px): th ocupa 40% del ancho de la tabla y se reducen letras y paddings de inputs.
+   CONFIGURABLE: 480px = punto de corte. */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .project-name-container {
+        font-size: 0.95rem;
+    }
+    
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+    
+    .language-selector select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 90px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .mejor-concepto {
+        font-size: 1.15rem;
+    }
+
+    .opciones-list {
+        padding: 1.25rem;
+    }
+
+    .opciones-list li {
+        font-size: 0.95rem;
+    }
+
+    .tabla-title {
+        font-size: 1.1rem;
+    }
+
+    th {
+        width: 40%;
+        font-size: 0.9rem;
+        padding: 0.875rem 1rem;
+    }
+
+    td input[type="text"],
+    td input[type="date"],
+    td input[type="number"] {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .riesgo-cell {
+        font-size: 1.25rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===== TEMA OSCURO ===== */
+/* Tema oscuro: js/core/theme.js pone data-theme="dark" en <html> y base.css redefine sus variables.
+   Aqui se redefinen los colores locales de riesgo. CONFIGURABLE: --risk-color oscuro. */
+[data-theme="dark"] {
+    --risk-color: #e07a6b;
+}
+
+/* Estilos específicos para tema oscuro */
+/* Reglas oscuras: sustituyen los colores fijos de arriba (#94a3b8, #3d4a5e, #212c3d, #e8edf4, #7fa8d4, rgba azules
+   y rojos) que no vienen de variables. CONFIGURABLE si cambias la paleta oscura. */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .language-selector select {
+    border-color: var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237fa8d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] .language-selector select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+    background-color: #212c3d;
+}
+
+[data-theme="dark"] .language-selector select option {
+    background-color: #212c3d;
+    color: #e8edf4;
+}
+
+[data-theme="dark"] .language-selector select option:checked {
+    background-color: rgba(84, 133, 187, 0.18);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .mejor-concepto {
+    color: var(--primary-light);
+    background: rgba(84, 133, 187, 0.1);
+    border-color: rgba(84, 133, 187, 0.3);
+}
+
+[data-theme="dark"] .opciones-list {
+    background: var(--list-bg);
+    border-left-color: var(--accent-border);
+}
+
+[data-theme="dark"] .opciones-list strong {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .opciones-list li {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .opciones-list li:before {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .tabla-prevencion {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .tabla-prevencion:hover {
+    border-color: #3d4a5e;
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .tabla-title {
+    color: var(--primary-light);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] table th {
+    background-color: var(--table-header);
+    color: var(--primary-light);
+    border-right-color: var(--border);
+}
+
+[data-theme="dark"] td {
+    background: var(--surface);
+}
+
+[data-theme="dark"] td input[type="text"],
+[data-theme="dark"] td input[type="date"],
+[data-theme="dark"] td input[type="number"] {
+    background: #212c3d;
+    border-color: var(--border);
+    color: var(--text-dark);
+    box-shadow: none;
+}
+
+[data-theme="dark"] td input[type="text"]:hover,
+[data-theme="dark"] td input[type="date"]:hover,
+[data-theme="dark"] td input[type="number"]:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] td input[type="text"]:focus,
+[data-theme="dark"] td input[type="date"]:focus,
+[data-theme="dark"] td input[type="number"]:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+    background: #212c3d;
+}
+
+[data-theme="dark"] td input[type="text"]::placeholder,
+[data-theme="dark"] td input[type="number"]::placeholder {
+    color: #64748b;
+}
+
+/* Celda de riesgo en oscuro (rojo de 224,122,107 = --risk-color oscuro). */
+[data-theme="dark"] .riesgo-cell {
+    color: var(--risk-color);
+    background: rgba(224, 122, 107, 0.12);
+    border-color: rgba(224, 122, 107, 0.35);
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84, 133, 187, 0.35);
+    background: rgba(59, 110, 165, 0.12);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59, 110, 165, 0.22);
+    border-color: rgba(84, 133, 187, 0.6);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+/* Efectos hover en tema oscuro */
+/* Hover de fila en oscuro (los colores claros de arriba no sirven sobre fondo oscuro). */
+[data-theme="dark"] tr:hover th {
+    background-color: #283449;
+}
+
+[data-theme="dark"] tr:hover td input {
+    border-color: #3d4a5e;
+}
+
+/* ===== BOTÓN ELIMINAR TABLA ===== */
+/* Boton "Eliminar" de cada prevencion (solo existe en tablas n > 1; prevenir.js pide confirmacion con confirm y renumera).
+   Color rojo fijo #c0392b (igual que --risk-color claro) y #a8311f en hover; CONFIGURABLE. No tiene variante oscura. */
+.btn-eliminar-tabla {
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    display: inline-block;
+}
+
+.btn-eliminar-tabla:hover {
+    background: #a8311f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+}
+
+/* Contenedor de botones de tabla */
+/* Contenedor del boton eliminar. */
+.tabla-buttons {
+    text-align: center;
+    margin-top: 1rem;
+}

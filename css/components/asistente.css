@@ -1,0 +1,261 @@
+/**
+ * asistente.css - Widget flotante del Asistente IA (boton redondo + panel de chat).
+ *
+ * Paginas que lo cargan: necesidades.html, ideas.html y evaluacion.html (ver su <link>).
+ * Orden de carga: va DESPUES de css/base.css y de css/pages/<pagina>.css.
+ *
+ * Contenido: boton flotante, panel (cabecera, mensajes, aviso de archivo listo, formulario)
+ * y un ajuste para moviles (max-width: 480px).
+ *
+ * Dependencias: usa variables de base.css (--primary, --primary-dark, --card-bg, --border,
+ * --text-dark, --text-light, --background-end, --surface, --shadow-lg). El tema oscuro
+ * entra solo por esas variables; este archivo no tiene bloques [data-theme="dark"].
+ * Tambien reutiliza .btn-secondary, que define cada CSS de pagina (no este archivo).
+ *
+ * JAVASCRIPT: js/features/assistant.js crea TODO este DOM (no existe en los HTML):
+ * #asistenteToggleBtn.asistente-toggle y #asistentePanel.asistente-panel (nace con la
+ * clase "oculto"). Alterna "oculto" en el panel al pulsar el boton o la X, y en
+ * #asistenteArchivoListo cuando el asistente genera un archivo. Las burbujas son
+ * .asistente-msg + .asistente-msg-user / .asistente-msg-assistant; mientras espera la
+ * respuesta se anade .asistente-pensando. Si se renombra una clase, cambiar ambos lados.
+ */
+
+/* ===== Boton flotante (abre/cierra el panel) =====
+   Fijo abajo a la derecha de la ventana. Redondo: 58px de ancho y alto con border-radius 50%.
+   El emoji se centra con flex. Transicion de 0.15s en transform (efecto de crecer en :hover)
+   y 0.2s en el fondo.
+   CONFIGURABLE: right/bottom 1.5rem (distancia a las esquinas; si se cambia, mover tambien
+   el bottom de .asistente-panel para que no se solapen) y width/height 58px (tamano del boton).
+   CUIDADO: z-index 1000 lo mantiene sobre el contenido de la pagina; el panel usa el mismo
+   valor. Si algun elemento de otra pagina usa un z-index mayor, tapara el asistente. */
+.asistente-toggle {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 1.6rem;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+/* Al pasar el raton: fondo mas oscuro y crece un 6% (scale 1.06). */
+.asistente-toggle:hover {
+    background: var(--primary-dark);
+    transform: scale(1.06);
+}
+
+/* ===== Panel de chat =====
+   Fijo encima del boton (bottom 5.5rem = boton 58px + 1.5rem de margen + hueco). Columna flex:
+   cabecera, mensajes (flex: 1, absorbe el espacio y hace scroll), aviso de archivo y formulario.
+   CONFIGURABLE: width 360px y height 520px (tamano del panel). max-width y max-height lo
+   limitan en ventanas pequenas: 2rem y 8rem son margenes para no salirse de la pantalla.
+   Sin transicion: se muestra/oculta de golpe con display (ver .oculto). */
+.asistente-panel {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 5.5rem;
+    width: 360px;
+    max-width: calc(100vw - 2rem);
+    height: 520px;
+    max-height: calc(100vh - 8rem);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* Estado cerrado. Lo anade y quita assistant.js (classList.toggle/add); es el unico mecanismo de mostrar y ocultar. */
+.asistente-panel.oculto {
+    display: none;
+}
+
+/* ===== Cabecera del panel: titulo a la izquierda y boton cerrar (X) a la derecha ===== */
+.asistente-header {
+    background: var(--primary);
+    color: var(--text-light);
+    padding: 0.9rem 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.asistente-cerrar {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.85;
+    padding: 0.2rem 0.4rem;
+}
+
+.asistente-cerrar:hover {
+    opacity: 1;
+}
+
+/* ===== Lista de mensajes =====
+   Columna flex con scroll vertical propio (assistant.js baja el scroll al final con cada mensaje);
+   gap 0.6rem separa las burbujas. */
+.asistente-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+/* Burbuja base (assistant.js le suma el rol de abajo). max-width 85% evita que ocupe todo el
+   ancho. white-space: pre-wrap respeta los saltos de linea de la respuesta de la IA y
+   word-break: break-word parte palabras muy largas o URLs. */
+.asistente-msg {
+    max-width: 85%;
+    padding: 0.6rem 0.85rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Burbuja de la IA: alineada a la izquierda; la esquina inferior izquierda casi recta da el efecto de globo. */
+.asistente-msg-assistant {
+    align-self: flex-start;
+    background: var(--background-end);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 2px;
+}
+
+/* Burbuja del usuario: alineada a la derecha con el color principal. */
+.asistente-msg-user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: var(--text-light);
+    border-bottom-right-radius: 2px;
+}
+
+/* Burbuja temporal de espera (assistant.js la crea al enviar): atenuada y en cursiva. */
+.asistente-pensando {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* ===== Aviso "archivo listo" =====
+   Franja bajo los mensajes con los botones Insertar y Descargar. Nace con la clase "oculto"
+   y assistant.js se la quita cuando la IA genera un archivo, y se la vuelve a poner despues. */
+.asistente-archivo-listo {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--background-end);
+}
+
+.asistente-archivo-listo.oculto {
+    display: none;
+}
+
+.asistente-archivo-listo p {
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    margin-bottom: 0.6rem;
+}
+
+/* Botones en fila; flex-wrap los baja a dos lineas si no caben. */
+.asistente-archivo-botones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Reduce el .btn-secondary de la pagina (mas grande de serie) para que quepan dos botones en el panel.
+   CONFIGURABLE: min-width 140px (ancho minimo antes de saltar de linea). */
+.asistente-archivo-botones .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+}
+
+/* ===== Formulario de envio: textarea que crece (flex: 1) y boton enviar ===== */
+.asistente-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+/* resize: none quita el tirador. CONFIGURABLE: max-height 90px (alto maximo del cuadro de escritura; despues hace scroll). */
+.asistente-form textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    background: var(--surface);
+    max-height: 90px;
+}
+
+.asistente-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Boton enviar cuadrado de 42px (flex-shrink: 0 impide que el textarea lo aplaste). Transicion de fondo de 0.2s. */
+.asistente-enviar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.asistente-enviar:hover {
+    background: var(--primary-dark);
+}
+
+/* assistant.js pone disabled mientras espera la respuesta y lo quita al terminar. */
+.asistente-enviar:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* ===== Moviles (hasta 480px de ancho) =====
+   El panel de 360px no cabe: left/right 1rem lo estiran a todo el ancho (width: auto
+   anula los 360px) y el boton se acerca a la esquina. bottom 5rem = 1rem del boton + 58px + hueco. */
+@media (max-width: 480px) {
+    .asistente-panel {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        bottom: 5rem;
+    }
+
+    .asistente-toggle {
+        right: 1rem;
+        bottom: 1rem;
+    }
+}

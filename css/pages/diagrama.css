@@ -1,0 +1,462 @@
+/**
+ * diagrama.css - Estilos propios de diagrama.html (diagrama de entradas, funciones y salidas).
+ *
+ * Quien lo carga: solo diagrama.html, con css/base.css primero y este archivo despues
+ * (no carga asistente.css). Va DESPUES de base.css y redefine .container, h1, .btn-primary,
+ * .btn-secondary, .theme-toggle y .language-selector select.
+ *
+ * Contenido: (1) variables locales y controles del header, (2) contenedor y tabla,
+ * (3) inputs y botones de fila, (4) celdas ocultas y flechas verticales, (5) resaltado de
+ * la columna Funcion, (6) responsive (768px), (7) tema oscuro.
+ *
+ * Lo genera JS (js/pages/diagrama.js): en #tareasBody crea tr.fila-principal con 7 celdas
+ * (numero, persona, flecha1, tarea, flecha2, salida, eliminar) y, entre filas,
+ * tr.flecha-vertical-row con un td colspan=7. Clases que anade JS:
+ *   td.celda-clickable (sin regla CSS aqui), td.celda-oculta (toggle al ocultar, con hijos
+ *   .contenido-oculto y .mensaje-oculto), td.flecha (flechas horizontales),
+ *   td.flecha-vertical-clickable / td.flecha-vertical-oculta (flecha vertical visible u
+ *   oculta), input.persona-input / .tarea-input / .salida-input (solo .tarea-input tiene
+ *   regla) y button.btn-eliminar-fila.
+ * JS ya NO fija estilos en linea: el aspecto de los inputs (incluidos :hover y :focus), de la
+ * columna Funcion (.tarea-input) y de las celdas flecha/numero (.flecha, .celda-numero)
+ * se cambia solo aqui.
+ */
+
+/* ===== Variables locales y controles del header ===== */
+/* Interlineado base de la pagina. */
+body {
+    line-height: 1.5;
+}
+
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* Contenedor de #themeToggle y del selector de idioma (derecha del header). */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Selector de idioma con flecha propia: appearance: none quita la flecha del navegador y
+   background-image dibuja un chevron SVG (stroke %231e3a5f = azul marino de --primary).
+   padding-right: 40px deja sitio a la flecha. CUIDADO: el color de la flecha esta dentro del
+   data URI y no usa variables; en oscuro se redefine abajo (%237fa8d4). Colores de
+   fondo, borde y texto: variables --select-* de base.css. */
+.language-selector select {
+    border: 1.5px solid var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e3a5f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.language-selector select:hover {
+    border-color: #94a3b8;
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+}
+
+/* ===== Contenedor y tabla ===== */
+/* CONFIGURABLE: max-width 1400px (mas ancho que otras paginas porque la tabla tiene 7
+   columnas), margin 3rem, padding 2.5rem. */
+.container {
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Titulo "Tareas" encima de la tabla (div.tabla-tareas). */
+.tabla-tareas h2 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+/* Envoltorio de la tabla: da scroll horizontal si no cabe (movil). */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Tabla del diagrama. Los anchos de columna (5% / 22% / 5% / 28% / 5% / 25% / 10%) estan en
+   atributos style de los <th> de diagrama.html, no aqui. overflow: hidden recorta las
+   esquinas redondeadas. */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--section-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+th {
+    background: var(--primary);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Inputs de texto de las celdas (max 30 caracteres, lo fija diagrama.js). Incluye los
+   efectos :hover y :focus de abajo. CONFIGURABLE: padding, border y border-radius. */
+td input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--surface);
+    color: var(--text-dark);
+}
+
+td input[type="text"]:hover {
+    border-color: #cbd5e1;
+}
+
+td input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+}
+
+/* Casilla de verificacion (accent-color usa el azul de marca). */
+td input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+/* Boton rojo de borrar fila (button.btn-eliminar-fila, creado por diagrama.js en la ultima
+   columna). CONFIGURABLE: #c0392b (rojo) y #a8311f (hover) son colores fijos, sin variable. */
+.btn-eliminar-fila {
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.btn-eliminar-fila:hover {
+    background: #a8311f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+}
+
+/* Flechas horizontales: JS anade la clase .flecha a las celdas flecha1 y flecha2
+   (tamano 1.8rem; en movil se reduce en el bloque responsive). */
+/* Flechas horizontales */
+.flecha {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Botones principales */
+
+/* Botones inferiores. Sobrescriben los de base.css (mismas dimensiones que en otras
+   paginas). CONFIGURABLE: padding, min-width 160px, desplazamiento de hover (-2px). */
+.btn-primary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-secondary {
+    min-width: 160px;
+    text-align: center;
+}
+
+/* Celda oculta: el usuario hace clic en una celda y se oculta su contenido para presentar
+   el diagrama con huecos. JS (pintarCelda) alterna la clase celda-oculta, mete el valor en
+   .contenido-oculto (display: none aqui) y muestra el aviso .mensaje-oculto. El estado se
+   guarda en projectData (celda_oculta_<tipo>_<fila>). */
+/* ===== CELDAS OCULTAS ===== */
+td.celda-oculta {
+    background-color: #f1f5f9;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td.celda-oculta .contenido-oculto {
+    display: none;
+}
+
+td.celda-oculta .mensaje-oculto {
+    display: block;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+td.celda-oculta .mensaje-oculto:hover {
+    color: var(--primary);
+}
+
+/* Fila que contiene la flecha vertical entre dos filas (tr creado por JS). !important para
+   anular el fondo y la sombra heredados de la tabla. CONFIGURABLE: height 50px = separacion
+   vertical entre filas. */
+/* ===== FLECHAS VERTICALES ===== */
+.flecha-vertical-row {
+    background: transparent !important;
+    box-shadow: none !important;
+    height: 50px;
+}
+
+/* Flecha vertical visible (td con el caracter de flecha hacia abajo). Clic = ocultarla. */
+/* Celda de flecha vertical clickeable - AJUSTADA MÁS A LA IZQUIERDA */
+.flecha-vertical-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: bold;
+    vertical-align: middle;
+    /* CONFIGURABLE: padding-left 600px coloca la flecha bajo la columna Funcion en escritorio
+       (valor magico, depende del ancho de columnas y del contenedor). En movil se reduce a 15px
+       en la media query. */
+    text-align: left !important;
+    padding-left: 600px !important;
+}
+
+.flecha-vertical-clickable:hover {
+    background-color: rgba(30, 58, 95, 0.08);
+}
+
+/* Flecha vertical oculta: el td muestra solo el aviso "Click para mostrar flecha". */
+/* Celda de flecha vertical oculta */
+.flecha-vertical-oculta {
+    background-color: #f1f5f9;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+    height: 50px;
+}
+
+.flecha-vertical-oculta .mensaje-oculto {
+    display: block;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Numero de fila (JS anade .celda-numero a la celda del numero). */
+.celda-numero {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* ===== Resaltado del cuadro de Funcion ===== */
+/* Clase tarea-input que JS pone a los input de la columna Funcion (tipo + "-input").
+   El selector repite td input[type="text"] para ganar en especificidad (sin !important);
+   va despues de las reglas de hover/focus, asi que mantiene su borde al pasar el raton. */
+/* ===== REMARCAR CUADRO DE FUNCIÓN ===== */
+td input[type="text"].tarea-input {
+    border: 2.5px solid var(--primary);
+    background-color: rgba(30, 58, 95, 0.04);
+    font-weight: 500;
+}
+
+/* ===== Responsive ===== */
+/* 768px: punto de corte comun de la app. Header en columna, tabla y textos mas compactos,
+   botones a ancho completo (max 280px) y flecha vertical casi pegada a la izquierda. */
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .header-left, .header-center, .header-right {
+        width: 100%;
+    }
+    
+    .container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    td input[type="text"] {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .flecha {
+        font-size: 1.2rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    .flecha-vertical-clickable {
+        padding-left: 15px !important;
+    }
+}
+
+/* ===== Tema oscuro ===== */
+/* theme.js pone data-theme="dark" en <html>. Redefine colores fijos que no vienen de las
+   variables de base.css. */
+/* ===== TEMA OSCURO ===== */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .language-selector select {
+    border-color: var(--select-border);
+    background-color: var(--select-bg);
+    color: var(--select-text);
+    /* Flecha del selector en oscuro (azul claro %237fa8d4). */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237fa8d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] .language-selector select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .tabla-tareas h2 {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] table {
+    background: var(--section-bg);
+}
+
+[data-theme="dark"] td {
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] td input[type="text"] {
+    background: #212c3d;
+    border-color: var(--border);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] td input[type="text"]:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] td input[type="text"]:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+/* Celdas y flechas ocultas en oscuro: #212c3d (fondo) y #94a3b8 (texto del aviso). */
+[data-theme="dark"] td.celda-oculta {
+    background-color: #212c3d;
+}
+
+[data-theme="dark"] td.celda-oculta .mensaje-oculto {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] td.celda-oculta .mensaje-oculto:hover {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .flecha-vertical-oculta {
+    background-color: #212c3d;
+}
+
+[data-theme="dark"] .flecha-vertical-oculta .mensaje-oculto {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .flecha-vertical-clickable:hover {
+    background-color: rgba(84, 133, 187, 0.12);
+}
+
+/* Resaltado de Funcion en oscuro. */
+[data-theme="dark"] td input[type="text"].tarea-input {
+    background-color: rgba(84, 133, 187, 0.1);
+    border-color: var(--primary-light);
+}

@@ -1,0 +1,582 @@
+/**
+ * evaluacion.css - Estilos propios de evaluacion.html (evaluacion de ideas con los criterios).
+ *
+ * Quien lo carga: solo evaluacion.html, en este orden: css/base.css, este archivo y
+ * css/components/asistente.css. Va DESPUES de base.css, asi que redefine varias de sus
+ * reglas (.container, h1, .btn-primary, .btn-secondary, .btn-calc, .theme-toggle...).
+ *
+ * Contenido: (1) cabecera y selector de idioma, (2) contenedor y titulo, (3) tarjetas
+ * .concepto-section y tablas de calificacion, (4) botones, (5) adaptacion movil
+ * (768px y 480px), (6) controles del header, (7) modo oscuro y su responsive.
+ *
+ * Lo genera JS: js/pages/evaluacion.js (generarTablas) crea en #tablasContainer una
+ * .concepto-section por idea con .concepto-title, una <table> de 5 filas (numero,
+ * criterio, input.calif, resultado) y un boton .btn-calc. El resultado es
+ * span.resultado#res_<tipo>_<idx>. NO se anade ninguna clase de estado por JS (ni
+ * .active ni .error); el unico estado visual es :invalid de los inputs.
+ * CUIDADO: JS tambien crea div.no-conceptos-message (cuando no hay ideas elegidas) y
+ * esta clase NO tiene reglas en este archivo.
+ */
+
+/* CONFIGURABLE: fondo de las tarjetas .concepto-section en tema claro (el oscuro se redefine
+   al final del archivo). Es una variable local de esta pagina, no esta en base.css. */
+:root {
+    --section-bg: #f8fafc;
+}
+
+/* ===== Cabecera y selector de idioma ===== */
+/* Titulo de la app en el header (.app-title, texto traducido por data-i18n). */
+.app-title {
+    margin-bottom: 0.25rem;
+}
+
+/* Selector de idioma (#languageSelector) sobre el header oscuro: por eso usa blancos
+   translucidos. CONFIGURABLE: min-width 120px = ancho minimo del desplegable. */
+.language-selector select {
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.language-selector select:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.language-selector select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+
+/* ===== Contenedor principal y titulo ===== */
+/* Tarjeta central de la pagina. CONFIGURABLE: max-width 1200px (ancho maximo del contenido),
+   margin 3rem (separacion con el header), padding 2.5rem. */
+.container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary);
+    font-size: 2.25rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Barra con los botones Cargar / Guardar evaluacion (.txt). El margin-top negativo
+   compensa el margin-bottom del h1 (3rem) para acercar los botones al titulo. */
+.file-actions {
+    margin-bottom: 2rem;
+    margin-top: -1.5rem;
+}
+
+/* ===== Tarjeta de cada idea y tabla de calificaciones ===== */
+/* Una tarjeta por idea; la crea evaluacion.js en #tablasContainer. Al pasar el raton
+   resalta borde y sombra (transicion 0.2s). El #cbd5e1 del hover es fijo (gris claro); su
+   version oscura esta mas abajo en [data-theme="dark"]. */
+.concepto-section {
+    margin-bottom: 3rem;
+    padding: 2.25rem;
+    background: var(--section-bg);
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.concepto-section:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--card-shadow);
+}
+
+/* Nombre de la idea (se inserta como texto de .concepto-title desde JS). */
+.concepto-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* Tabla de criterios: border-spacing vertical 0.75rem separa las filas como "tarjetas";
+   por eso la tabla usa border-collapse: separate y las esquinas redondeadas se aplican
+   en la primera y ultima celda de cada fila. Afecta a toda <table> de la pagina. */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    margin-bottom: 2rem;
+}
+
+/* Encabezados: # / Criterio / Calificacion (0-10) / Resultado. */
+th {
+    background-color: var(--table-header);
+    color: var(--primary);
+    padding: 1.1rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--border);
+}
+
+/* Celdas: sin padding por defecto (la celda de la calificacion contiene el input a todo
+   el ancho); las columnas 1 y 2 y la ultima lo redefinen abajo. */
+td {
+    padding: 0;
+    background: var(--surface);
+    transition: background-color 0.2s ease;
+}
+
+td:first-child,
+td:nth-child(2) {
+    padding: 1.1rem 1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+/* Columna 1: numero de criterio (1 a 5). CONFIGURABLE: width 60px. */
+td:first-child {
+    text-align: center;
+    width: 60px;
+    font-weight: 600;
+    color: var(--primary);
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+/* Columna 2: nombre del criterio (o "Criterio N" si esta vacio). */
+td:nth-child(2) {
+    border-left: 1px solid var(--border);
+}
+
+/* Columna 3: input de calificacion. CONFIGURABLE: width 200px. */
+td:nth-child(3) {
+    text-align: center;
+    width: 200px;
+}
+
+/* Ultima columna: resultado ponderado (solo la fila 1 contiene el span.resultado).
+   CONFIGURABLE: width 140px y font-size 1.3rem. El fondo verde translucido usa el mismo
+   verde que --success (rgba(13,150,104)); si cambias --success, ajustalo aqui tambien. */
+td:last-child {
+    text-align: center;
+    font-weight: 700;
+    color: var(--success);
+    font-size: 1.3rem;
+    width: 140px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left: 1px solid var(--border);
+    background: rgba(13, 150, 104, 0.04);
+}
+
+/* Input de calificacion (input.calif, 0 a 10 paso 0.1; los limites estan en el HTML que
+   genera evaluacion.js, no aqui). :invalid se activa si el valor esta fuera de rango. */
+input[type="number"] {
+    width: 100%;
+    padding: 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+    background: var(--surface);
+    color: var(--text-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+input[type="number"]:hover {
+    border-color: #cbd5e1;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+}
+
+input[type="number"]:invalid {
+    border-color: var(--error);
+}
+
+/* Boton "Calcular" de cada tarjeta (lo genera evaluacion.js con data-tipo y data-idx).
+   Sobrescribe el .btn-calc de base.css. */
+.btn-calc {
+    margin: 0 auto;
+}
+
+/* ===== Botones Guardar / Continuar / Regreso ===== */
+/* Fila de botones inferior (clase .buttons, definida en base.css; aqui solo el margen). */
+/* ========== BOTONES MODIFICADOS ========== */
+.buttons {
+    margin-top: 4rem;
+}
+
+/* Sobrescribe .btn-primary de base.css. CONFIGURABLE: padding, min-width 160px, y el
+   desplazamiento de hover (translateY(-2px) sube el boton; 0.15s de transicion). */
+.btn-primary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.3), var(--shadow-sm);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Eliminado el estilo :disabled */
+
+/* Boton secundario (Regreso y Cargar/Guardar evaluacion). Mismas dimensiones que el primario
+   para que alineen. */
+.btn-secondary {
+    min-width: 160px;
+    text-align: center;
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.25);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Área de error - ELIMINADA (ya no se usa) */
+/* .error { ... } */
+
+/* Etiqueta del resultado de una idea: span#res_<tipo>_<idx>. Muestra "-" hasta que se pulsa
+   Calcular; JS pone ahi el numero y lo vuelve a "-" si el usuario cambia una calificacion. */
+.resultado {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    background: rgba(13, 150, 104, 0.06);
+    border-radius: 10px;
+    border: 1.5px solid rgba(13, 150, 104, 0.3);
+    min-width: 100px;
+    text-shadow: none;
+}
+
+/* ===== Adaptacion movil (tablet y telefono) ===== */
+/* 768px: punto de corte comun a toda la app (igual que base.css). En movil el header se
+   apila en columna y el orden visual pasa a: izquierda, derecha (controles), centro (titulo). */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        width: 100%;
+        text-align: center;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .header-center {
+        order: 3;
+        margin-top: 0.5rem;
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .project-name-container {
+        font-size: 1rem;
+    }
+
+    .language-selector select {
+        min-width: 100px;
+    }
+
+    .container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .concepto-section {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .concepto-title {
+        font-size: 1.2rem;
+    }
+
+    table {
+        font-size: 0.95rem;
+    }
+
+    th, td {
+        padding: 0.875rem 0.75rem;
+    }
+
+    .buttons {
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 280px;
+        min-width: auto;
+        font-size: 1.05rem;
+        padding: 1rem 1.5rem;
+    }
+
+    .file-actions {
+        margin-top: 0;
+    }
+}
+
+/* 480px: telefonos pequenos. La tabla pasa a display: block con scroll horizontal para
+   que las 4 columnas (anchos fijos) no desborden la pagina. */
+@media (max-width: 480px) {
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .project-name-container {
+        font-size: 0.95rem;
+    }
+    
+    .language-selector select {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 90px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .concepto-title {
+        font-size: 1.1rem;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    td:last-child {
+        font-size: 1.05rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===== Controles del header (tema e idioma) ===== */
+/* Contenedor de #themeToggle y del selector de idioma, alineado a la derecha. */
+/* ========== CONTROLES DEL HEADER ========== */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.theme-toggle:active {
+    transform: scale(0.94);
+}
+
+/* ===== Modo oscuro ===== */
+/* theme.js pone data-theme="dark" en <html>; estas reglas redefinen colores fijos que no
+   salen de las variables de base.css. */
+/* CONFIGURABLE: fondo de las tarjetas .concepto-section en oscuro. */
+/* ========== VARIABLES PARA MODO OSCURO ========== */
+[data-theme="dark"] {
+    --section-bg: #161f30;
+}
+
+/* Varios de estos bloques repiten valores de base.css con variables (son redundantes pero
+   inofensivos). Los colores fijos (#212c3d celdas e inputs, #3d4a5e bordes en hover,
+   rgba(21,168,119) verde de exito) no tienen variable: cambialos aqui si cambias la paleta. */
+/* ========== ESTILOS MODO OSCURO ========== */
+[data-theme="dark"] body {
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .project-name-container {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .concepto-section {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .concepto-section:hover {
+    border-color: #3d4a5e;
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .concepto-title {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] table th {
+    background-color: var(--table-header);
+    color: var(--primary-light);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] td {
+    background: #212c3d;
+}
+
+[data-theme="dark"] td:first-child {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] td:nth-child(2) {
+    color: var(--text-dark);
+    border-left-color: var(--border);
+}
+
+[data-theme="dark"] td:last-child {
+    color: var(--success);
+    border-left-color: var(--border);
+    background: rgba(21, 168, 119, 0.08);
+}
+
+[data-theme="dark"] input[type="number"] {
+    background: #212c3d;
+    border-color: var(--border);
+    color: var(--text-dark);
+    box-shadow: none;
+}
+
+[data-theme="dark"] input[type="number"]:hover {
+    border-color: #3d4a5e;
+}
+
+[data-theme="dark"] input[type="number"]:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(84, 133, 187, 0.18);
+}
+
+[data-theme="dark"] .theme-toggle {
+    border-color: rgba(84, 133, 187, 0.35);
+    background: rgba(59, 110, 165, 0.12);
+    color: #7fa8d4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(59, 110, 165, 0.22);
+    border-color: rgba(84, 133, 187, 0.6);
+}
+
+[data-theme="dark"] .language-selector select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .language-selector select:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--primary);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+[data-theme="dark"] .resultado {
+    background: rgba(21, 168, 119, 0.1);
+    border-color: rgba(21, 168, 119, 0.4);
+}
+
+/* ===== Adaptacion movil de los controles del header (768px y 480px) ===== */
+/* En movil el boton de tema se reduce (38px y luego 36px) y los controles se centran. */
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .header-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    .theme-toggle {
+        order: 1;
+    }
+    
+    .language-selector {
+        order: 2;
+    }
+    
+    .theme-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+    }
+}
