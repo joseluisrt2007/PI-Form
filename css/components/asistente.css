@@ -220,6 +220,34 @@
 }
 
 /* Boton enviar cuadrado de 42px (flex-shrink: 0 impide que el textarea lo aplaste). Transicion de fondo de 0.2s. */
+/* Botón de dictado por voz (🎤), a la izquierda de Enviar. Mismo tamaño que .asistente-enviar.
+   La clase .escuchando (la pone assistant.js mientras se dicta) lo pinta en rojo con un pulso. */
+.asistente-mic {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.asistente-mic:hover {
+    border-color: var(--primary);
+}
+/* CONFIGURABLE: rojo de "grabando" (el mismo en claro y oscuro). */
+.asistente-mic.escuchando {
+    background: #c0392b;
+    border-color: #c0392b;
+    color: #ffffff;
+    animation: asistente-mic-pulso 1.2s ease-in-out infinite;
+}
+@keyframes asistente-mic-pulso {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0); }
+}
 .asistente-enviar {
     width: 42px;
     height: 42px;
