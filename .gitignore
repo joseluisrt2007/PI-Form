@@ -1,0 +1,13 @@
+# Nunca subir credenciales
+.env
+.env.local
+.env*.local
+
+# Vercel
+.vercel
+
+# Node (por si en el futuro se agregan dependencias)
+node_modules/
+
+# Sistema
+.DS_Store

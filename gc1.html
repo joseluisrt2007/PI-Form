@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!--
+        PÁGINA: gc1.html
+        PROPÓSITO: formación de conceptos: matriz de casillas donde, en cada una de 3 columnas (conceptos formados), se elige UNA posibilidad por elemento.
+        POSICIÓN EN EL FLUJO (js/core/flow.js, FLOW_STEPS): octavo paso de FLOW_STEPS; solo con exploracionConceptos activo, después de morfologia.html y antes de evalConceptos.html.
+        CSS (en este orden): css/base.css primero (variables, cabecera, botones, tema oscuro) y después css/pages/gc1.css con lo específico de la página; el segundo puede sobrescribir al primero, por eso no se invierten.
+        SCRIPTS (al final del body, en orden de dependencia; ver el comentario antes de ellos): i18n/es.js, i18n/en.js, js/core/{i18n,storage,theme,flow,page}.js, js/shared/elementos.js y js/pages/gc1.js.
+        MÓDULOS DE LOS QUE DEPENDE: PFM.i18n, PFM.storage, PFM.theme, PFM.flow y PFM.page (js/core/). Además PFM.elementos.getActivos. Lee pos_<tipo>_<idx>_<fila> (morfologia) y escribe fila_grupo_<tipo>_<idx>_col<k> (número de fila elegida; migra el formato antiguo pastel_grupo_*), que leen evalConceptos.js, prevenir.js y js/pdf/grupos.js vía PFM.elementos.getOpcionElegida.
+        TEXTOS: los elementos con data-i18n o data-i18n-placeholder usan una clave de i18n/es.js e i18n/en.js; el texto escrito en este HTML es solo el valor por defecto antes de traducir y puede diferir del texto final.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        data-i18n="concept_formation" en el <title>: js/core/i18n.js reemplaza el texto de la pestaña con esa clave (i18n/es.js e i18n/en.js); el texto de aquí es el valor por defecto.
+    -->
+    <title data-i18n="concept_formation">Formación de Conceptos - Actividades de Mejora</title>
+    <!--
+        Fuente Roboto desde Google Fonts: los dos preconnect y el link de la hoja aceleran la descarga; requiere Internet, sin conexión el navegador usa una fuente alternativa.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/pages/gc1.css">
+</head>
+<body>
+    <!--
+        CABECERA común a las páginas: tres zonas (izquierda reservada, centro con título y nombre de proyecto, derecha con tema e idioma). Estilos en css/base.css.
+    -->
+    <header role="banner">
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <!-- Zona central: título de la aplicación y nombre del proyecto en curso. -->
+        <div class="header-center">
+            <!--
+                data-i18n="app_title": clave en i18n/es.js e i18n/en.js; el texto de aquí es el valor por defecto y se sustituye al traducir.
+            -->
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+            <!--
+                id="projectNameDisplay": contenedor del nombre de proyecto; ningún JS lo usa, solo css/base.css (.project-name-container).
+            -->
+            <div class="project-name-container" id="projectNameDisplay">
+                <!--
+                    data-i18n="project": etiqueta "Proyecto:" (clave en i18n/es.js e i18n/en.js). id="projectNameText": lo escribe js/core/page.js (updateProjectName) con projectData.projectName o "(Sin nombre)" traducido (clave unnamed_project).
+                -->
+                <span data-i18n="project">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <!--
+                Controles de cabecera: botón de tema y selector de idioma, ambos conectados por js/core/ (no por el script de la página).
+            -->
+            <div class="header-controls">
+                <!--
+                    id="themeToggle": lo conecta js/core/theme.js (PFM.theme.init, llamado desde PFM.page.init) para alternar claro/oscuro; guarda localStorage["theme"] (no renombrar esa clave). El title y el emoji se reescriben por JS según el tema.
+                -->
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    🌙
+                </button>
+                <!-- Selector de idioma. -->
+                <div class="language-selector">
+                    <!--
+                        id="languageSelector": lo conecta js/core/page.js (PFM.page.init): refleja PFM.i18n.getLang() y al cambiar llama a PFM.i18n.setLanguage, que guarda localStorage["preferredLanguage"].
+                    -->
+                    <select id="languageSelector">
+                        <!--
+                            CONFIGURABLE: cada <option value> debe ser un código existente en PFM.translations (es, en). Para agregar un idioma: crear i18n/<lang>.js, cargarlo antes de core/i18n.js en TODOS los HTML y añadir aquí su option (ver cabecera de i18n/es.js).
+                        -->
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!--
+            data-i18n="concept_formation": en es.js vale "Formación de Conceptos" (igual que el valor por defecto del HTML).
+        -->
+        <h1 data-i18n="concept_formation">Formación de Conceptos</h1>
+
+        <!--
+            id="tablasContainer": js/pages/gc1.js genera aquí una tabla por elemento activo con casillas .chk (data-elem, data-col, data-pos-key) y encabezados con data-i18n-col; no hay filas estáticas. CONFIGURABLE: filas (posibilidades) y columnas (3 conceptos formados) se definen en gc1.js y deben coincidir con morfologia.js, evalConceptos.js y el PDF. CUIDADO: no renombrar el id.
+        -->
+        <div id="tablasContainer"></div>
+
+        <!--
+            BARRA DE BOTONES común: Guardar / Continuar / Regreso; los tres los conecta js/core/page.js (PFM.page.init).
+        -->
+        <div class="buttons">
+            <!--
+                id="guardarBtn": js/core/page.js lo enlaza a la función save() que la página pasa a PFM.page.init (la de js/pages/gc1.js). CUIDADO: no renombrar los ids guardarBtn, continuarBtn y anteriorBtn, o dejan de funciónar en silencio.
+            -->
+            <button class="btn-primary" id="guardarBtn" data-i18n="save">Guardar</button>
+            <!--
+                id="continuarBtn": ejecuta save() y navega con PFM.flow.getNextPage("gc1.html"), que sigue FLOW_STEPS según los módulos elegidos en descripcion.html.
+            -->
+            <button class="btn-primary" id="continuarBtn" data-i18n="continue">Continuar</button>
+            <!--
+                id="anteriorBtn": navega con PFM.flow.getPreviousPage("gc1.html"); si es la primera página del flujo activo vuelve a index.html.
+            -->
+            <button class="btn-secondary" id="anteriorBtn" data-i18n="back">Regreso</button>
+        </div>
+    </div>
+
+    <!--
+        ORDEN DE LOS SCRIPTS - NO REORDENAR. Sin módulos ES (file://), cada archivo asume que los anteriores ya cargaron y se comunican por el objeto global PFM:
+        1) i18n/es.js e i18n/en.js crean PFM.translations.es / .en.
+        2) js/core/i18n.js lee PFM.translations al cargarse, por eso va después de los diccionarios.
+        3) js/core/storage.js (sin dependencias): PFM.storage sobre localStorage['projectData'].
+        4) js/core/theme.js usa PFM.i18n (claves theme_light y theme_dark).
+        5) js/core/flow.js usa PFM.storage (lee modulosSeleccionados) y define FLOW_STEPS.
+        6) js/core/page.js (PFM.page.init) usa i18n, storage, theme y flow, asi que va el ultimo del nucleo.
+        Después van las utilidades de la página y, al final, su script, que llama a PFM.page.init en DOMContentLoaded.
+    -->
+    <!-- Núcleo compartido (el orden importa) -->
+    <script src="i18n/es.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/core/html.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/flow.js"></script>
+    <script src="js/core/page.js"></script>
+    <!-- Utilidades compartidas: js/shared/elementos.js antes de gc1.js. -->
+    <!-- Utilidades compartidas -->
+    <script src="js/shared/elementos.js"></script>
+    <!--
+        Script propio de la página: va después de todo lo que usa (nucleo, utilidades) porque se ejecuta en cuanto carga y registra su DOMContentLoaded.
+    -->
+    <!-- Lógica de esta página -->
+    <script src="js/pages/gc1.js"></script>
+</body>
+</html>

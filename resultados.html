@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!--
+        PÁGINA: resultados.html
+        PROPÓSITO: generar y descargar automáticamente el informe PDF del proyecto, y permitir descargarlo de nuevo o volver al menú.
+        POSICIÓN EN EL FLUJO (js/core/flow.js, FLOW_STEPS): último paso de FLOW_STEPS (modulo "siempre"); es el respaldo de getNextPage. Sus botones no son los comunes: no hay Guardar/Continuar/Regreso.
+        CSS (en este orden): css/base.css primero (variables, cabecera, botones, tema oscuro) y después css/pages/resultados.css con lo específico de la página; el segundo puede sobrescribir al primero, por eso no se invierten.
+        SCRIPTS (al final del body, en orden de dependencia; ver el comentario antes de ellos): i18n/es.js, i18n/en.js, js/core/{i18n,storage,theme,flow,page}.js, js/core/file-io.js, js/shared/elementos.js, js/shared/scoring.js, i18n/pdf.js, i18n/resultados.js, js/pdf/* (context, grupos, evaluacion-elementos, 14 secciones y report.js) y js/pages/resultados.js. Además jsPDF 2.5.1 en el head.
+        MÓDULOS DE LOS QUE DEPENDE: PFM.i18n, PFM.storage, PFM.theme, PFM.flow y PFM.page (js/core/). Además PFM.fileIO.downloadBlob, PFM.scoring, PFM.pdf.generateReport y jsPDF (window.jspdf). Solo lee projectData (todo el proyecto); no escribe.
+        TEXTOS: los elementos con data-i18n o data-i18n-placeholder usan una clave de i18n/es.js e i18n/en.js; el texto escrito en este HTML es solo el valor por defecto antes de traducir y puede diferir del texto final.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        Esta página no usa data-i18n: js/pages/resultados.js asigna document.title y los textos desde i18n/resultados.js (PFM.resultadosStrings).
+    -->
+    <title>Resultados - Actividades de Mejora</title>
+    <!--
+        Fuente Roboto desde Google Fonts: los dos preconnect y el link de la hoja aceleran la descarga; requiere Internet, sin conexión el navegador usa una fuente alternativa.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!--
+        jsPDF 2.5.1 desde CDN (cdnjs, jspdf.umd.min.js), en el head para estar cargado antes que cualquier script del body: js/pdf/report.js crea new jsPDF() (A4 vertical, unidades mm) y js/pages/resultados.js comprueba window.jspdf (si falta muestra un alert y no genera el PDF). CUIDADO: requiere Internet; no está empaquetado en el proyecto. CONFIGURABLE: para cambiar de versión se edita la URL aquí, pero las unidades y el formato por defecto que documenta js/pdf/context.js corresponden a 2.5.1: probar el PDF completo tras cambiarla. Para uso sin conexión, alojar el archivo localmente y apuntar src a él.
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/pages/resultados.css">
+</head>
+<body>
+    <!--
+        CABECERA común a las páginas: tres zonas (izquierda reservada, centro con título y nombre de proyecto, derecha con tema e idioma). Estilos en css/base.css.
+    -->
+    <header role="banner">
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <!-- Zona central: título de la aplicación y nombre del proyecto en curso. -->
+        <div class="header-center">
+            <!--
+                id="appTitleText": lo usa js/pages/resultados.js (updateInterface) para escribir app_title desde i18n/resultados.js; esta página no usa data-i18n.
+            -->
+            <div class="app-title" id="appTitleText">Desarrollo de Formularios para Actividades de Mejora</div>
+            <!--
+                id="projectNameDisplay": contenedor del nombre de proyecto; ningún JS lo usa, solo css/base.css (.project-name-container).
+            -->
+            <div class="project-name-container" id="projectNameDisplay">
+                <!--
+                    id="projectLabel": lo usa js/pages/resultados.js (updateInterface) para la etiqueta "Proyecto:". id="projectNameText": lo escribe js/core/page.js (updateProjectName) con projectData.projectName o "(Sin nombre)" traducido.
+                -->
+                <span id="projectLabel">Proyecto:</span> <span id="projectNameText">(Sin nombre)</span>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <!--
+                Controles de cabecera: botón de tema y selector de idioma, ambos conectados por js/core/ (no por el script de la página).
+            -->
+            <div class="header-controls">
+                <!--
+                    id="themeToggle": lo conecta js/core/theme.js (PFM.theme.init, llamado desde PFM.page.init) para alternar claro/oscuro; guarda localStorage["theme"] (no renombrar esa clave). El title y el emoji se reescriben por JS según el tema.
+                -->
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    🌙
+                </button>
+                <!-- Selector de idioma. -->
+                <div class="language-selector">
+                    <!--
+                        id="languageSelector": lo conecta js/core/page.js (PFM.page.init): refleja PFM.i18n.getLang() y al cambiar llama a PFM.i18n.setLanguage, que guarda localStorage["preferredLanguage"].
+                    -->
+                    <select id="languageSelector">
+                        <!--
+                            CONFIGURABLE: cada <option value> debe ser un código existente en PFM.translations (es, en). Para agregar un idioma: crear i18n/<lang>.js, cargarlo antes de core/i18n.js en TODOS los HTML y añadir aquí su option (ver cabecera de i18n/es.js).
+                        -->
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!--
+        CONTENIDO: mensaje de éxito, nombre del archivo, botón para descargar de nuevo y botón de volver al menú. El PDF se genera una sola vez al abrir la página (con 1 s de espera tras cargar), en el idioma del momento; cambiar de idioma después solo traduce estos textos.
+    -->
+    <main>
+        <div class="container">
+            <!--
+                id="reportTitle": js/pages/resultados.js (updateInterface) escribe aquí report_generated de i18n/resultados.js; el texto del HTML es el valor por defecto en español.
+            -->
+            <h1 id="reportTitle">¡Informe generado con éxito!</h1>
+
+            <!--
+                id="pdfDownloadInfo": resultados.js lo reescribe con innerHTML (la clave pdf_download_info lleva un br); el texto del HTML es el valor por defecto.
+            -->
+            <div class="success-message" id="pdfDownloadInfo">
+                El informe PDF de su proyecto ha sido generado y descargado automáticamente.<br>
+                Puede encontrarlo en la carpeta de descargas de su navegador.
+            </div>
+
+            <!-- Bloque con el nombre del archivo y la descarga repetida. -->
+            <div class="pdf-info">
+                <!--
+                    id="filenameLabel": etiqueta traducida por resultados.js (clave pdf_filename). id="filenameDisplay": resultados.js escribe el nombre informe_<proyecto>.pdf (espacios cambiados por guion bajo).
+                -->
+                <strong id="filenameLabel">Nombre del archivo:</strong> <span id="filenameDisplay"></span><br><br>
+                <!--
+                    id="downloadAgainBtn": resultados.js vuelve a descargar el PDF ya generado (o lo genera si aún no existe). Su texto se reescribe con la clave download_pdf.
+                -->
+                <button class="btn-primary" id="downloadAgainBtn">Descargar PDF nuevamente</button>
+            </div>
+
+            <div class="buttons">
+                <!--
+                    id="returnMainMenuBtn": resultados.js navega a index.html. Es el único botón de navegación de esta página; su texto se reescribe con return_main_menu. CUIDADO: no renombrar los ids de este bloque, resultados.js los usa por id (los ausentes se ignoran sin avisar).
+                -->
+                <button class="btn-secondary" id="returnMainMenuBtn">Volver al menú principal</button>
+            </div>
+        </div>
+    </main>
+
+    <!--
+        ORDEN DE LOS SCRIPTS - NO REORDENAR. Sin módulos ES (file://), cada archivo asume que los anteriores ya cargaron y se comunican por el objeto global PFM:
+        1) i18n/es.js e i18n/en.js crean PFM.translations.es / .en.
+        2) js/core/i18n.js lee PFM.translations al cargarse, por eso va después de los diccionarios.
+        3) js/core/storage.js (sin dependencias): PFM.storage sobre localStorage['projectData'].
+        4) js/core/theme.js usa PFM.i18n (claves theme_light y theme_dark).
+        5) js/core/flow.js usa PFM.storage (lee modulosSeleccionados) y define FLOW_STEPS.
+        6) js/core/page.js (PFM.page.init) usa i18n, storage, theme y flow, asi que va el ultimo del nucleo.
+        Después van las utilidades de la página y, al final, su script, que llama a PFM.page.init en DOMContentLoaded.
+    -->
+    <!-- Núcleo compartido (el orden importa) -->
+    <script src="i18n/es.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/core/html.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/flow.js"></script>
+    <script src="js/core/page.js"></script>
+    <!--
+        js/core/file-io.js (PFM.fileIO.downloadBlob, usado para descargar el PDF) depende de PFM.i18n; va tras page.js y antes de los módulos PDF.
+    -->
+    <script src="js/core/file-io.js"></script>
+    <!--
+        js/shared/scoring.js (pesos y totales ponderados que usan las secciones de evaluación del PDF) usa PFM.i18n.
+    -->
+    <!-- Utilidades compartidas -->
+    <script src="js/shared/elementos.js"></script>
+    <script src="js/shared/scoring.js"></script>
+    <!--
+        BLOQUE DE SCRIPTS DEL PDF - NO REORDENAR (cada archivo asume que los anteriores ya cargaron): 1) i18n/pdf.js (PFM.pdfStrings, textos del informe) e i18n/resultados.js (PFM.resultadosStrings, textos de esta página); 2) js/pdf/context.js (contexto de dibujo), js/pdf/grupos.js y js/pdf/evaluacion-elementos.js (ayudas compartidas por las secciones); 3) las 14 secciones de js/pdf/sections/, cada una registra PFM.pdf.sections.<nombre>; 4) js/pdf/report.js al final: define ORDEN y falla (TypeError) si alguna sección de ORDEN no está cargada; 5) js/pages/resultados.js, que invoca PFM.pdf.generateReport. CONFIGURABLE: para agregar o quitar una sección hay que cargar su archivo aquí ANTES de report.js y añadir o quitar su nombre en ORDEN (js/pdf/report.js); sus textos van en i18n/pdf.js, en es y en en.
+    -->
+    <!-- Generación del informe PDF -->
+    <script src="i18n/pdf.js"></script>
+    <script src="i18n/resultados.js"></script>
+    <script src="js/pdf/context.js"></script>
+    <script src="js/pdf/grupos.js"></script>
+    <script src="js/pdf/evaluacion-elementos.js"></script>
+    <!--
+        Secciones del informe (una por archivo): portada, info-proyecto, criterios, ideas, evaluacion-ideas, evaluacion-funciones, plan-accion, exploracion, formacion, conceptos-formados, evaluacion-conceptos, mejor-concepto, prevencion y cierre. Cuáles se imprimen lo decide enabled(modulos) de cada una; el orden real lo fija ORDEN en report.js, no el de estos script.
+    -->
+    <script src="js/pdf/sections/portada.js"></script>
+    <script src="js/pdf/sections/info-proyecto.js"></script>
+    <script src="js/pdf/sections/criterios.js"></script>
+    <script src="js/pdf/sections/ideas.js"></script>
+    
+    <script src="js/pdf/sections/evaluacion-ideas.js"></script>
+    <script src="js/pdf/sections/evaluacion-funciones.js"></script>
+    <script src="js/pdf/sections/plan-accion.js"></script>
+    <script src="js/pdf/sections/exploracion.js"></script>
+    <script src="js/pdf/sections/formacion.js"></script>
+    <script src="js/pdf/sections/conceptos-formados.js"></script>
+    <script src="js/pdf/sections/evaluacion-conceptos.js"></script>
+    <script src="js/pdf/sections/mejor-concepto.js"></script>
+    <script src="js/pdf/sections/prevencion.js"></script>
+    <script src="js/pdf/sections/cierre.js"></script>
+    <!--
+        js/pdf/report.js: debe ir DESPUÉS de context.js, grupos.js, evaluacion-elementos.js y de todas las secciones, y ANTES de js/pages/resultados.js. Expone PFM.pdf.generateReport(data), que devuelve un Blob.
+    -->
+    <script src="js/pdf/report.js"></script>
+    <!--
+        Script propio de la página: va después de todo lo que usa (nucleo, utilidades) porque se ejecuta en cuanto carga y registra su DOMContentLoaded.
+    -->
+    <!-- Lógica de esta página -->
+    <script src="js/pages/resultados.js"></script>
+</body>
+</html>

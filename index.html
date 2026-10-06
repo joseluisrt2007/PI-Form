@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!--
+        PÁGINA: index.html
+        PROPÓSITO: menú principal: da la bienvenida y el botón Iniciar. No captura datos.
+        POSICIÓN EN EL FLUJO (js/core/flow.js, FLOW_STEPS): NO figura en FLOW_STEPS: es el punto de entrada y el destino de respaldo de getPreviousPage (devuelve index.html cuando la página es la primera del flujo) y del botón "Volver al menú principal" de resultados.html. Iniciar lleva a descripcion.html (primera fila de FLOW_STEPS).
+        CSS (en este orden): css/base.css primero (variables, cabecera, botones, tema oscuro) y después css/pages/index.css con lo específico de la página; el segundo puede sobrescribir al primero, por eso no se invierten.
+        SCRIPTS (al final del body, en orden de dependencia; ver el comentario antes de ellos): i18n/es.js, i18n/en.js, js/core/{i18n,storage,theme,flow,page}.js y js/pages/index.js.
+        MÓDULOS DE LOS QUE DEPENDE: PFM.i18n, PFM.storage, PFM.theme, PFM.flow y PFM.page (js/core/). index.js solo usa PFM.storage.ensure y PFM.page.
+        TEXTOS: los elementos con data-i18n o data-i18n-placeholder usan una clave de i18n/es.js e i18n/en.js; el texto escrito en este HTML es solo el valor por defecto antes de traducir y puede diferir del texto final.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        data-i18n="app_title" en el <title>: js/core/i18n.js reemplaza el texto de la pestaña con esa clave (i18n/es.js e i18n/en.js); el texto de aquí es el valor por defecto.
+    -->
+    <title data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</title>
+    <!--
+        Fuente Roboto desde Google Fonts: los dos preconnect y el link de la hoja aceleran la descarga; requiere Internet, sin conexión el navegador usa una fuente alternativa.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/pages/index.css">
+</head>
+<body>
+    <!--
+        CABECERA común a las páginas: tres zonas (izquierda reservada, centro con título y nombre de proyecto, derecha con tema e idioma). Estilos en css/base.css.
+    -->
+    <!--
+        NOTA: en esta página la zona central no incluye el nombre de proyecto (no hay #projectNameText); js/core/page.js ignora los ids ausentes.
+    -->
+    <header role="banner">
+        <div class="header-left">
+            <!-- Espacio reservado para alineación -->
+        </div>
+        
+        <!-- Zona central: título de la aplicación. -->
+        <div class="header-center">
+            <!--
+                data-i18n="app_title": clave en i18n/es.js e i18n/en.js; el texto de aquí es el valor por defecto y se sustituye al traducir.
+            -->
+            <div class="app-title" data-i18n="app_title">Desarrollo de Formularios para Actividades de Mejora</div>
+        </div>
+        
+        <div class="header-right">
+            <!--
+                Controles de cabecera: botón de tema y selector de idioma, ambos conectados por js/core/ (no por el script de la página).
+            -->
+            <div class="header-controls">
+                <!--
+                    id="themeToggle": lo conecta js/core/theme.js (PFM.theme.init, llamado desde PFM.page.init) para alternar claro/oscuro; guarda localStorage["theme"] (no renombrar esa clave). El title y el emoji se reescriben por JS según el tema.
+                -->
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                    🌙
+                </button>
+                <!-- Selector de idioma. -->
+                <div class="language-selector">
+                    <!--
+                        id="languageSelector": lo conecta js/core/page.js (PFM.page.init): refleja PFM.i18n.getLang() y al cambiar llama a PFM.i18n.setLanguage, que guarda localStorage["preferredLanguage"].
+                    -->
+                    <select id="languageSelector">
+                        <!--
+                            CONFIGURABLE: cada <option value> debe ser un código existente en PFM.translations (es, en). Para agregar un idioma: crear i18n/<lang>.js, cargarlo antes de core/i18n.js en TODOS los HTML y añadir aquí su option (ver cabecera de i18n/es.js).
+                        -->
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="en">🇺🇸 English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!--
+        CONTENIDO: menú principal con título y botón Iniciar. No hay barra Guardar/Continuar/Regreso en esta página (index.js llama a PFM.page.init sin page ni save).
+    -->
+    <main>
+        <!--
+            data-i18n="main_menu": clave en i18n/es.js e i18n/en.js (valor por defecto del HTML: "Menú Principal"). Estilo: css/pages/index.css.
+        -->
+        <h1 class="page-title" data-i18n="main_menu">Menú Principal</h1>
+        <!-- Contenedor del botón de inicio (estilo en css/pages/index.css). -->
+        <div class="menu-actions">
+            <!--
+                id="startBtn": lo usa js/pages/index.js para navegar a descripcion.html al hacer clic. data-i18n="start" (en es.js el valor incluye emoji). CUIDADO: el aria-label está fijo en español y no pasa por i18n. CONFIGURABLE: si cambia la primera página del flujo, actualizar la navegación en index.js junto con FLOW_STEPS (flow.js).
+            -->
+            <button class="btn-primary" id="startBtn" aria-label="Iniciar una nueva actividad de mejora" data-i18n="start">
+                 Iniciar
+            </button>
+        </div>
+    </main>
+
+    <!--
+        PIE DE PÁGINA: js/core/i18n.js lo localiza por footer[role="contentinfo"] y, como no tiene data-i18n, sustituye su texto por la clave footer_text de i18n/es.js e i18n/en.js; el texto de aquí es solo el valor por defecto. CONFIGURABLE: para cambiar los créditos editar footer_text en ambos idiomas. CUIDADO: no quitar role="contentinfo" ni el atributo si se desea mantener esa traducción.
+    -->
+    <footer role="contentinfo">
+        José Luis Rodríguez Téllez — ITESM Hidalgo — Salvador Gonzáles García
+    </footer>
+
+    <!--
+        ORDEN DE LOS SCRIPTS - NO REORDENAR. Sin módulos ES (file://), cada archivo asume que los anteriores ya cargaron y se comunican por el objeto global PFM:
+        1) i18n/es.js e i18n/en.js crean PFM.translations.es / .en.
+        2) js/core/i18n.js lee PFM.translations al cargarse, por eso va después de los diccionarios.
+        3) js/core/storage.js (sin dependencias): PFM.storage sobre localStorage['projectData'].
+        4) js/core/theme.js usa PFM.i18n (claves theme_light y theme_dark).
+        5) js/core/flow.js usa PFM.storage (lee modulosSeleccionados) y define FLOW_STEPS.
+        6) js/core/page.js (PFM.page.init) usa i18n, storage, theme y flow, asi que va el ultimo del nucleo.
+        Después van las utilidades de la página y, al final, su script, que llama a PFM.page.init en DOMContentLoaded.
+    -->
+    <!-- Núcleo compartido (el orden importa) -->
+    <script src="i18n/es.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/core/html.js"></script>
+    <script src="js/core/theme.js"></script>
+    <script src="js/core/flow.js"></script>
+    <script src="js/core/page.js"></script>
+    <!--
+        Script propio de la página: va después de todo lo que usa (nucleo, utilidades) porque se ejecuta en cuanto carga y registra su DOMContentLoaded.
+    -->
+    <!-- Lógica de esta página -->
+    <script src="js/pages/index.js"></script>
+</body>
+</html>
