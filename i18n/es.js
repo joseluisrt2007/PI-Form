@@ -204,6 +204,15 @@
         'assistant_greeting_ideas': '¡Hola! Ayudémonos a generar ideas para tu proyecto. ¿Qué problema específico quieres resolver?',
         'assistant_greeting_evaluacion': '¡Hola! Vamos a evaluar tus ideas frente a tus criterios. ¿Prefieres que revisemos idea por idea, o me das primero tu opinión general?',
         'assistant_greeting_default': '¡Hola! ¿En qué te puedo ayudar?',
+        'assistant_mic': 'Dictar por voz',
+        'assistant_mic_stop': 'Detener dictado',
+        'assistant_listening': 'Escuchando… habla ahora',
+        'assistant_voice_unsupported': 'Tu navegador no admite dictado por voz. Usa Chrome o Edge, o escribe tu mensaje.',
+        'assistant_voice_denied': 'No se pudo usar el micrófono. Permite el acceso al micrófono en tu navegador (la página debe abrirse con HTTPS).',
+        'assistant_voice_no_speech': 'No se escuchó nada. Pulsa el micrófono e inténtalo de nuevo.',
+        'assistant_voice_no_mic': 'No se encontró un micrófono. Conecta uno e inténtalo de nuevo.',
+        'assistant_voice_network': 'El servicio de voz del navegador no está disponible. Revisa tu conexión.',
+        'assistant_voice_error': 'No se pudo iniciar el dictado por voz.',
 
         // PIE DE PÁGINA
         'footer_text': 'José Luis Rodríguez Téllez — Salvador González García'

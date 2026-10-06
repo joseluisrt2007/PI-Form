@@ -178,6 +178,15 @@
         'assistant_greeting_ideas': 'Hi! Let\'s generate ideas for your project. What specific problem do you want to solve?',
         'assistant_greeting_evaluacion': 'Hi! Let\'s evaluate your ideas against your criteria. Would you rather go idea by idea, or give me your general opinion first?',
         'assistant_greeting_default': 'Hi! How can I help you?',
+        'assistant_mic': 'Dictate by voice',
+        'assistant_mic_stop': 'Stop dictation',
+        'assistant_listening': 'Listening… speak now',
+        'assistant_voice_unsupported': 'Your browser does not support voice dictation. Use Chrome or Edge, or type your message.',
+        'assistant_voice_denied': 'Could not use the microphone. Allow microphone access in your browser (the page must be opened over HTTPS).',
+        'assistant_voice_no_speech': 'Nothing was heard. Press the microphone and try again.',
+        'assistant_voice_no_mic': 'No microphone was found. Connect one and try again.',
+        'assistant_voice_network': 'The browser voice service is unavailable. Check your connection.',
+        'assistant_voice_error': 'Could not start voice dictation.',
 
         
         // FOOTER 
