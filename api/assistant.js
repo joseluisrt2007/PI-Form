@@ -245,6 +245,7 @@ const TEXTOS = {
     sinIdeas: '(el usuario todavía no tiene ideas registradas; dile que regrese a la página de Ideas primero)',
     sinCriterios: '(no hay criterios registrados)',
     bloqueEvaluacion: (elementos, criterios) => `IDEAS A EVALUAR:\n${elementos}\n\nCRITERIOS (numerados del 1 al 5):\n${criterios}`,
+    notaVoz: 'Nota: el usuario puede escribir sus mensajes dictándolos por voz, así que pueden venir sin puntuación, con mayúsculas irregulares o con alguna palabra mal reconocida. Interpreta la intención con tolerancia y, si algo es ambiguo, pregúntalo. Los números pueden venir escritos con letras ("tres", "siete punto cinco"); conviértelos a cifras en el archivo.',
     errMetodo: 'Método no permitido',
     errSinClave: 'El servidor no tiene configurada la variable GEMINI_API_KEY.',
     errContexto: 'Contexto inválido.',
@@ -259,6 +260,7 @@ const TEXTOS = {
     sinIdeas: '(the user has no ideas yet; tell them to go back to the Ideas page first)',
     sinCriterios: '(no criteria registered)',
     bloqueEvaluacion: (elementos, criterios) => `IDEAS TO EVALUATE:\n${elementos}\n\nCRITERIA (numbered 1 to 5):\n${criterios}`,
+    notaVoz: 'Note: the user may type messages by voice dictation, so they may lack punctuation, have irregular capitalization or contain a misrecognized word. Interpret the intent tolerantly and, if something is ambiguous, ask. Numbers may be spelled out ("three", "seven point five"); convert them to digits in the file.',
     errMetodo: 'Method not allowed',
     errSinClave: 'The server does not have the GEMINI_API_KEY variable configured.',
     errContexto: 'Invalid context.',
@@ -403,6 +405,7 @@ module.exports = async (req, res) => {
     res.status(400).json({ error: tx.errContexto });
     return;
   }
+  if (systemPrompt) systemPrompt += `\n\n${tx.notaVoz}`;
   if (!systemPrompt) {
     res.status(400).json({ error: tx.errPagina });
     return;
