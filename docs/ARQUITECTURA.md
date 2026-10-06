@@ -94,6 +94,8 @@ antes de `report.js` y añade `'<nombre>'` a `ORDEN` en `js/pdf/report.js`.
 (Nota: `base.css` se carga primero; las páginas pueden sobrescribirlo. Desde esta versión incluye también los componentes compartidos de la cabecera y los botones: `.language-selector`, `.theme-toggle`, `.btn-primary`, `.btn-secondary`, `.btn-file-action`, `.btn-calc`, con sus variantes oscuras y responsive. CUIDADO: cambiar un valor ahí afecta a todas las páginas que no lo sobrescriban.)
 
 **Asistente IA:** ver `ASISTENTE_IA_SETUP.md`. Solo funciona desplegado en Vercel; el resto de la
+
+**Dictado por voz (asistente):** el botón 🎤 de `js/features/assistant.js` usa el reconocimiento de voz del navegador (Web Speech API). Solo Chrome/Edge (no Firefox) y con la página en HTTPS (Vercel) o `localhost`; el texto dictado se escribe en el cuadro para revisarlo y enviarlo. El idioma de reconocimiento sale de `VOZ_LOCALES` (es-MX / en-US). Textos en `i18n/es.js` y `en.js` (claves `assistant_mic*`, `assistant_voice_*`); estilo en `css/components/asistente.css` (`.asistente-mic`). `api/assistant.js` añade a cada prompt una nota (`TEXTOS[lang].notaVoz`) para tolerar dictado sin puntuación.
 app funciona sin servidor.
 
 ## Convención de comentarios (cómo leer el código)
