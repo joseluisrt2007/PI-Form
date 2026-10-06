@@ -16,6 +16,13 @@
 //     función aplicarContenidoTXT).
 //   - Descargar: baja el bloque como <página>_generado.txt.
 //
+// DICTADO POR VOZ: el botón 🎤 junto al cuadro de texto usa el reconocimiento de voz del
+// navegador (Web Speech API: SpeechRecognition / webkitSpeechRecognition). Funciona en Chrome y
+// Edge, NO en Firefox; el navegador pide permiso de micrófono y esto solo es fiable con la página en
+// HTTPS (Vercel) o en localhost. El texto dictado se escribe en el cuadro para que la persona lo
+// revise y pulse Enviar; no se envía solo. El idioma de reconocimiento sigue al de la página
+// (VOZ_LOCALES). El audio lo procesa el servicio de voz del navegador (en Chrome, Google).
+//
 // API PÚBLICA: ninguna (todo es privado a la IIFE). Se auto-inicia en DOMContentLoaded.
 //
 // DEPENDENCIAS Y ORDEN DE CARGA: debe ir DESPUÉS de core/storage.js (lee projectData)
@@ -42,6 +49,15 @@
     const ASSISTANT_ENDPOINT = '/api/assistant';
 
     const t = PFM.i18n.t;
+
+    // CONFIGURABLE: idioma de reconocimiento de voz según el idioma de la página (código BCP 47).
+    // Al agregar un idioma a la app, añadir aquí su entrada; si falta se usa 'es-MX'.
+    const VOZ_LOCALES = { es: 'es-MX', en: 'en-US' };
+    // Constructor del reconocimiento de voz (undefined si el navegador no lo soporta, p. ej. Firefox).
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    // Estado del dictado: reconocedor activo (o null) y texto que ya había en el cuadro al empezar.
+    let reconocimiento = null;
+    let textoBaseDictado = '';
 
     // Nombre de la página (data-page del <script>). document.currentScript solo es válido mientras
     // se ejecuta el script de forma síncrona (por eso se lee aquí, fuera de los manejadores).
@@ -145,6 +161,7 @@
             </div>
             <form id="asistenteForm" class="asistente-form">
                 <textarea id="asistenteInput" data-i18n-placeholder="assistant_placeholder" placeholder="Escribe aquí..." rows="1"></textarea>
+                <button type="button" class="asistente-mic" id="asistenteMicBtn" data-i18n-title="assistant_mic" title="Dictar por voz" aria-pressed="false">🎤</button>
                 <button type="submit" class="asistente-enviar" id="asistenteEnviarBtn" data-i18n-title="assistant_send" title="Enviar">➤</button>
             </form>
         `;
@@ -161,17 +178,93 @@
             form: panel.querySelector('#asistenteForm'),
             input: panel.querySelector('#asistenteInput'),
             enviarBtn: panel.querySelector('#asistenteEnviarBtn'),
+            micBtn: panel.querySelector('#asistenteMicBtn'),
             cerrarBtn: panel.querySelector('#asistenteCerrarBtn'),
             archivoListo: panel.querySelector('#asistenteArchivoListo'),
             insertarBtn: panel.querySelector('#asistenteInsertarBtn'),
             descargarBtn: panel.querySelector('#asistenteDescargarBtn')
         };
 
-        boton.addEventListener('click', () => panel.classList.toggle('oculto'));
-        dom.cerrarBtn.addEventListener('click', () => panel.classList.add('oculto'));
+        boton.addEventListener('click', () => {
+            panel.classList.toggle('oculto');
+            if (panel.classList.contains('oculto')) detenerDictado();
+        });
+        dom.cerrarBtn.addEventListener('click', () => {
+            panel.classList.add('oculto');
+            detenerDictado();
+        });
+        dom.micBtn.addEventListener('click', alternarDictado);
         dom.form.addEventListener('submit', onEnviar);
         dom.insertarBtn.addEventListener('click', insertarArchivo);
         dom.descargarBtn.addEventListener('click', descargarArchivo);
+    }
+
+    // ---------- Dictado por voz ----------
+
+    /** Muestra u oculta el estado "escuchando" del botón y del cuadro de texto. */
+    function marcarEscuchando(activo) {
+        dom.micBtn.classList.toggle('escuchando', activo);
+        dom.micBtn.setAttribute('aria-pressed', String(activo));
+        dom.micBtn.title = t(activo ? 'assistant_mic_stop' : 'assistant_mic');
+        dom.input.placeholder = t(activo ? 'assistant_listening' : 'assistant_placeholder');
+    }
+
+    /** Detiene el dictado si está activo (el texto reconocido se conserva en el cuadro). */
+    function detenerDictado() {
+        if (reconocimiento) reconocimiento.stop();
+    }
+
+    /** Mensaje (clave i18n) que corresponde a un código de error de SpeechRecognition. */
+    function claveErrorVoz(codigo) {
+        if (codigo === 'not-allowed' || codigo === 'service-not-allowed') return 'assistant_voice_denied';
+        if (codigo === 'no-speech') return 'assistant_voice_no_speech';
+        if (codigo === 'audio-capture') return 'assistant_voice_no_mic';
+        if (codigo === 'network') return 'assistant_voice_network';
+        return 'assistant_voice_error';
+    }
+
+    /**
+     * Botón 🎤: inicia o detiene el dictado. Mientras escucha, el texto reconocido (provisional
+     * incluido) se escribe a continuación de lo que ya hubiera en el cuadro. No envía nada solo.
+     */
+    function alternarDictado() {
+        if (reconocimiento) { detenerDictado(); return; }
+        if (!SpeechRecognitionAPI) {
+            agregarMensaje('assistant', `⚠️ ${t('assistant_voice_unsupported')}`);
+            return;
+        }
+
+        const rec = new SpeechRecognitionAPI();
+        rec.lang = VOZ_LOCALES[PFM.i18n.getLang()] || 'es-MX';
+        rec.continuous = true;      // sigue escuchando aunque la persona haga pausas
+        rec.interimResults = true;  // muestra el texto mientras se habla
+        textoBaseDictado = dom.input.value.trim();
+
+        rec.onresult = evt => {
+            // Se reconstruye todo el dictado de esta sesión (finales + provisional) en cada evento.
+            let dictado = '';
+            for (let i = 0; i < evt.results.length; i++) dictado += evt.results[i][0].transcript;
+            dom.input.value = [textoBaseDictado, dictado.trim()].filter(Boolean).join(' ');
+        };
+        rec.onerror = evt => {
+            // 'aborted' ocurre al detener a mano: no es un error para la persona.
+            if (evt.error !== 'aborted') agregarMensaje('assistant', `⚠️ ${t(claveErrorVoz(evt.error))}`);
+        };
+        rec.onend = () => {
+            reconocimiento = null;
+            marcarEscuchando(false);
+            dom.input.focus();
+        };
+
+        reconocimiento = rec;
+        try {
+            rec.start();
+            marcarEscuchando(true);
+        } catch (err) {
+            reconocimiento = null;
+            marcarEscuchando(false);
+            agregarMensaje('assistant', `⚠️ ${t('assistant_voice_error')}`);
+        }
     }
 
     /**
@@ -211,6 +304,9 @@
      */
     async function onEnviar(evt) {
         evt.preventDefault();
+        // Al enviar se corta el dictado y se ignora cualquier resultado tardío, para que no
+        // reescriba el cuadro ya vaciado.
+        if (reconocimiento) { reconocimiento.onresult = null; detenerDictado(); }
         const texto = dom.input.value.trim();
         if (!texto) return;
 
