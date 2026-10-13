@@ -86,7 +86,7 @@
         // BOTONES (MODIFICADO: Separar Guardar y Continuar)
         'save': 'Guardar',
         'continue': 'Continuar',
-        'back': '◀️ Regreso',
+        'back': 'Regreso',
         'load_necesidades': 'Cargar Necesidades',
         'save_necesidades': 'Guardar Necesidades',
         'load_ideas': 'Cargar Ideas',
