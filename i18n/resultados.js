@@ -33,8 +33,8 @@
         'report_generated': '¡Informe generado con éxito!',
         'pdf_download_info': 'El informe PDF de su proyecto ha sido generado y descargado automáticamente.<br>Puede encontrarlo en la carpeta de descargas de su navegador.',
         'pdf_filename': 'Nombre del archivo:',
-        'download_pdf': '📄 Descargar PDF nuevamente',
-        'return_main_menu': '🏠 Volver al menú principal',
+        'download_pdf': 'Descargar PDF nuevamente',
+        'return_main_menu': 'Volver al menú principal',
         // SIN USO en esta página (ver CUIDADO de la cabecera)
         'theme_light': 'Cambiar a modo claro',
         'theme_dark': 'Cambiar a modo oscuro'
@@ -45,8 +45,8 @@
         'report_generated': 'Report generated successfully!',
         'pdf_download_info': 'Your project PDF report has been generated and downloaded automatically.<br>You can find it in your browser\'s downloads folder.',
         'pdf_filename': 'File name:',
-        'download_pdf': '📄 Download PDF again',
-        'return_main_menu': '🏠 Return to main menu',
+        'download_pdf': 'Download PDF again',
+        'return_main_menu': 'Return to main menu',
         // SIN USO en esta página (ver CUIDADO de la cabecera)
         'theme_light': 'Switch to light mode',
         'theme_dark': 'Switch to dark mode'
