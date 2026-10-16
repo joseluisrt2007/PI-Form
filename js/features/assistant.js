@@ -23,6 +23,13 @@
 // revise y pulse Enviar; no se envía solo. El idioma de reconocimiento sigue al de la página
 // (VOZ_LOCALES). El audio lo procesa el servicio de voz del navegador (en Chrome, Google).
 //
+// AUDIO ADJUNTO: el botón 📎 permite adjuntar una grabación (nota de voz, entrevista...). Se lee en el
+// navegador como base64 y viaja en la siguiente petición como `audio: { mimeType, data }`;
+// api/assistant.js se la pasa a Gemini, que la escucha y responde como si fuera el mensaje del
+// usuario. Límite de tamaño: MAX_AUDIO_BYTES (Vercel acepta cuerpos de ~4.5 MB y el base64 pesa
+// ~33 % más). El audio se envía a Google (Gemini) para analizarlo. Solo viaja en ese mensaje: el
+// historial guarda únicamente el texto y el nombre del archivo.
+//
 // API PÚBLICA: ninguna (todo es privado a la IIFE). Se auto-inicia en DOMContentLoaded.
 //
 // DEPENDENCIAS Y ORDEN DE CARGA: debe ir DESPUÉS de core/storage.js (lee projectData)
@@ -55,6 +62,21 @@
     const VOZ_LOCALES = { es: 'es-MX', en: 'en-US' };
     // Constructor del reconocimiento de voz (undefined si el navegador no lo soporta, p. ej. Firefox).
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    // CONFIGURABLE: tamaño máximo del audio adjunto (bytes). 3 MB en base64 ≈ 4.0 MB, que cabe en el
+    // límite de ~4.5 MB que Vercel pone al cuerpo de la petición. NO subirlo sin cambiar de vía de
+    // subida; debe coincidir con MAX_AUDIO_BASE64 de api/assistant.js (≈ MAX_AUDIO_BYTES * 4 / 3).
+    const MAX_AUDIO_BYTES = 3 * 1024 * 1024;
+    // Formatos aceptados: extensión -> tipo MIME que se envía a Gemini (Gemini admite WAV, MP3, AIFF,
+    // AAC, OGG y FLAC). Se usa la extensión porque algunos navegadores dejan file.type vacío
+    // (p. ej. con .opus de WhatsApp). CONFIGURABLE: añadir aquí otros formatos; el servidor tiene
+    // su propia lista (TIPOS_AUDIO en api/assistant.js).
+    const AUDIO_POR_EXTENSION = {
+        mp3: 'audio/mpeg', wav: 'audio/wav', aac: 'audio/aac', m4a: 'audio/aac',
+        ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg', flac: 'audio/flac',
+        aif: 'audio/aiff', aiff: 'audio/aiff'
+    };
+    // Audio pendiente de enviar: { name, mimeType, data (base64) } o null.
+    let audioAdjunto = null;
     // Estado del dictado: reconocedor activo (o null) y texto que ya había en el cuadro al empezar.
     let reconocimiento = null;
     let textoBaseDictado = '';
@@ -159,8 +181,15 @@
                     <button type="button" id="asistenteDescargarBtn" class="btn-secondary" data-i18n="assistant_download">💾 Descargar .txt</button>
                 </div>
             </div>
+            <div class="asistente-adjunto oculto" id="asistenteAdjunto">
+                <span class="asistente-adjunto-nombre" id="asistenteAdjuntoNombre"></span>
+                <span class="asistente-adjunto-nota" data-i18n="assistant_audio_note">El audio se enviará a Google (Gemini) para analizarlo.</span>
+                <button type="button" id="asistenteAdjuntoQuitar" class="asistente-adjunto-quitar" data-i18n-title="assistant_audio_remove" title="Quitar audio">✕</button>
+            </div>
             <form id="asistenteForm" class="asistente-form">
                 <textarea id="asistenteInput" data-i18n-placeholder="assistant_placeholder" placeholder="Escribe aquí..." rows="1"></textarea>
+                <input type="file" id="asistenteAudioInput" accept="audio/*,.mp3,.wav,.aac,.m4a,.ogg,.oga,.opus,.flac,.aif,.aiff" hidden>
+                <button type="button" class="asistente-adjuntar" id="asistenteAdjuntarBtn" data-i18n-title="assistant_attach" title="Adjuntar audio">📎</button>
                 <button type="button" class="asistente-mic" id="asistenteMicBtn" data-i18n-title="assistant_mic" title="Dictar por voz" aria-pressed="false">🎤</button>
                 <button type="submit" class="asistente-enviar" id="asistenteEnviarBtn" data-i18n-title="assistant_send" title="Enviar">➤</button>
             </form>
@@ -179,6 +208,11 @@
             input: panel.querySelector('#asistenteInput'),
             enviarBtn: panel.querySelector('#asistenteEnviarBtn'),
             micBtn: panel.querySelector('#asistenteMicBtn'),
+            adjuntarBtn: panel.querySelector('#asistenteAdjuntarBtn'),
+            audioInput: panel.querySelector('#asistenteAudioInput'),
+            adjunto: panel.querySelector('#asistenteAdjunto'),
+            adjuntoNombre: panel.querySelector('#asistenteAdjuntoNombre'),
+            adjuntoQuitar: panel.querySelector('#asistenteAdjuntoQuitar'),
             cerrarBtn: panel.querySelector('#asistenteCerrarBtn'),
             archivoListo: panel.querySelector('#asistenteArchivoListo'),
             insertarBtn: panel.querySelector('#asistenteInsertarBtn'),
@@ -194,9 +228,62 @@
             detenerDictado();
         });
         dom.micBtn.addEventListener('click', alternarDictado);
+        dom.adjuntarBtn.addEventListener('click', () => dom.audioInput.click());
+        dom.audioInput.addEventListener('change', alSeleccionarAudio);
+        dom.adjuntoQuitar.addEventListener('click', quitarAudio);
         dom.form.addEventListener('submit', onEnviar);
         dom.insertarBtn.addEventListener('click', insertarArchivo);
         dom.descargarBtn.addEventListener('click', descargarArchivo);
+    }
+
+    // ---------- Audio adjunto ----------
+
+    /** Tipo MIME para Gemini según la extensión del archivo (o según file.type si no hay extensión conocida). */
+    function tipoDeAudio(archivo) {
+        const ext = (archivo.name.split('.').pop() || '').toLowerCase();
+        if (AUDIO_POR_EXTENSION[ext]) return AUDIO_POR_EXTENSION[ext];
+        return /^audio\//.test(archivo.type) ? archivo.type : null;
+    }
+
+    /** Quita el audio pendiente y oculta el aviso. */
+    function quitarAudio() {
+        audioAdjunto = null;
+        dom.audioInput.value = '';
+        dom.adjunto.classList.add('oculto');
+        dom.adjuntarBtn.classList.remove('con-audio');
+    }
+
+    /** Lee el archivo elegido, valida tipo y tamaño y lo deja listo para el próximo envío. */
+    function alSeleccionarAudio() {
+        const archivo = dom.audioInput.files && dom.audioInput.files[0];
+        if (!archivo) return;
+
+        const mimeType = tipoDeAudio(archivo);
+        if (!mimeType) {
+            quitarAudio();
+            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_bad_type')}`);
+            return;
+        }
+        if (archivo.size > MAX_AUDIO_BYTES) {
+            quitarAudio();
+            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_too_big', { max: Math.round(MAX_AUDIO_BYTES / 1048576) })}`);
+            return;
+        }
+
+        const lector = new FileReader();
+        lector.onload = () => {
+            // readAsDataURL devuelve "data:<tipo>;base64,<datos>": solo se guardan los datos.
+            const data = String(lector.result).split(',')[1] || '';
+            audioAdjunto = { name: archivo.name, mimeType, data };
+            dom.adjuntoNombre.textContent = `🎧 ${archivo.name} (${(archivo.size / 1048576).toFixed(1)} MB)`;
+            dom.adjunto.classList.remove('oculto');
+            dom.adjuntarBtn.classList.add('con-audio');
+        };
+        lector.onerror = () => {
+            quitarAudio();
+            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_read_error')}`);
+        };
+        lector.readAsDataURL(archivo);
     }
 
     // ---------- Dictado por voz ----------
@@ -307,11 +394,16 @@
         // Al enviar se corta el dictado y se ignora cualquier resultado tardío, para que no
         // reescriba el cuadro ya vaciado.
         if (reconocimiento) { reconocimiento.onresult = null; detenerDictado(); }
-        const texto = dom.input.value.trim();
+        // Con audio adjunto se puede enviar sin escribir nada: se usa un texto por defecto.
+        const audio = audioAdjunto;
+        const texto = dom.input.value.trim() || (audio ? t('assistant_audio_default_text') : '');
         if (!texto) return;
 
-        agregarMensaje('user', texto);
-        historial.push({ role: 'user', content: texto });
+        // En pantalla y en el historial el audio queda como una línea con su nombre (el archivo en sí
+        // solo viaja en esta petición).
+        const textoConAudio = audio ? `${texto}\n🎧 ${audio.name}` : texto;
+        agregarMensaje('user', textoConAudio);
+        historial.push({ role: 'user', content: textoConAudio });
         dom.input.value = '';
         dom.enviarBtn.disabled = true;
 
@@ -334,7 +426,9 @@
                     page,
                     lang: PFM.i18n.getLang(),
                     messages: historial,
-                    context: buildContext(page)
+                    context: buildContext(page),
+                    // Solo si hay audio adjunto: { mimeType, data (base64) }; api/assistant.js lo valida.
+                    ...(audio ? { audio: { mimeType: audio.mimeType, data: audio.data } } : {})
                 })
             });
 
@@ -359,6 +453,7 @@
                 .replace(/\[ARCHIVO_TXT\][\s\S]*?\[\/ARCHIVO_TXT\]/, '')
                 .trim();
 
+            if (audio) quitarAudio(); // enviado con éxito; si la petición falla se conserva para reintentar
             if (textoVisible) agregarMensaje('assistant', textoVisible);
             historial.push({ role: 'assistant', content: datos.reply });
 
