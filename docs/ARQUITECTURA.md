@@ -96,6 +96,8 @@ antes de `report.js` y añade `'<nombre>'` a `ORDEN` en `js/pdf/report.js`.
 **Asistente IA:** ver `ASISTENTE_IA_SETUP.md`. Solo funciona desplegado en Vercel; el resto de la
 
 **Dictado por voz (asistente):** el botón 🎤 de `js/features/assistant.js` usa el reconocimiento de voz del navegador (Web Speech API). Solo Chrome/Edge (no Firefox) y con la página en HTTPS (Vercel) o `localhost`; el texto dictado se escribe en el cuadro para revisarlo y enviarlo. El idioma de reconocimiento sale de `VOZ_LOCALES` (es-MX / en-US). Textos en `i18n/es.js` y `en.js` (claves `assistant_mic*`, `assistant_voice_*`); estilo en `css/components/asistente.css` (`.asistente-mic`). `api/assistant.js` añade a cada prompt una nota (`TEXTOS[lang].notaVoz`) para tolerar dictado sin puntuación.
+
+**Audio adjunto (asistente):** el botón 📎 de `js/features/assistant.js` adjunta una grabación (mp3, wav, aac/m4a, ogg/opus, flac, aiff; máximo 3 MB, `MAX_AUDIO_BYTES`). Se envía en base64 como `audio: { mimeType, data }` en la petición; `api/assistant.js` lo valida (`TIPOS_AUDIO`, `MAX_AUDIO_BASE64`, HTTP 400 si no cuadra) y lo añade como `inline_data` al último mensaje del usuario para que Gemini lo escuche. El historial guarda solo el texto y el nombre del archivo; el audio viaja una sola vez. El audio se envía a Google (Gemini) y el chat lo avisa. Límite práctico por el tope de ~4.5 MB que Vercel pone al cuerpo de la petición. Textos: claves `assistant_attach` y `assistant_audio_*` en `i18n/es.js` y `en.js`.
 app funciona sin servidor.
 
 ## Convención de comentarios (cómo leer el código)
