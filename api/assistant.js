@@ -61,7 +61,57 @@
 const MODEL = 'gemini-3.8-flash';
 // Endpoint REST v1beta de generación de contenido (sin streaming). La API key NO va en la URL
 // sino en la cabecera x-goog-api-key (ver el fetch más abajo).
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const urlDeModelo = modelo => `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`;
+
+// CONFIGURABLE: modelos de respaldo, en orden. Si MODEL está saturado (HTTP 503 "high demand"),
+// no existe para la cuenta o agotó su cuota (HTTP 429), el servidor prueba el siguiente.
+// gemini-3.5-flash-lite es el más económico de la lista de Google. Dejar [] para no usar respaldo.
+const MODELOS_RESPALDO = ['gemini-3.5-flash-lite'];
+
+// CONFIGURABLE: reintentos sobre el MISMO modelo ante errores temporales (503/500/504) y espera
+// entre ellos. Con 1 reintento y 1000 ms se tolera un pico breve sin acercarse al límite de tiempo
+// de la función de Vercel.
+const REINTENTOS_POR_MODELO = 1;
+const ESPERA_REINTENTO_MS = 1000;
+
+const dormir = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Llama a Gemini con reintentos y modelos de respaldo.
+ * @param {Object} cuerpo  Cuerpo de la petición (system_instruction, contents, generationConfig).
+ * @returns {Promise<{apiResponse:Response, data:Object}>} La primera respuesta buena, o la última
+ *   respuesta de error si todos los intentos fallan.
+ * Orden: MODEL y luego cada modelo de MODELOS_RESPALDO. 503/500/504 -> se reintenta el mismo modelo
+ * y luego se pasa al siguiente; 429 y 404 (modelo no disponible) -> se pasa al siguiente enseguida;
+ * cualquier otro error (400, 401, 403...) se devuelve sin más intentos, porque otro modelo no lo arregla.
+ */
+async function llamarGemini(cuerpo) {
+  let ultima = null;
+  for (const modelo of [MODEL, ...MODELOS_RESPALDO]) {
+    for (let intento = 0; intento <= REINTENTOS_POR_MODELO; intento++) {
+      const apiResponse = await fetch(urlDeModelo(modelo), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': process.env.GEMINI_API_KEY
+        },
+        body: JSON.stringify(cuerpo)
+      });
+      // Se lee el JSON incluso en error: Gemini explica el fallo en data.error.message.
+      // CUIDADO: si la respuesta no fuera JSON, .json() lanza y cae en el catch del handler (HTTP 500 genérico).
+      const data = await apiResponse.json();
+      ultima = { apiResponse, data };
+      if (apiResponse.ok) return ultima;
+
+      const estado = apiResponse.status;
+      console.error(`Gemini (${modelo}) respondió ${estado}:`, data);
+      if (estado === 429 || estado === 404) break; // otro modelo
+      if (estado !== 503 && estado !== 500 && estado !== 504) return ultima; // error no temporal
+      if (intento < REINTENTOS_POR_MODELO) await dormir(ESPERA_REINTENTO_MS);
+    }
+  }
+  return ultima;
+}
 // CONFIGURABLE: tope de tokens de la respuesta del modelo (generationConfig.maxOutputTokens).
 // 1024 alcanza para una charla breve y el bloque [ARCHIVO_TXT]; la evaluación completa
 // (hasta 5 ideas x 5 criterios = 25 líneas) cabe, pero si se aumentan ideas/criterios hay
@@ -420,26 +470,15 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const apiResponse = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': process.env.GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        // (arriba) system_instruction = prompt del sistema; contents = historial convertido al formato Gemini.
-        // generationConfig limita la longitud de la salida (ver MAX_OUTPUT_TOKENS).
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS
-        }
-      })
+    // system_instruction = prompt del sistema; contents = historial convertido al formato Gemini.
+    // generationConfig limita la longitud de la salida (ver MAX_OUTPUT_TOKENS).
+    const { apiResponse, data } = await llamarGemini({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents,
+      generationConfig: {
+        maxOutputTokens: MAX_OUTPUT_TOKENS
+      }
     });
-
-    // Se lee el JSON incluso en error: Gemini explica el fallo en data.error.message.
-    // CUIDADO: si la respuesta no fuera JSON, .json() lanza y cae en el catch (HTTP 500 genérico).
-    const data = await apiResponse.json();
 
     if (!apiResponse.ok) {
       console.error('Error de la API de Gemini:', data);
