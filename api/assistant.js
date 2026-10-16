@@ -22,6 +22,8 @@
 //   Content-Type: application/json
 //   petición: { page: 'necesidades' | 'ideas' | 'evaluacion',
 //               lang: 'es' | 'en'   (opcional; idioma del prompt y de los errores; por defecto 'es'),
+//               audio: { mimeType, data }   (opcional; grabación en base64 que Gemini escucha como parte
+//                                      del ÚLTIMO mensaje del usuario; ver TIPOS_AUDIO y MAX_AUDIO_BASE64),
 //               messages: [{ role: 'user' | 'assistant', content: string }, ...],
 //               context: {...} }      (forma de context según la página, ver buildSystemPrompt:
 //                                      ideas -> { criterios: string[] };
@@ -128,6 +130,16 @@ const MAX_MENSAJES = 40;
 // CONFIGURABLE: nº máximo de caracteres por mensaje (el resto se corta). Protege de cuerpos
 // gigantes; 4000 caracteres sobran para un mensaje normal del usuario.
 const MAX_CARACTERES_MENSAJE = 4000;
+
+// CONFIGURABLE: tipos MIME de audio que se aceptan (los que Gemini entiende: WAV, MP3, AIFF, AAC, OGG,
+// FLAC). Cualquier otro se rechaza con HTTP 400. Debe ser compatible con AUDIO_POR_EXTENSION de
+// js/features/assistant.js.
+const TIPOS_AUDIO = ['audio/wav', 'audio/mpeg', 'audio/aiff', 'audio/aac', 'audio/ogg', 'audio/flac'];
+
+// CONFIGURABLE: tamaño máximo del audio en base64 (caracteres). Vercel limita el cuerpo de la petición
+// a ~4.5 MB (incluye el historial), así que 4.1 millones deja margen; equivale a ~3 MB de audio
+// (MAX_AUDIO_BYTES en js/features/assistant.js). Subirlo exige otra vía de subida.
+const MAX_AUDIO_BASE64 = 4100000;
 
 // CONFIGURABLE: nº máximo de ideas/criterios aceptados en `context` (el proyecto tiene 5 de cada uno).
 const MAX_ELEMENTOS_CONTEXTO = 10;
@@ -298,6 +310,8 @@ const TEXTOS = {
     sinCriterios: '(no hay criterios registrados)',
     bloqueEvaluacion: (elementos, criterios) => `IDEAS A EVALUAR:\n${elementos}\n\nCRITERIOS (numerados del 1 al 5):\n${criterios}`,
     notaVoz: 'Nota: el usuario puede escribir sus mensajes dictándolos por voz, así que pueden venir sin puntuación, con mayúsculas irregulares o con alguna palabra mal reconocida. Interpreta la intención con tolerancia y, si algo es ambiguo, pregúntalo. Los números pueden venir escritos con letras ("tres", "siete punto cinco"); conviértelos a cifras en el archivo.',
+    notaAudio: 'Nota: el último mensaje del usuario incluye una grabación de audio. Escúchala completa y trata lo que se dice en ella como lo que el usuario te cuenta (sus necesidades, ideas o calificaciones). No transcribas el audio completo en tu respuesta: usa su contenido para ayudarlo y haz preguntas solo sobre lo que falte o esté poco claro.',
+    errAudio: 'El audio no es válido o es demasiado grande.',
     errMetodo: 'Método no permitido',
     errSinClave: 'El servidor no tiene configurada la variable GEMINI_API_KEY.',
     errContexto: 'Contexto inválido.',
@@ -313,6 +327,8 @@ const TEXTOS = {
     sinCriterios: '(no criteria registered)',
     bloqueEvaluacion: (elementos, criterios) => `IDEAS TO EVALUATE:\n${elementos}\n\nCRITERIA (numbered 1 to 5):\n${criterios}`,
     notaVoz: 'Note: the user may type messages by voice dictation, so they may lack punctuation, have irregular capitalization or contain a misrecognized word. Interpret the intent tolerantly and, if something is ambiguous, ask. Numbers may be spelled out ("three", "seven point five"); convert them to digits in the file.',
+    notaAudio: 'Note: the user\'s last message includes an audio recording. Listen to all of it and treat what is said in it as what the user is telling you (their needs, ideas or scores). Do not transcribe the whole audio in your reply: use its content to help them and ask only about what is missing or unclear.',
+    errAudio: 'The audio is invalid or too large.',
     errMetodo: 'Method not allowed',
     errSinClave: 'The server does not have the GEMINI_API_KEY variable configured.',
     errContexto: 'Invalid context.',
@@ -440,7 +456,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { page, messages, context, lang } = req.body || {};
+  const { page, messages, context, lang, audio } = req.body || {};
   // Idioma del usuario ('es' | 'en'): decide el prompt y el idioma de los mensajes de error.
   const tx = TEXTOS[normalizarIdioma(lang)];
 
@@ -467,6 +483,25 @@ module.exports = async (req, res) => {
   if (contents.length === 0) {
     res.status(400).json({ error: tx.errHistorial });
     return;
+  }
+
+  // Audio opcional: se valida (objeto con tipo permitido y base64 no vacío ni mayor que el tope) y se
+  // añade como parte inline_data al ÚLTIMO mensaje, que debe ser del usuario. Si algo no cuadra,
+  // HTTP 400: es mejor avisar que enviar a Gemini algo que no podrá usar.
+  if (audio !== undefined && audio !== null) {
+    const valido = typeof audio === 'object'
+      && TIPOS_AUDIO.includes(audio.mimeType)
+      && typeof audio.data === 'string'
+      && audio.data.length > 0
+      && audio.data.length <= MAX_AUDIO_BASE64
+      && /^[A-Za-z0-9+/]+={0,2}$/.test(audio.data);
+    const ultimo = contents[contents.length - 1];
+    if (!valido || ultimo.role !== 'user') {
+      res.status(400).json({ error: tx.errAudio });
+      return;
+    }
+    ultimo.parts.push({ inline_data: { mime_type: audio.mimeType, data: audio.data } });
+    systemPrompt += `\n\n${tx.notaAudio}`;
   }
 
   try {
