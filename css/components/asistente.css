@@ -248,6 +248,56 @@
     0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.5); }
     50% { box-shadow: 0 0 0 6px rgba(192, 57, 43, 0); }
 }
+/* Botón de adjuntar audio (📎): mismo aspecto que .asistente-mic. .con-audio lo marca cuando hay un
+   audio pendiente de enviar. */
+.asistente-adjuntar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.asistente-adjuntar:hover,
+.asistente-adjuntar.con-audio {
+    border-color: var(--primary);
+}
+/* Franja sobre el formulario con el audio pendiente: nombre, aviso de privacidad y botón para quitarlo. */
+.asistente-adjunto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+    font-size: 0.8rem;
+    color: var(--text-dark);
+}
+.asistente-adjunto.oculto {
+    display: none;
+}
+.asistente-adjunto-nombre {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.asistente-adjunto-nota {
+    flex: 1;
+    min-width: 8rem;
+    opacity: 0.75;
+}
+.asistente-adjunto-quitar {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    color: var(--text-dark);
+    font-size: 1rem;
+    cursor: pointer;
+}
 .asistente-enviar {
     width: 42px;
     height: 42px;
