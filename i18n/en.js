@@ -187,6 +187,13 @@
         'assistant_voice_no_mic': 'No microphone was found. Connect one and try again.',
         'assistant_voice_network': 'The browser voice service is unavailable. Check your connection.',
         'assistant_voice_error': 'Could not start voice dictation.',
+        'assistant_attach': 'Attach audio',
+        'assistant_audio_remove': 'Remove audio',
+        'assistant_audio_note': 'The audio will be sent to Google (Gemini) for analysis.',
+        'assistant_audio_default_text': 'I am sharing an audio where I tell you about my business. Listen to it and help me with it.',
+        'assistant_audio_bad_type': 'Unsupported format. Use an MP3, WAV, AAC, M4A, OGG, OPUS or FLAC audio file.',
+        'assistant_audio_too_big': 'The audio is too large (maximum {{max}} MB). Use a shorter or more compressed recording.',
+        'assistant_audio_read_error': 'The audio file could not be read.',
 
         
         // FOOTER 

@@ -15,7 +15,7 @@
  *     el agrupado es solo visual, no tiene efecto.
  *   - Marcadores: un valor puede llevar {{nombre}}; PFM.i18n.t(clave, { nombre: valor })
  *     lo sustituye (core/i18n.js).
- *   - Los textos con emoji ('💾 Guardar') llevan el emoji dentro del valor.
+ *   - Si un texto lleva emoji (hoy solo el título del asistente, '🤖 Asistente IA'), va dentro del valor.
  *
  * ESTRUCTURA: PFM.translations es un objeto { es: {...}, en: {...} }. Este archivo
  * añade la entrada `es` (crea PFM.translations si aún no existe); core/i18n.js lo lee
@@ -213,6 +213,13 @@
         'assistant_voice_no_mic': 'No se encontró un micrófono. Conecta uno e inténtalo de nuevo.',
         'assistant_voice_network': 'El servicio de voz del navegador no está disponible. Revisa tu conexión.',
         'assistant_voice_error': 'No se pudo iniciar el dictado por voz.',
+        'assistant_attach': 'Adjuntar audio',
+        'assistant_audio_remove': 'Quitar audio',
+        'assistant_audio_note': 'El audio se enviará a Google (Gemini) para analizarlo.',
+        'assistant_audio_default_text': 'Te comparto un audio donde te cuento sobre mi negocio. Escúchalo y ayúdame con él.',
+        'assistant_audio_bad_type': 'Formato no compatible. Usa un audio MP3, WAV, AAC, M4A, OGG, OPUS o FLAC.',
+        'assistant_audio_too_big': 'El audio pesa demasiado (máximo {{max}} MB). Usa una grabación más corta o más comprimida.',
+        'assistant_audio_read_error': 'No se pudo leer el archivo de audio.',
 
         // PIE DE PÁGINA
         'footer_text': 'José Luis Rodríguez Téllez — Salvador González García'
