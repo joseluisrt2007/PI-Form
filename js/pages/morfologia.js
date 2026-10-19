@@ -108,6 +108,32 @@
         PFM.storage.save(data);
     }
 
+    /**
+     * Rellena las posibilidades que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR):
+     *   MORFOLOGIA_V1
+     *   posibilidad<TAB><tipo><TAB><idx><TAB><1..3><TAB><texto>
+     * Solo para elementos que están en pantalla (tipo + idx); lo demás se ignora. Un campo que no
+     * aparezca en el texto conserva su valor. Guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        saveData(); // conserva lo que se haya escrito a mano y aún no se guardó
+        const validos = new Set(PFM.elementos.getActivos(data).map(e => `${e.tipo}_${e.idx}`));
+        PFM.fileIO.contentLines(texto, 'MORFOLOGIA').forEach(linea => {
+            const campos = linea.split('\t').map(c => c.trim());
+            if ((campos[0] || '').toLowerCase() !== 'posibilidad') return;
+            const tipo = (campos[1] || '').toLowerCase();
+            const idx = parseInt(campos[2], 10);
+            const n = parseInt(campos[3], 10);
+            const valor = (campos.slice(4).join(' ') || '').slice(0, 200);
+            if (!validos.has(`${tipo}_${idx}`) || !(n >= 1 && n <= POSIBILIDADES_POR_ELEMENTO) || !valor) return;
+            data[`pos_${tipo}_${idx}_${n}`] = valor;
+        });
+        generarTablas();
+        saveData();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             page: 'morfologia.html',
@@ -115,5 +141,7 @@
             onLanguageChange: generarTablas
         });
         generarTablas();
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

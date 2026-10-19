@@ -259,6 +259,38 @@
         PFM.storage.save(data);
     }
 
+    /**
+     * Rellena las calificaciones que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR):
+     *   EVAL_CONCEPTOS_V1
+     *   calificacion<TAB><concepto formado 1..3><TAB><criterio 1..NUM_CRITERIOS><TAB><0-10>
+     * Acepta punto o coma decimal; fuera de 0-10 se ignora. Los conceptos que reciben notas se
+     * recalculan (Resultado) y todo se guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        saveData(); // conserva lo escrito a mano y aún no guardado
+        const tocados = new Set();
+        PFM.fileIO.contentLines(texto, 'EVAL_CONCEPTOS').forEach(linea => {
+            const campos = linea.split('\t').map(c => c.trim());
+            if ((campos[0] || '').toLowerCase() !== 'calificacion') return;
+            const conc = parseInt(campos[1], 10);
+            const crit = parseInt(campos[2], 10);
+            const nota = parseFloat((campos[3] || '').replace(',', '.'));
+            if (!(conc >= 1 && conc <= NUM_CONCEPTOS_FORMADOS) || !(crit >= 1 && crit <= NUM_CRITERIOS)) return;
+            if (!isFinite(nota) || nota < 0 || nota > 10) return;
+            data[claveCalif(conc, crit)] = String(Math.round(nota * 10) / 10);
+            tocados.add(conc);
+        });
+        tocados.forEach(conc => {
+            data[`calculadoFormado${conc}`] = false;
+            data[claveResultado(conc)] = null;
+        });
+        generarTablas();
+        tocados.forEach(conc => calcular(conc));
+        saveData();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             page: 'evalConceptos.html',
@@ -266,5 +298,7 @@
             onLanguageChange: generarTablas
         });
         generarTablas();
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

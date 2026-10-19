@@ -151,6 +151,33 @@
         PFM.storage.save(data);
     }
 
+    /**
+     * Marca las opciones que eligió el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR):
+     *   GC1_V1
+     *   seleccion<TAB><tipo><TAB><idx><TAB><concepto formado 1..3><TAB><opción 1..3>
+     * Para cada concepto formado (columna) y cada elemento se elige UNA opción (fila). Solo
+     * cuentan elementos en pantalla y opciones que tienen texto; lo demás se ignora. Una columna
+     * que no aparezca conserva lo que ya tenía. Guarda de inmediato (clave fila_grupo_*).
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        const validos = new Set(PFM.elementos.getActivos(data).map(e => `${e.tipo}_${e.idx}`));
+        PFM.fileIO.contentLines(texto, 'GC1').forEach(linea => {
+            const campos = linea.split('\t').map(c => c.trim());
+            if ((campos[0] || '').toLowerCase() !== 'seleccion') return;
+            const tipo = (campos[1] || '').toLowerCase();
+            const idx = parseInt(campos[2], 10);
+            const col = parseInt(campos[3], 10);
+            const fila = parseInt(campos[4], 10);
+            if (!validos.has(`${tipo}_${idx}`) || !COLUMNAS.includes(col) || !FILAS.includes(fila)) return;
+            if (!data[`pos_${tipo}_${idx}_${fila}`]) return; // esa opción no tiene texto
+            data[`fila_grupo_${tipo}_${idx}_col${col}`] = String(fila);
+        });
+        generarTablas();
+        PFM.storage.save(data);
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             page: 'gc1.html',
@@ -160,5 +187,7 @@
         // Convierte selecciones guardadas con el formato antiguo (texto) antes de dibujar.
         if (PFM.elementos.migrarSelecciones(data)) PFM.storage.save(data);
         generarTablas();
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

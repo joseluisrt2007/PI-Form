@@ -108,6 +108,38 @@
         aplicarModulosAUI();
     }
 
+    /**
+     * Rellena el formulario con lo que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR; el asistente solo incluye lo que la persona dijo):
+     *   DESCRIPCION_V1
+     *   nombre<TAB><nombre del proyecto>
+     *   descripcion<TAB><descripción en una sola línea>
+     *   modulo<TAB><definicionIdeas|diagrama|exploracionConceptos|prevencion><TAB><si|no>
+     * Solo cambia lo que viene en el texto: un campo ausente conserva su valor. El módulo
+     * obligatorio (analisisInicial) no se puede cambiar. Guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        const nameInput = document.getElementById('projectName');
+        PFM.fileIO.contentLines(texto, 'DESCRIPCION').forEach(linea => {
+            const campos = linea.split('\t').map(c => c.trim());
+            const clave = (campos[0] || '').toLowerCase();
+            if (clave === 'nombre' && campos[1]) {
+                nameInput.value = campos[1].slice(0, 200);
+                // dispara 'input' para que el encabezado "Proyecto: ..." se actualice
+                nameInput.dispatchEvent(new Event('input'));
+            } else if (clave === 'descripcion' && campos[1]) {
+                document.getElementById('projectDescription').value = campos.slice(1).join(' ').slice(0, 5000);
+            } else if (clave === 'modulo' && MODULOS_OPCIONALES[campos[1]]) {
+                const checkbox = document.getElementById(MODULOS_OPCIONALES[campos[1]]);
+                const valor = (campos[2] || '').toLowerCase();
+                if (checkbox && /^(si|sí|yes|true|1)$/.test(valor)) checkbox.checked = true;
+                else if (checkbox && /^(no|false|0)$/.test(valor)) checkbox.checked = false;
+            }
+        });
+        saveData();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         loadSavedData();
 
@@ -121,5 +153,7 @@
 
         // Actualiza el "Proyecto: ..." del encabezado en vivo mientras se escribe
         nameInput.addEventListener('input', header.updateProjectName);
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

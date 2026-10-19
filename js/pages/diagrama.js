@@ -407,6 +407,37 @@
         agregarTareaBtn.innerHTML = `+ ${t('add_row')}`;
     }
 
+    /**
+     * Reemplaza el diagrama por el proceso que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR), una línea por paso en orden:
+     *   DIAGRAMA_V1
+     *   fila<TAB><responsable><TAB><tarea><TAB><salida>
+     * Cada texto se recorta a 30 caracteres (maxLength de los campos) y se admiten hasta
+     * MAX_FILAS pasos. Sustituye TODAS las filas actuales (y sus celdas ocultas). Guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        const pasos = [];
+        PFM.fileIO.contentLines(texto, 'DIAGRAMA').forEach(linea => {
+            const campos = linea.split('\t');
+            if ((campos[0] || '').trim().toLowerCase() !== 'fila') return;
+            const cortar = v => (v || '').trim().slice(0, 30);
+            const paso = { persona: cortar(campos[1]), tarea: cortar(campos[2]), salida: cortar(campos[3]) };
+            if (paso.persona || paso.tarea || paso.salida) pasos.push(paso);
+        });
+        if (pasos.length === 0) return;
+
+        for (let i = 1; i <= MAX_FILAS; i++) borrarDatosDeFila(i);
+        pasos.slice(0, MAX_FILAS).forEach((paso, i) => {
+            if (paso.persona) data[`persona${i + 1}`] = paso.persona;
+            if (paso.tarea) data[`tarea${i + 1}`] = paso.tarea;
+            if (paso.salida) data[`salida${i + 1}`] = paso.salida;
+        });
+        data.numeroTareas = Math.min(pasos.length, MAX_FILAS);
+        cargarFilasGuardadas();
+        guardar();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             page: 'diagrama.html',
@@ -421,5 +452,7 @@
         cargarFilasGuardadas();
         traducirBotonAgregar();
         agregarTareaBtn.addEventListener('click', agregarNuevaFila);
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

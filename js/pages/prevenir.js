@@ -351,6 +351,47 @@
         });
     }
 
+    /**
+     * Rellena las tablas de prevención que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR; los campos vacíos pueden omitirse al final):
+     *   PREVENIR_V1
+     *   prevencion<TAB><n><TAB><falla potencial><TAB><efecto><TAB><severidad 1-10><TAB><ocurrencia 1-10>
+     *             <TAB><acciones a tomar><TAB><responsable><TAB><acción tomada><TAB><fecha de la acción AAAA-MM-DD>
+     * La tabla n se SOBRESCRIBE con los campos que vengan con valor (los demás conservan lo que
+     * tenían); si n es mayor que las tablas actuales se crean las necesarias (máx. MAX_TABLAS).
+     * El riesgo se calcula (severidad x ocurrencia). Guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        saveData(); // recoge lo escrito a mano antes de redibujar
+        const MAX_TABLAS = 20;
+        const acotar = v => {
+            const n = Math.round(parseFloat(String(v || '').replace(',', '.')));
+            return isFinite(n) ? String(Math.min(10, Math.max(1, n))) : '';
+        };
+        const fecha = v => (/^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : '');
+        let mayor = 0;
+        PFM.fileIO.contentLines(texto, 'PREVENIR').forEach(linea => {
+            const c = linea.split('\t').map(x => x.trim());
+            if ((c[0] || '').toLowerCase() !== 'prevencion') return;
+            const n = parseInt(c[1], 10);
+            if (!(n >= 1 && n <= MAX_TABLAS)) return;
+            const campos = {
+                fallaPotencial: c[2], efecto: c[3], sev: acotar(c[4]), ocu: acotar(c[5]),
+                accionReal: c[6], responsable: c[7], accionTom: c[8], fecha: fecha(c[9])
+            };
+            Object.keys(campos).forEach(k => { if (campos[k]) data[`${k}${n}`] = campos[k]; });
+            const sev = parseFloat(data[`sev${n}`]) || 0;
+            const ocu = parseFloat(data[`ocu${n}`]) || 0;
+            if (sev && ocu) data[`riesgo${n}`] = (sev * ocu).toFixed(2);
+            mayor = Math.max(mayor, n);
+        });
+        if (!mayor) return;
+        data.numeroPrevenciones = Math.max(data.numeroPrevenciones || 1, mayor);
+        cargarTablasGuardadas();
+        saveData();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             page: 'prevenir.html',
@@ -360,5 +401,7 @@
         conectarEventosDeTablas();
         agregarTablaBtn.addEventListener('click', agregarTabla);
         generarContenido();
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();

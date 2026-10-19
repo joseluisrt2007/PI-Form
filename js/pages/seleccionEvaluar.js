@@ -269,6 +269,33 @@
         PFM.storage.save(data);
     }
 
+    /**
+     * Marca en la lista los elementos que dictó el asistente de IA (PFM.page.importText).
+     * Formato (TABULADOR):
+     *   SELECCION_EVALUAR_V1
+     *   elemento<TAB><concepto|tarea><TAB><idx>
+     * Una línea por elemento a EVALUAR; los que no aparezcan quedan desmarcados. Solo cuentan
+     * los elementos que existen en la lista (tipo + idx); el resto se ignora. Guarda de inmediato.
+     * @param {string} texto contenido del bloque [ARCHIVO_TXT].
+     */
+    function aplicarContenidoTXT(texto) {
+        const elegidos = new Set();
+        PFM.fileIO.contentLines(texto, 'SELECCION_EVALUAR').forEach(linea => {
+            const campos = linea.split('\t').map(c => c.trim());
+            if ((campos[0] || '').toLowerCase() !== 'elemento') return;
+            const idx = parseInt(campos[2], 10);
+            if (!idx) return;
+            elegidos.add(`${(campos[1] || '').toLowerCase()}_${idx}`);
+        });
+        tarjetas.forEach(entry => {
+            const marcado = elegidos.has(`${entry.tipo}_${entry.idx}`);
+            entry.checked = marcado;
+            entry.cardEl.classList.toggle('seleccionado', marcado);
+            entry.cardEl.querySelector('input[type="checkbox"]').checked = marcado;
+        });
+        saveData();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         PFM.page.init({
             // Nombre del archivo: lo usa PFM.flow para calcular siguiente/anterior.
@@ -277,5 +304,7 @@
             onLanguageChange: renderizarElementos
         });
         renderizarElementos();
+
+        PFM.page.importText = aplicarContenidoTXT; // lo usa el asistente de IA
     });
 })();
