@@ -2,10 +2,12 @@
 // js/features/assistant.js  ->  Widget del Asistente IA (sin namespace propio:
 // es una IIFE que usa PFM.storage y PFM.page, no publica nada en PFM).
 //
-// Se carga SOLO en necesidades.html, ideas.html y evaluacion.html, al final del
+// Se carga en TODAS las páginas donde se capturan datos (necesidades, ideas, evaluacion, descripcion,
+// seleccionEvaluar, diagrama, morfologia, gc1, evalConceptos y prevenir), al final del
 // <body>, indicando la página en el atributo data-page del <script>:
 //     <script src="js/features/assistant.js" data-page="necesidades"></script>
-// (valores válidos: 'necesidades' | 'ideas' | 'evaluacion'). Sin data-page el
+// (el valor debe tener su prompt en api/assistant.js y su importador PFM.page.importText en la página).
+// Sin data-page el
 // widget no se crea. Estilos: css/components/asistente.css (clases asistente-*).
 //
 // Qué hace: inyecta un botón flotante + un panel de chat, envía el historial a
@@ -98,9 +100,10 @@
 
     /**
      * Arma el objeto `context` que se envía al servidor para que el prompt incluya datos reales.
-     * @param {string} page  'necesidades' | 'ideas' | 'evaluacion'.
+     * @param {string} page  nombre de la página (data-page).
      * @returns {Object} necesidades -> {} ; ideas -> { criterios: string[] } ;
-     *   evaluacion -> { elementos: [{tipo:'concepto', idx, nombre}], criterios: string[] }.
+     *   evaluacion -> { elementos: [{tipo:'concepto', idx, nombre}], criterios: string[] };
+     *   seleccionEvaluar / morfologia / gc1 / evalConceptos / prevenir -> { lineas: string[] }; resto -> {}.
      *   La forma debe coincidir con lo que lee buildSystemPrompt en api/assistant.js.
      */
     function buildContext(page) {
@@ -134,8 +137,110 @@
             return { elementos, criterios };
         }
 
+        // Resto de páginas de captura: el contexto es { lineas: string[] } (datos reales del proyecto,
+        // una línea cada uno) y api/assistant.js lo inserta donde el prompt tiene {contextoGeneral}.
+        // descripcion y diagrama no necesitan datos previos.
+        if (CONTEXTOS_POR_LINEAS[page]) return { lineas: CONTEXTOS_POR_LINEAS[page](data) };
+
         return {};
     }
+
+    /** Fecha local de hoy como AAAA-MM-DD (para que el modelo convierta "el viernes" en una fecha). */
+    function hoyISO() {
+        const d = new Date();
+        const dos = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
+    }
+
+    /** Textos de las etiquetas del contexto según el idioma de la página (solo es/en). */
+    function etiquetas() {
+        return PFM.i18n.getLang() === 'en'
+            ? { opcion: 'option', sinElementos: '(no items yet: tell the user to complete the previous pages first)',
+                formado: 'Formed concept', criterio: 'Criterion', hoy: 'Today\'s date', mejor: 'Best formed concept so far',
+                tablas: 'Prevention tables already filled', ninguna: 'none', modulo: 'Available modules' }
+            : { opcion: 'opción', sinElementos: '(todavía no hay elementos: indícale que complete primero las páginas anteriores)',
+                formado: 'Concepto formado', criterio: 'Criterio', hoy: 'Fecha de hoy', mejor: 'Mejor concepto formado hasta ahora',
+                tablas: 'Tablas de prevención ya llenas', ninguna: 'ninguna', modulo: 'Módulos disponibles' };
+    }
+
+    /** Elementos activos (ideas o seleccionados) como líneas `- tipo idx N: "nombre"`. */
+    function lineasElementos(data, conOpciones) {
+        const L = etiquetas();
+        const elementos = PFM.elementos.getActivos(data);
+        if (!elementos.length) return [L.sinElementos];
+        const lineas = [];
+        elementos.forEach(e => {
+            lineas.push(`- ${e.tipo} idx ${e.idx}: "${e.nombre}"`);
+            if (!conOpciones) return;
+            for (let i = 1; i <= 3; i++) {
+                const txt = (data[`pos_${e.tipo}_${e.idx}_${i}`] || '').trim();
+                if (txt) lineas.push(`    ${L.opcion} ${i}: "${txt}"`);
+            }
+        });
+        return lineas;
+    }
+
+    // Generadores de `context.lineas` por página (reciben projectData). Para añadir una página nueva
+    // con asistente: agregar su entrada aquí, su prompt en api/assistant.js y sus saludos en i18n.
+    const CONTEXTOS_POR_LINEAS = {
+        // Ideas y tareas entre las que se puede elegir (según los módulos activados)
+        seleccionEvaluar: data => {
+            const L = etiquetas();
+            const modulos = data.modulosSeleccionados || {};
+            const lineas = [];
+            if (modulos.definicionIdeas) {
+                PFM.elementos.getIdeas(data).forEach(e => lineas.push(`- concepto idx ${e.idx}: "${e.nombre}"`));
+            }
+            if (modulos.diagrama) {
+                const n = parseInt(data.numeroTareas, 10) || 0;
+                for (let i = 1; i <= n; i++) {
+                    const nombre = (data[`tarea${i}`] || '').trim();
+                    if (nombre) lineas.push(`- tarea idx ${i}: "${nombre}"`);
+                }
+            }
+            return lineas.length ? lineas : [L.sinElementos];
+        },
+        morfologia: data => lineasElementos(data, false),
+        gc1: data => lineasElementos(data, true),
+        // Criterios y de qué opciones está hecho cada concepto formado
+        evalConceptos: data => {
+            const L = etiquetas();
+            const lineas = [];
+            for (let i = 1; i <= 5; i++) {
+                if (data[`criterio${i}`]) lineas.push(`${L.criterio} ${i}: ${data[`criterio${i}`]}`);
+            }
+            for (let c = 1; c <= 3; c++) {
+                const partes = [];
+                PFM.elementos.getActivos(data).forEach(e => {
+                    const op = (PFM.elementos.getOpcionElegida(data, e.tipo, e.idx, c) || '').trim();
+                    if (op) partes.push(`${e.nombre}: ${op}`);
+                });
+                lineas.push(`${L.formado} ${c}: ${partes.length ? partes.join(' | ') : '-'}`);
+            }
+            return lineas;
+        },
+        prevenir: data => {
+            const L = etiquetas();
+            const res = [4, 5, 6].map(n => parseFloat(data[`resultado${n}`]) || 0);
+            const mejor = res.some(r => r > 0) ? res.indexOf(Math.max(...res)) + 1 : 0;
+            const lineas = [`${L.hoy}: ${hoyISO()}`];
+            if (mejor) {
+                const partes = [];
+                PFM.elementos.getActivos(data).forEach(e => {
+                    const op = (PFM.elementos.getOpcionElegida(data, e.tipo, e.idx, mejor) || '').trim();
+                    if (op) partes.push(`${e.nombre}: ${op}`);
+                });
+                lineas.push(`${L.mejor}: ${mejor}${partes.length ? ' (' + partes.join(' | ') + ')' : ''}`);
+            }
+            const llenas = [];
+            const n = parseInt(data.numeroPrevenciones, 10) || 1;
+            for (let i = 1; i <= n; i++) {
+                if ((data[`fallaPotencial${i}`] || '').trim()) llenas.push(`${i}: ${data[`fallaPotencial${i}`]}`);
+            }
+            lineas.push(`${L.tablas}: ${llenas.length ? llenas.join(' | ') : L.ninguna}`);
+            return lineas;
+        }
+    };
 
     // Historial de la conversación, formato { role: 'user' | 'assistant', content: string }.
     // Se envía COMPLETO en cada petición (la API no guarda estado). Incluye el saludo inicial.
@@ -508,7 +613,7 @@
 
     /**
      * Saludo inicial según la página, en el idioma actual.
-     * @param {string} page  'necesidades' | 'ideas' | 'evaluacion'.
+     * @param {string} page  nombre de la página (data-page).
      * @returns {string} Texto del saludo (o uno genérico si la página no tiene clave propia).
      * CONFIGURABLE: los textos están en i18n/es.js y en.js (assistant_greeting_<página>); al añadir una
      * página con asistente hay que añadir también esa clave en ambos idiomas, su entrada en
