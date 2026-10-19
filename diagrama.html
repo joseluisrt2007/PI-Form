@@ -26,6 +26,7 @@
     <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/pages/diagrama.css">
+    <link rel="stylesheet" href="css/components/asistente.css">
 </head>
 <body>
     <!--
@@ -164,10 +165,15 @@
     <script src="js/core/theme.js"></script>
     <script src="js/core/flow.js"></script>
     <script src="js/core/page.js"></script>
+    <script src="js/core/file-io.js"></script>
     <!--
         Script propio de la página: va después de todo lo que usa (nucleo, utilidades) porque se ejecuta en cuanto carga y registra su DOMContentLoaded.
     -->
     <!-- Lógica de esta página -->
     <script src="js/pages/diagrama.js"></script>
+    <!--
+        js/features/assistant.js (asistente de IA): va después del script de la página porque usa PFM.storage y PFM.page.importText (que define js/pages/diagrama.js). data-page="diagrama" lo lee con document.currentScript. Requiere /api/assistant desplegado (Vercel); sin él la página funciona igual. CUIDADO: sin data-page el widget no se crea. js/core/file-io.js se agregó arriba porque el importador de esta página usa PFM.fileIO.
+    -->
+    <script src="js/features/assistant.js" data-page="diagrama"></script>
 </body>
 </html>

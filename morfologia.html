@@ -26,6 +26,7 @@
     <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/pages/morfologia.css">
+    <link rel="stylesheet" href="css/components/asistente.css">
 </head>
 <body>
     <!--
@@ -130,6 +131,7 @@
     <script src="js/core/theme.js"></script>
     <script src="js/core/flow.js"></script>
     <script src="js/core/page.js"></script>
+    <script src="js/core/file-io.js"></script>
     <!-- Utilidades compartidas: js/shared/elementos.js antes de morfologia.js, que lo usa al generar las tablas. -->
     <!-- Utilidades compartidas -->
     <script src="js/shared/elementos.js"></script>
@@ -138,5 +140,9 @@
     -->
     <!-- Lógica de esta página -->
     <script src="js/pages/morfologia.js"></script>
+    <!--
+        js/features/assistant.js (asistente de IA): va después del script de la página porque usa PFM.storage y PFM.page.importText (que define js/pages/morfologia.js). data-page="morfologia" lo lee con document.currentScript. Requiere /api/assistant desplegado (Vercel); sin él la página funciona igual. CUIDADO: sin data-page el widget no se crea. js/core/file-io.js se agregó arriba porque el importador de esta página usa PFM.fileIO.
+    -->
+    <script src="js/features/assistant.js" data-page="morfologia"></script>
 </body>
 </html>
