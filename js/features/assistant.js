@@ -18,14 +18,14 @@
 //     función aplicarContenidoTXT).
 //   - Descargar: baja el bloque como <página>_generado.txt.
 //
-// DICTADO POR VOZ: el botón 🎤 junto al cuadro de texto usa el reconocimiento de voz del
+// DICTADO POR VOZ: el botón del micrófono junto al cuadro de texto usa el reconocimiento de voz del
 // navegador (Web Speech API: SpeechRecognition / webkitSpeechRecognition). Funciona en Chrome y
 // Edge, NO en Firefox; el navegador pide permiso de micrófono y esto solo es fiable con la página en
 // HTTPS (Vercel) o en localhost. El texto dictado se escribe en el cuadro para que la persona lo
 // revise y pulse Enviar; no se envía solo. El idioma de reconocimiento sigue al de la página
 // (VOZ_LOCALES). El audio lo procesa el servicio de voz del navegador (en Chrome, Google).
 //
-// AUDIO ADJUNTO: el botón 📎 permite adjuntar una grabación (nota de voz, entrevista...). Se lee en el
+// AUDIO ADJUNTO: el botón del clip permite adjuntar una grabación (nota de voz, entrevista...). Se lee en el
 // navegador como base64 y viaja en la siguiente petición como `audio: { mimeType, data }`;
 // api/assistant.js se la pasa a Gemini, que la escucha y responde como si fuera el mensaje del
 // usuario. Límite de tamaño: MAX_AUDIO_BYTES (Vercel acepta cuerpos de ~4.5 MB y el base64 pesa
@@ -265,7 +265,8 @@
         boton.type = 'button';
         boton.title = t('assistant_toggle');
         boton.setAttribute('data-i18n-title', 'assistant_toggle');
-        boton.textContent = '🤖';
+        // Icono SVG + etiqueta traducible (sin emoji); estilos en css/corporate.css (.asistente-toggle).
+        boton.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span data-i18n="assistant_toggle">${t('assistant_toggle')}</span>`;
 
         const panel = document.createElement('div');
         panel.id = 'asistentePanel';
@@ -275,28 +276,28 @@
         // querySelector de más abajo y el CSS. rows="1": altura inicial del textarea.
         panel.innerHTML = `
             <div class="asistente-header">
-                <span data-i18n="assistant_title">🤖 Asistente IA</span>
-                <button type="button" id="asistenteCerrarBtn" class="asistente-cerrar" data-i18n-title="assistant_close" title="Cerrar">✕</button>
+                <span data-i18n="assistant_title">Asistente IA</span>
+                <button type="button" id="asistenteCerrarBtn" class="asistente-cerrar" data-i18n-title="assistant_close" title="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
             </div>
             <div class="asistente-mensajes" id="asistenteMensajes"></div>
             <div class="asistente-archivo-listo oculto" id="asistenteArchivoListo">
-                <p data-i18n="assistant_file_ready">📄 El asistente generó un archivo listo para usar.</p>
+                <p data-i18n="assistant_file_ready">El asistente generó un archivo listo para usar.</p>
                 <div class="asistente-archivo-botones">
-                    <button type="button" id="asistenteInsertarBtn" class="btn-secondary" data-i18n="assistant_insert">📥 Insertar en el formulario</button>
-                    <button type="button" id="asistenteDescargarBtn" class="btn-secondary" data-i18n="assistant_download">💾 Descargar .txt</button>
+                    <button type="button" id="asistenteInsertarBtn" class="btn-secondary" data-i18n="assistant_insert">Insertar en el formulario</button>
+                    <button type="button" id="asistenteDescargarBtn" class="btn-secondary" data-i18n="assistant_download">Descargar .txt</button>
                 </div>
             </div>
             <div class="asistente-adjunto oculto" id="asistenteAdjunto">
                 <span class="asistente-adjunto-nombre" id="asistenteAdjuntoNombre"></span>
                 <span class="asistente-adjunto-nota" data-i18n="assistant_audio_note">El audio se enviará a Google (Gemini) para analizarlo.</span>
-                <button type="button" id="asistenteAdjuntoQuitar" class="asistente-adjunto-quitar" data-i18n-title="assistant_audio_remove" title="Quitar audio">✕</button>
+                <button type="button" id="asistenteAdjuntoQuitar" class="asistente-adjunto-quitar" data-i18n-title="assistant_audio_remove" title="Quitar audio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
             </div>
             <form id="asistenteForm" class="asistente-form">
                 <textarea id="asistenteInput" data-i18n-placeholder="assistant_placeholder" placeholder="Escribe aquí..." rows="1"></textarea>
                 <input type="file" id="asistenteAudioInput" accept="audio/*,.mp3,.wav,.aac,.m4a,.ogg,.oga,.opus,.flac,.aif,.aiff" hidden>
-                <button type="button" class="asistente-adjuntar" id="asistenteAdjuntarBtn" data-i18n-title="assistant_attach" title="Adjuntar audio">📎</button>
-                <button type="button" class="asistente-mic" id="asistenteMicBtn" data-i18n-title="assistant_mic" title="Dictar por voz" aria-pressed="false">🎤</button>
-                <button type="submit" class="asistente-enviar" id="asistenteEnviarBtn" data-i18n-title="assistant_send" title="Enviar">➤</button>
+                <button type="button" class="asistente-adjuntar" id="asistenteAdjuntarBtn" data-i18n-title="assistant_attach" title="Adjuntar audio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7-7l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l8-8"/></svg></button>
+                <button type="button" class="asistente-mic" id="asistenteMicBtn" data-i18n-title="assistant_mic" title="Dictar por voz" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+                <button type="submit" class="asistente-enviar" id="asistenteEnviarBtn" data-i18n-title="assistant_send" title="Enviar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5L4 12z"/></svg></button>
             </form>
         `;
 
@@ -366,12 +367,12 @@
         const mimeType = tipoDeAudio(archivo);
         if (!mimeType) {
             quitarAudio();
-            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_bad_type')}`);
+            agregarMensaje('assistant', `${t('assistant_audio_bad_type')}`);
             return;
         }
         if (archivo.size > MAX_AUDIO_BYTES) {
             quitarAudio();
-            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_too_big', { max: Math.round(MAX_AUDIO_BYTES / 1048576) })}`);
+            agregarMensaje('assistant', `${t('assistant_audio_too_big', { max: Math.round(MAX_AUDIO_BYTES / 1048576) })}`);
             return;
         }
 
@@ -380,13 +381,13 @@
             // readAsDataURL devuelve "data:<tipo>;base64,<datos>": solo se guardan los datos.
             const data = String(lector.result).split(',')[1] || '';
             audioAdjunto = { name: archivo.name, mimeType, data };
-            dom.adjuntoNombre.textContent = `🎧 ${archivo.name} (${(archivo.size / 1048576).toFixed(1)} MB)`;
+            dom.adjuntoNombre.textContent = `${archivo.name} (${(archivo.size / 1048576).toFixed(1)} MB)`;
             dom.adjunto.classList.remove('oculto');
             dom.adjuntarBtn.classList.add('con-audio');
         };
         lector.onerror = () => {
             quitarAudio();
-            agregarMensaje('assistant', `⚠️ ${t('assistant_audio_read_error')}`);
+            agregarMensaje('assistant', `${t('assistant_audio_read_error')}`);
         };
         lector.readAsDataURL(archivo);
     }
@@ -416,13 +417,13 @@
     }
 
     /**
-     * Botón 🎤: inicia o detiene el dictado. Mientras escucha, el texto reconocido (provisional
+     * Botón del micrófono: inicia o detiene el dictado. Mientras escucha, el texto reconocido (provisional
      * incluido) se escribe a continuación de lo que ya hubiera en el cuadro. No envía nada solo.
      */
     function alternarDictado() {
         if (reconocimiento) { detenerDictado(); return; }
         if (!SpeechRecognitionAPI) {
-            agregarMensaje('assistant', `⚠️ ${t('assistant_voice_unsupported')}`);
+            agregarMensaje('assistant', `${t('assistant_voice_unsupported')}`);
             return;
         }
 
@@ -440,7 +441,7 @@
         };
         rec.onerror = evt => {
             // 'aborted' ocurre al detener a mano: no es un error para la persona.
-            if (evt.error !== 'aborted') agregarMensaje('assistant', `⚠️ ${t(claveErrorVoz(evt.error))}`);
+            if (evt.error !== 'aborted') agregarMensaje('assistant', `${t(claveErrorVoz(evt.error))}`);
         };
         rec.onend = () => {
             reconocimiento = null;
@@ -455,7 +456,7 @@
         } catch (err) {
             reconocimiento = null;
             marcarEscuchando(false);
-            agregarMensaje('assistant', `⚠️ ${t('assistant_voice_error')}`);
+            agregarMensaje('assistant', `${t('assistant_voice_error')}`);
         }
     }
 
@@ -506,7 +507,7 @@
 
         // En pantalla y en el historial el audio queda como una línea con su nombre (el archivo en sí
         // solo viaja en esta petición).
-        const textoConAudio = audio ? `${texto}\n🎧 ${audio.name}` : texto;
+        const textoConAudio = audio ? `${texto}\n[audio] ${audio.name}` : texto;
         agregarMensaje('user', textoConAudio);
         historial.push({ role: 'user', content: textoConAudio });
         dom.input.value = '';
@@ -544,7 +545,7 @@
             // servidor. Nota: el mensaje del usuario ya quedó en `historial`, así que se reenviará en el
             // siguiente intento aunque esta petición haya fallado.
             if (!respuesta.ok) {
-                agregarMensaje('assistant', `⚠️ ${datos.error || t('assistant_error_generic')}`);
+                agregarMensaje('assistant', `${datos.error || t('assistant_error_generic')}`);
                 return;
             }
 
@@ -568,7 +569,7 @@
             }
         } catch (err) {
             pensando.remove();
-            agregarMensaje('assistant', `⚠️ ${t('assistant_error_network')}`);
+            agregarMensaje('assistant', `${t('assistant_error_network')}`);
             console.error('Error del asistente IA:', err);
         } finally {
             dom.enviarBtn.disabled = false;
