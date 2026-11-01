@@ -21,12 +21,14 @@
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- css/base.css va ANTES que la hoja propia de la página (la de la página sobrescribe a la base). -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/pages/diagrama.css">
     <link rel="stylesheet" href="css/components/asistente.css">
+    <!-- css/corporate.css: tema corporativo; debe ser la ULTIMA hoja de estilos (sobrescribe a las anteriores). Quitar esta linea devuelve el aspecto anterior. -->
+    <link rel="stylesheet" href="css/corporate.css">
 </head>
 <body>
     <!--
@@ -60,7 +62,7 @@
                 <!--
                     id="themeToggle": lo conecta js/core/theme.js (PFM.theme.init, llamado desde PFM.page.init) para alternar claro/oscuro; guarda localStorage["theme"] (no renombrar esa clave). El title y el emoji se reescriben por JS según el tema.
                 -->
-                <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
+                <button class="theme-toggle" id="themeToggle" title="Cambiar tema"></button>
                 <!-- Selector de idioma. -->
                 <div class="language-selector">
                     <!--
@@ -70,8 +72,8 @@
                         <!--
                             CONFIGURABLE: cada <option value> debe ser un código existente en PFM.translations (es, en). Para agregar un idioma: crear i18n/<lang>.js, cargarlo antes de core/i18n.js en TODOS los HTML y añadir aquí su option (ver cabecera de i18n/es.js).
                         -->
-                        <option value="es">🇪🇸 Español</option>
-                        <option value="en">🇺🇸 English</option>
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
                     </select>
                 </div>
             </div>
@@ -121,7 +123,7 @@
                 <!--
                     id="agregarTareaBtn": diagrama.js añade una fila vacía al hacer clic y reescribe su texto con la clave add_row (traducirBotonAgregar); el "+ Agregar fila" del HTML es solo el valor inicial. El fondo verde es un estilo inline. CONFIGURABLE: el tope MAX_FILAS (50) de diagrama.js solo limita los bucles de borrado/renumeración, no el botón; la longitud máxima de cada texto (30) se fija en diagrama.js (input.maxLength), no en el HTML.
                 -->
-                <button class="btn-secondary" id="agregarTareaBtn" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <button class="btn-secondary" id="agregarTareaBtn">
                     + Agregar fila
                 </button>
             </div>
