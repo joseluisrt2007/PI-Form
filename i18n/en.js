@@ -136,6 +136,7 @@
         'no_concepts_defined': 'No concepts defined. Go back to the previous page to enter concepts.',
         'no_elements_to_evaluate': 'No elements selected to evaluate. Go back to the previous page and select at least one.',
         // Diálogos (prevenir: confirmar borrado; resultados: falta la librería jsPDF)
+        'delete': 'Delete',
         'confirm_delete_prevention': 'Delete this prevention?',
         'error_jspdf_missing': 'Error: the PDF cannot be generated. jsPDF is not loaded.',
         
@@ -161,7 +162,7 @@
         'evaluation_concepts_formed': 'Evaluation of Formed Concepts',
         'concepts_formed': 'Formed Concepts',
         // ASISTENTE IA (js/features/assistant.js)
-        'assistant_title': '🤖 AI Assistant',
+        'assistant_title': 'AI Assistant',
         'assistant_toggle': 'AI Assistant',
         'assistant_close': 'Close',
         'assistant_file_ready': 'The assistant generated a file ready to use.',

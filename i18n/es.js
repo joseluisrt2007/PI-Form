@@ -15,7 +15,7 @@
  *     el agrupado es solo visual, no tiene efecto.
  *   - Marcadores: un valor puede llevar {{nombre}}; PFM.i18n.t(clave, { nombre: valor })
  *     lo sustituye (core/i18n.js).
- *   - Si un texto lleva emoji (hoy solo el título del asistente, '🤖 Asistente IA'), va dentro del valor.
+ *   - Los textos no llevan emoji (tema corporativo); los iconos son SVG en el código.
  *
  * ESTRUCTURA: PFM.translations es un objeto { es: {...}, en: {...} }. Este archivo
  * añade la entrada `es` (crea PFM.translations si aún no existe); core/i18n.js lo lee
@@ -161,6 +161,7 @@
         'no_concepts_defined': 'No hay conceptos definidos. Regresa a la página anterior para ingresar conceptos.',
         'no_elements_to_evaluate': 'No hay elementos seleccionados para evaluar. Regresa a la página anterior y selecciona al menos uno.',
         // Diálogos (prevenir: confirmar borrado; resultados: falta la librería jsPDF)
+        'delete': 'Eliminar',
         'confirm_delete_prevention': '¿Eliminar esta prevención?',
         'error_jspdf_missing': 'Error: No se puede generar el PDF. jsPDF no está cargado.',
         
@@ -187,7 +188,7 @@
         'concepts_formed': 'Conceptos Formados',
         
         // ASISTENTE IA (js/features/assistant.js)
-        'assistant_title': '🤖 Asistente IA',
+        'assistant_title': 'Asistente IA',
         'assistant_toggle': 'Asistente IA',
         'assistant_close': 'Cerrar',
         'assistant_file_ready': 'El asistente generó un archivo listo para usar.',
