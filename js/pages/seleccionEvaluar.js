@@ -124,7 +124,7 @@
         // CONFIGURABLE: textos fijos en español (no pasan por i18n); para traducirlos
         // habría que crear claves en i18n/es.js y en.js y usar t().
         btnEditar.title = 'Editar nombre';
-        btnEditar.innerHTML = '✏️';
+        btnEditar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>';
         btnEditar.setAttribute('aria-label', 'Editar nombre del elemento');
 
         /** Sincroniza checkbox, estado (entry.checked) y estilo de la tarjeta. */
