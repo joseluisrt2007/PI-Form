@@ -1,0 +1,523 @@
+/**
+ * corporate.css - Capa de tema "corporativo" (sobria, plana, azul marino y grises).
+ *
+ * Que paginas lo cargan: las 12, SIEMPRE como ULTIMA hoja de estilos (despues de base.css,
+ * css/pages/<pagina>.css y, donde existe, css/components/asistente.css). Como solo
+ * sobrescribe, quitar su <link> devuelve el aspecto anterior sin tocar nada mas.
+ *
+ * Que cambia respecto al diseno anterior:
+ *   - Paleta: azul marino y grises neutros; verde y rojo apagados (variables de :root y del
+ *     tema oscuro; todo el sitio las usa con var(--xxx), por eso basta redefinirlas aqui).
+ *   - Tipografia: IBM Plex Sans (se carga con <link> a Google Fonts en cada HTML; si no esta
+ *     disponible cae a Segoe UI / Helvetica / Arial).
+ *   - Cabecera: baja, con el titulo a la izquierda y el proyecto como texto secundario.
+ *   - Titulos de pagina: a la izquierda, tamano medio y una linea fina debajo (antes centrados y grandes).
+ *   - Formas: esquinas de 4 a 6 px, tarjetas planas con borde fino, sin sombras marcadas y sin
+ *     efectos de elevacion o giro al pasar el raton.
+ *   - Tablas y campos: encabezados en mayusculas pequenas, foco azul marino.
+ *   - Asistente: pestana rectangular con icono SVG y etiqueta (antes boton redondo con emoji).
+ *
+ * CONFIGURABLE: los colores estan SOLO en los dos primeros bloques (:root y [data-theme="dark"]);
+ * el radio de esquina en las variables --radius-sm / --radius-md.
+ * CUIDADO: algunas reglas usan selectores de clase de css/pages/*.css para ganar por orden de
+ * carga (misma especificidad, esta hoja va despues). Si una pagina cambia sus clases, revisa aqui.
+ * El orden de carga no debe alterarse: si este archivo va antes que los demas, no tendra efecto.
+ */
+
+/* ===== Paleta clara ===== */
+:root {
+    --primary: #1b365d;
+    --primary-dark: #122846;
+    --primary-light: #2f5a8f;
+    --background-start: #f3f5f8;
+    --background-end: #e9edf2;
+    --text-dark: #1f2933;
+    --text-light: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 4px 14px rgba(16, 24, 40, 0.14);
+    --surface: #ffffff;
+    --border: #d5dbe3;
+    --card-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --border-light: #e3e8ee;
+    --error: #b42318;
+    --card-bg: #ffffff;
+    --header-bg: #14263f;
+    --info: #2f5a8f;
+    --success: #2e7d5b;
+    --section-bg: #ffffff;
+    --table-header: #eef1f5;
+    --accent-border: #1b365d;
+    --list-bg: #f7f9fb;
+    --select-text: #1f2933;
+    --select-bg: #ffffff;
+    --select-border: #c5cdd8;
+
+    /* Radios de esquina del tema */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+}
+
+/* ===== Paleta oscura (tonos pizarra, poco saturados) ===== */
+[data-theme="dark"] {
+    --primary: #4a78b0;
+    --primary-dark: #3a6396;
+    --primary-light: #6b93c4;
+    --background-start: #0f141b;
+    --background-end: #161c25;
+    --text-dark: #e6eaf0;
+    --text-light: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.5);
+    --surface: #171d26;
+    --border: #2a3340;
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --border-light: #2a3340;
+    --error: #f0857d;
+    --card-bg: #171d26;
+    --header-bg: #0b1119;
+    --info: #8fb0d6;
+    --success: #3fa37a;
+    --section-bg: #171d26;
+    --table-header: #1e2631;
+    --accent-border: #6b93c4;
+    --list-bg: #131922;
+    --select-text: #e6eaf0;
+    --select-bg: #1e2631;
+    --select-border: #2a3340;
+}
+
+/* ===== Cuerpo y tipografia ===== */
+body {
+    font-family: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    background: var(--background-start);
+    color: var(--text-dark);
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+/* ===== Cabecera: baja, titulo a la izquierda ===== */
+header {
+    padding: 0.7rem 2rem;
+    box-shadow: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.header-left {
+    display: none;
+}
+
+.header-center {
+    flex: 1;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.header-right {
+    flex: 0 0 auto;
+}
+
+.app-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.project-name-container {
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 1;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.header-controls {
+    gap: 0.6rem;
+}
+
+/* Boton de tema: cuadrado discreto con icono SVG (lo dibuja js/core/theme.js) */
+.theme-toggle {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    font-size: 1rem;
+}
+
+.theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.theme-toggle:hover,
+.theme-toggle:active {
+    transform: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Selector de idioma */
+.language-selector select {
+    min-width: 0;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background-color: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.language-selector select option {
+    color: #1f2933;
+    background: #ffffff;
+}
+
+[data-theme="dark"] .language-selector select option {
+    color: #e6eaf0;
+    background: #1e2631;
+}
+
+/* ===== Contenedor y titulos ===== */
+.container {
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+}
+
+h1 {
+    text-align: left;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--text-dark);
+}
+
+h2,
+.concepto-title,
+.tabla-title,
+.section-title {
+    font-weight: 600;
+}
+
+/* evaluacion.css sube esta barra con margin-top negativo para compensar el h1 antiguo (3rem);
+   con el h1 nuevo (margen 1.75rem) hay que anular esa compensacion. */
+.file-actions {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== Botones: planos, sin elevacion ===== */
+.btn-primary,
+.btn-secondary,
+.btn-calc {
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.65rem 1.5rem;
+    box-shadow: none;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary,
+.btn-calc {
+    background: var(--primary);
+    color: var(--text-light);
+    border: 1px solid var(--primary);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text-dark);
+    border: 1px solid var(--select-border);
+}
+
+.btn-primary:hover,
+.btn-calc:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-secondary:hover {
+    background: var(--table-header);
+    border-color: var(--primary-light);
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-calc:active {
+    transform: none;
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-calc:focus-visible,
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--primary-light);
+    outline-offset: 2px;
+}
+
+.btn-eliminar-tabla,
+.btn-eliminar-fila,
+.btn-editar {
+    border-radius: var(--radius-sm);
+}
+
+.btn-eliminar-fila svg,
+.btn-editar svg,
+.btn-eliminar-tabla svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+    margin: 0 auto;
+}
+
+.btn-eliminar-tabla svg {
+    display: inline-block;
+    vertical-align: -3px;
+    margin: 0 0.35rem 0 0;
+}
+
+/* ===== Tarjetas, secciones y listas: planas, 6 px ===== */
+.concepto-section,
+.ideas-section,
+.mejor-concepto,
+.module-card,
+.opciones-list,
+.pdf-info,
+.tabla-prevencion,
+.elemento-card,
+.ideas-list li,
+.sin-elementos-msg,
+.riesgo-cell,
+table {
+    border-radius: var(--radius-md);
+}
+
+.concepto-section,
+.ideas-section,
+.tabla-prevencion,
+.module-card,
+.elemento-card {
+    box-shadow: none;
+}
+
+.module-card:hover,
+.elemento-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.module-badge {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+/* ===== Tablas: encabezados en mayusculas pequenas ===== */
+th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ===== Campos de formulario ===== */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select,
+td input[type="text"],
+td input[type="number"],
+td input[type="date"],
+.posibilidad {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--select-border);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus,
+td input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(47, 90, 143, 0.2);
+    border-radius: var(--radius-sm);
+}
+
+.resultado {
+    border-radius: var(--radius-sm);
+}
+
+/* ===== Asistente de IA: pestana con icono y etiqueta ===== */
+.asistente-toggle {
+    width: auto;
+    height: auto;
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+}
+
+.asistente-toggle:hover {
+    transform: none;
+}
+
+.asistente-toggle svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+}
+
+.asistente-panel {
+    border-radius: var(--radius-md);
+    bottom: 4.5rem;
+}
+
+.asistente-header {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.asistente-msg {
+    border-radius: var(--radius-md);
+}
+
+.asistente-form textarea,
+.asistente-adjuntar,
+.asistente-mic,
+.asistente-enviar {
+    border-radius: var(--radius-sm);
+}
+
+.asistente-adjuntar svg,
+.asistente-mic svg,
+.asistente-enviar svg,
+.asistente-cerrar svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: 0 auto;
+}
+
+.asistente-adjunto-quitar svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.asistente-archivo-botones .btn-secondary {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+/* ===== Pantallas pequenas ===== */
+@media (max-width: 768px) {
+    header {
+        padding: 0.6rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        text-align: left;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .asistente-toggle span {
+        display: none;
+    }
+
+    .asistente-toggle {
+        padding: 0.7rem;
+    }
+}
+
+/* ===== Ajustes de paginas concretas ===== */
+
+/* index: el titulo del menu es mas sobrio, centrado y sin linea (no es un titulo de formulario) */
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 2.5rem;
+    letter-spacing: 0;
+}
+
+/* Botones "agregar" de diagrama y prevenir: antes llevaban un degradado verde inline (quitado del
+   HTML); ahora son botones de contorno azul marino. */
+#agregarTareaBtn,
+#agregarTablaBtn {
+    background: var(--surface);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+#agregarTareaBtn:hover,
+#agregarTablaBtn:hover {
+    background: var(--primary);
+    color: var(--text-light);
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] #agregarTareaBtn,
+[data-theme="dark"] #agregarTablaBtn {
+    color: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+[data-theme="dark"] #agregarTareaBtn:hover,
+[data-theme="dark"] #agregarTablaBtn:hover {
+    background: var(--primary);
+    color: var(--text-light);
+}
+
+/* Botones de eliminar: rojo apagado (antes #c0392b brillante) */
+.btn-eliminar-fila,
+.btn-eliminar-tabla {
+    background: var(--surface);
+    color: var(--error);
+    border: 1px solid var(--error);
+}
+
+.btn-eliminar-fila:hover,
+.btn-eliminar-tabla:hover {
+    background: var(--error);
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .btn-eliminar-fila:hover,
+[data-theme="dark"] .btn-eliminar-tabla:hover {
+    color: #0f141b;
+}
