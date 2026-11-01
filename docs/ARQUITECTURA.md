@@ -122,3 +122,5 @@ Al agregar código nuevo, mantén esta convención. Todo texto escrito por el us
 Abrir `index.html` en el navegador y recorrer el flujo. No hay suite de pruebas automáticas;
 esta reorganización se verificó con Playwright comparando capturas, `localStorage`, PDF
 generado y estilos computados contra la versión original.
+
+**Tema corporativo:** `css/corporate.css` es una capa que se carga como ÚLTIMA hoja de estilos en las 12 páginas y sobrescribe a `base.css`, `css/pages/*.css` y `css/components/asistente.css`: paleta (variables de tema claro y oscuro), tipografía IBM Plex Sans (enlace a Google Fonts en cada HTML), cabecera baja con el título a la izquierda, títulos alineados a la izquierda con línea fina, esquinas de 4 a 6 px, tablas con encabezado en mayúsculas pequeñas y botones planos. Los iconos son SVG en el código (`js/core/theme.js`, `js/features/assistant.js`, `diagrama.js`, `prevenir.js`, `seleccionEvaluar.js`), sin emojis ni banderas. Para volver al aspecto anterior basta quitar el `<link>` de `corporate.css`. Para cambiar colores o el radio de esquina, editar solo las variables del principio de ese archivo.
